@@ -1,0 +1,829 @@
+<!doctype html>
+<html lang="ro">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Laborator 2 – Partea B</title>
+<style>
+:root {
+  --bg: #fbfaf8; --surface: #ffffff; --text: #1d1d1f; --muted: #6b6b70; --border: #e3e1dc;
+  --accent: #2f5fb3; --accent-soft: #e9effa; --code-bg: #f3f2ef; --term-bg: #1e1f24; --term-text: #e6e6e6;
+  --ok: #1f7a3d; --ok-soft: #e4f3e9; --bad: #b3261e; --bad-soft: #fbe9e7; --warn: #8a5a00; --warn-soft: #fdf3dc;
+  --hist: #5a4fb3; --hist-soft: #ecebfa;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #141517; --surface: #1c1d21; --text: #e8e8ea; --muted: #9a9aa2; --border: #2e3036;
+    --accent: #8ab0f0; --accent-soft: #1f2a3d; --code-bg: #25272c; --term-bg: #0e0f11; --term-text: #dcdcdc;
+    --ok: #6fd08f; --ok-soft: #173222; --bad: #f08b84; --bad-soft: #3a1d1b; --warn: #e8bf6a; --warn-soft: #33290f;
+    --hist: #b3abf5; --hist-soft: #26233f;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #141517; --surface: #1c1d21; --text: #e8e8ea; --muted: #9a9aa2; --border: #2e3036;
+  --accent: #8ab0f0; --accent-soft: #1f2a3d; --code-bg: #25272c; --term-bg: #0e0f11; --term-text: #dcdcdc;
+  --ok: #6fd08f; --ok-soft: #173222; --bad: #f08b84; --bad-soft: #3a1d1b; --warn: #e8bf6a; --warn-soft: #33290f;
+  --hist: #b3abf5; --hist-soft: #26233f;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--text);
+  font: 16px/1.6 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+main { max-width: 1040px; margin: 0 auto; padding: 32px 16px 80px; }
+header h1 { font-size: 1.9rem; margin: 0 0 4px; letter-spacing: -0.01em; }
+header .sub { color: var(--muted); margin: 0 0 16px; }
+nav { position: sticky; top: 0; z-index: 5; background: var(--bg); padding: 10px 0; margin-bottom: 8px;
+  border-bottom: 1px solid var(--border); display: flex; gap: 6px; flex-wrap: wrap; }
+nav a { text-decoration: none; color: var(--accent); background: var(--accent-soft); padding: 3px 12px;
+  border-radius: 999px; font-weight: 600; font-size: .9rem; }
+section { background: var(--surface); border: 1px solid var(--border); border-radius: 12px;
+  padding: 20px 22px; margin: 22px 0; }
+h2 { margin: 0 0 8px; font-size: 1.35rem; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+h3 { font-size: 1rem; margin: 20px 0 8px; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; }
+.ex { background: var(--accent); color: var(--surface); border-radius: 6px; padding: 0 8px; font-size: 1rem; }
+.opt { font-size: .75rem; font-weight: 600; color: var(--warn); background: var(--warn-soft);
+  padding: 1px 8px; border-radius: 999px; }
+.task { color: var(--muted); border-left: 3px solid var(--border); padding-left: 12px; margin: 6px 0 0; }
+code { font-family: ui-monospace, "Cascadia Code", Consolas, monospace; font-size: .86em;
+  background: var(--code-bg); padding: 1px 5px; border-radius: 4px; overflow-wrap: anywhere; }
+pre { font-family: ui-monospace, "Cascadia Code", Consolas, monospace; font-size: .8rem; line-height: 1.5;
+  padding: 12px 14px; border-radius: 8px; overflow-x: auto; margin: 8px 0; }
+pre.log { background: var(--code-bg); color: var(--text); white-space: pre; }
+pre.term { background: var(--term-bg); color: var(--term-text); white-space: pre-wrap; }
+.table-wrap { overflow-x: auto; margin: 8px 0; }
+table { border-collapse: collapse; width: 100%; font-size: .9rem; margin: 0; }
+th, td { border-bottom: 1px solid var(--border); padding: 7px 10px; text-align: left; vertical-align: top; }
+th { font-weight: 600; background: var(--code-bg); }
+td.num { text-align: center; white-space: nowrap; font-variant-numeric: tabular-nums; }
+td.flow { font-size: .78rem; color: var(--muted); }
+td.flow sub { font-size: .7em; }
+tr.total td { font-weight: 600; background: var(--code-bg); }
+td.pass { color: var(--ok); font-weight: 600; white-space: nowrap; }
+td.fail { color: var(--bad); font-weight: 600; white-space: nowrap; }
+.muted { color: var(--muted); font-size: .9em; }
+.tag { font-size: .72rem; font-weight: 700; padding: 1px 7px; border-radius: 999px; white-space: nowrap; }
+.tag.ok { color: var(--ok); background: var(--ok-soft); }
+.tag.bad { color: var(--bad); background: var(--bad-soft); }
+.tag.miss { color: var(--warn); background: var(--warn-soft); }
+.tag.hist { color: var(--hist); background: var(--hist-soft); }
+.callout { background: var(--accent-soft); border-radius: 8px; padding: 10px 14px; margin: 12px 0 4px; font-size: .93rem; }
+.callout.warn { background: var(--warn-soft); }
+ul { padding-left: 20px; }
+li { margin: 6px 0; }
+details { margin: 8px 0; border: 1px solid var(--border); border-radius: 8px; padding: 4px 12px; }
+details summary { cursor: pointer; font-weight: 600; font-size: .9rem; padding: 4px 0; color: var(--accent); }
+.meta { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 10px; margin: 14px 0; }
+.meta div { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 10px 14px; }
+.meta b { display: block; font-size: .75rem; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; }
+.score { font-size: 1.5rem; font-weight: 700; color: var(--ok); }
+</style>
+</head>
+<body>
+<main>
+<header>
+<h1>Laborator 2 – Partea B</h1>
+<p class="sub">Exercițiile 4.3: instrumente cu efecte (modificatori). Toate rezultatele sunt din rulări reale, pe 22.10.2026.</p>
+<div class="meta">
+<div><b>B1–B3</b>MCP Inspector CLI + client FastMCP</div>
+<div><b>B4–B6</b>mock (<code>mock-1</code>) prin <code>chat.py</code></div>
+<div><b>B7</b><code>gemini-3.5-flash-lite</code></div>
+<div><b>Verificări automate</b><span class="score">33/33</span> trecute</div>
+</div>
+</header>
+<nav><a href="#b1">B1</a><a href="#b2">B2</a><a href="#b3">B3</a><a href="#b4">B4</a><a href="#b5">B5</a><a href="#b6">B6</a><a href="#b7">B7</a><a href="#teste">Teste</a></nav>
+
+<section id="b1">
+<h2><span class="ex">B1</span> Adnotările în Inspector</h2>
+<p class="task">În Tools verificați că apar opt instrumente; cu <code>--cli … --method tools/list</code> găsiți câmpul <code>annotations</code>. Care au <code>readOnlyHint: true</code>? Ce valoare are <code>destructiveHint</code> la <code>reset_building</code>?</p>
+<h3>Comanda rulată</h3>
+<pre class="term">npx @modelcontextprotocol/inspector --cli .venv/Scripts/python.exe server.py --method tools/list</pre>
+<h3>Rezultat: câmpul <code>annotations</code></h3>
+<div class="table-wrap"><table><thead><tr><th>Instrument</th><th>readOnlyHint</th><th>destructiveHint</th><th>idempotentHint</th><th>openWorldHint</th></tr></thead>
+<tbody><tr><td><code>list_devices</code></td><td class='num'>true</td><td class='num'>—</td><td class='num'>—</td><td class='num'>—</td></tr><tr><td><code>get_device_info</code></td><td class='num'>true</td><td class='num'>—</td><td class='num'>—</td><td class='num'>—</td></tr><tr><td><code>check_conflict</code></td><td class='num'>true</td><td class='num'>—</td><td class='num'>—</td><td class='num'>—</td></tr><tr><td><code>estimate_energy</code></td><td class='num'>true</td><td class='num'>—</td><td class='num'>—</td><td class='num'>—</td></tr><tr><td><code>get_building_state</code></td><td class='num'>true</td><td class='num'>—</td><td class='num'>—</td><td class='num'>—</td></tr><tr><td><code>set_device_state</code></td><td class='num'>false</td><td class='num'>false</td><td class='num'>true</td><td class='num'>—</td></tr><tr><td><code>set_thermostat</code></td><td class='num'>false</td><td class='num'>false</td><td class='num'>true</td><td class='num'>—</td></tr><tr><td><code>reset_building</code></td><td class='num'>false</td><td class='num'>true</td><td class='num'>true</td><td class='num'>—</td></tr></tbody></table></div>
+<h3>Răspuns</h3>
+<ul>
+<li>Apar <b>8 instrumente</b>: cele 5 din Laboratorul 1, plus <code>get_building_state</code> (citire) și trei noi cu efecte (<code>set_device_state</code>, <code>set_thermostat</code>, <code>reset_building</code>).</li>
+<li><b><code>readOnlyHint: true</code></b> au: <code>list_devices</code>, <code>get_device_info</code>, <code>check_conflict</code>, <code>estimate_energy</code>, <code>get_building_state</code>.</li>
+<li><b><code>reset_building</code></b> are <code>destructiveHint: <b>true</b></code> (și <code>readOnlyHint: false</code>, <code>idempotentHint: true</code>). <code>set_device_state</code> și <code>set_thermostat</code> au <code>destructiveHint: false</code>, pentru că efectul lor se anulează cu un alt apel.</li>
+<li>Instrumentele de citire declară <b>doar</b> <code>readOnlyHint</code>; celelalte câmpuri lipsesc („—”). Niciun instrument nu declară <code>openWorldHint</code>, deci după specificație valoarea implicită este <code>true</code>, deși serverul nu iese din proces. Adnotările sunt indicii: agentul le citește în <code>tool_flags</code>, dar nu le poate verifica.</li>
+<li>Schema lui <code>set_thermostat</code> conține limitele din <code>Field(ge=10, le=30)</code>; așa le vede și modelul:</li>
+</ul>
+<pre class="log">{
+  &quot;type&quot;: &quot;object&quot;,
+  &quot;properties&quot;: {
+    &quot;temp_c&quot;: {
+      &quot;description&quot;: &quot;Temperatura dorită, în grade Celsius (10-30).&quot;,
+      &quot;maximum&quot;: 30,
+      &quot;minimum&quot;: 10,
+      &quot;type&quot;: &quot;number&quot;
+    }
+  },
+  &quot;required&quot;: [
+    &quot;temp_c&quot;
+  ],
+  &quot;additionalProperties&quot;: false
+}</pre>
+<div class="callout"><b>Notă:</b> interfața web a Inspector-ului (tab-ul Tools) folosește exact aceeași cerere <code>tools/list</code>. Aici am verificat numărul de instrumente din ieșirea CLI, deci nu există o captură de ecran din interfața web.</div>
+<details><summary>Ieșirea completă tools/list (JSON)</summary><pre class="log">{
+  &quot;tools&quot;: [
+    {
+      &quot;name&quot;: &quot;list_devices&quot;,
+      &quot;title&quot;: &quot;List Devices&quot;,
+      &quot;description&quot;: &quot;Returnează numele tuturor dispozitivelor cunoscute din clădire.&quot;,
+      &quot;inputSchema&quot;: {
+        &quot;type&quot;: &quot;object&quot;,
+        &quot;properties&quot;: {},
+        &quot;additionalProperties&quot;: false
+      },
+      &quot;outputSchema&quot;: {
+        &quot;type&quot;: &quot;object&quot;,
+        &quot;properties&quot;: {
+          &quot;result&quot;: {
+            &quot;items&quot;: {
+              &quot;type&quot;: &quot;string&quot;
+            },
+            &quot;type&quot;: &quot;array&quot;
+          }
+        },
+        &quot;required&quot;: [
+          &quot;result&quot;
+        ],
+        &quot;x-fastmcp-wrap-result&quot;: true
+      },
+      &quot;annotations&quot;: {
+        &quot;readOnlyHint&quot;: true
+      },
+      &quot;_meta&quot;: {
+        &quot;fastmcp&quot;: {
+          &quot;tags&quot;: []
+        }
+      }
+    },
+    {
+      &quot;name&quot;: &quot;get_device_info&quot;,
+      &quot;title&quot;: &quot;Get Device Info&quot;,
+      &quot;description&quot;: &quot;Returnează informații de bază despre un dispozitiv (categorie, putere în W, note).&quot;,
+      &quot;inputSchema&quot;: {
+        &quot;type&quot;: &quot;object&quot;,
+        &quot;properties&quot;: {
+          &quot;name&quot;: {
+            &quot;type&quot;: &quot;string&quot;
+          }
+        },
+        &quot;required&quot;: [
+          &quot;name&quot;
+        ],
+        &quot;additionalProperties&quot;: false
+      },
+      &quot;outputSchema&quot;: {
+        &quot;type&quot;: &quot;object&quot;,
+        &quot;additionalProperties&quot;: true
+      },
+      &quot;annotations&quot;: {
+        &quot;readOnlyHint&quot;: true
+      },
+      &quot;_meta&quot;: {
+        &quot;fastmcp&quot;: {
+          &quot;tags&quot;: []
+        }
+      }
+    },
+    {
+      &quot;name&quot;: &quot;check_conflict&quot;,
+      &quot;title&quot;: &quot;Check Conflict&quot;,
+      &quot;description&quot;: &quot;Verifică dacă două dispozitive au un conflict de funcționare cunoscut.&quot;,
+      &quot;inputSchema&quot;: {
+        &quot;type&quot;: &quot;object&quot;,
+        &quot;properties&quot;: {
+          &quot;device_a&quot;: {
+            &quot;type&quot;: &quot;string&quot;
+          },
+          &quot;device_b&quot;: {
+            &quot;type&quot;: &quot;string&quot;
+          }
+        },
+        &quot;required&quot;: [
+          &quot;device_a&quot;,
+          &quot;device_b&quot;
+        ],
+        &quot;additionalProperties&quot;: false
+      },
+      &quot;outputSchema&quot;: {
+        &quot;type&quot;: &quot;object&quot;,
+        &quot;properties&quot;: {
+          &quot;result&quot;: {
+            &quot;type&quot;: &quot;string&quot;
+          }
+        },
+        &quot;required&quot;: [
+          &quot;result&quot;
+        ],
+        &quot;x-fastmcp-wrap-result&quot;: true
+      },
+      &quot;annotations&quot;: {
+        &quot;readOnlyHint&quot;: true
+      },
+      &quot;_meta&quot;: {
+        &quot;fastmcp&quot;: {
+          &quot;tags&quot;: []
+        }
+      }
+    },
+    {
+      &quot;name&quot;: &quot;estimate_energy&quot;,
+      &quot;title&quot;: &quot;Estimate Energy&quot;,
+      &quot;description&quot;: &quot;Estimează energia consumată (în kWh) de un dispozitiv care funcționează un număr de ore.&quot;,
+      &quot;inputSchema&quot;: {
+        &quot;type&quot;: &quot;object&quot;,
+        &quot;properties&quot;: {
+          &quot;name&quot;: {
+            &quot;type&quot;: &quot;string&quot;
+          },
+          &quot;hours&quot;: {
+            &quot;type&quot;: &quot;number&quot;
+          }
+        },
+        &quot;required&quot;: [
+          &quot;name&quot;,
+          &quot;hours&quot;
+        ],
+        &quot;additionalProperties&quot;: false
+      },
+      &quot;outputSchema&quot;: {
+        &quot;type&quot;: &quot;object&quot;,
+        &quot;additionalProperties&quot;: true
+      },
+      &quot;annotations&quot;: {
+        &quot;readOnlyHint&quot;: true
+      },
+      &quot;_meta&quot;: {
+        &quot;fastmcp&quot;: {
+          &quot;tags&quot;: []
+        }
+      }
+    },
+    {
+      &quot;name&quot;: &quot;get_building_state&quot;,
+      &quot;title&quot;: &quot;Get Building State&quot;,
+      &quot;description&quot;: &quot;Returnează starea curentă a clădirii: dispozitivele pornite și temperatura dorită a termostatului.&quot;,
+      &quot;inputSchema&quot;: {
+        &quot;type&quot;: &quot;object&quot;,
+        &quot;properties&quot;: {},
+        &quot;additionalProperties&quot;: false
+      },
+      &quot;outputSchema&quot;: {
+        &quot;type&quot;: &quot;object&quot;,
+        &quot;additionalProperties&quot;: true
+      },
+      &quot;annotations&quot;: {
+        &quot;readOnlyHint&quot;: true
+      },
+      &quot;_meta&quot;: {
+        &quot;fastmcp&quot;: {
+          &quot;tags&quot;: []
+        }
+      }
+    },
+    {
+      &quot;name&quot;: &quot;set_device_state&quot;,
+      &quot;title&quot;: &quot;Set Device State&quot;,
+      &quot;description&quot;: &quot;Pornește (on=true) sau oprește (on=false) un dispozitiv.\n\nRefuză pornirea dacă ar crea un conflict de nivel RIDICAT cu un dispozitiv deja pornit.&quot;,
+      &quot;inputSchema&quot;: {
+        &quot;type&quot;: &quot;object&quot;,
+        &quot;properties&quot;: {
+          &quot;name&quot;: {
+            &quot;type&quot;: &quot;string&quot;
+          },
+          &quot;on&quot;: {
+            &quot;type&quot;: &quot;boolean&quot;
+          }
+        },
+        &quot;required&quot;: [
+          &quot;name&quot;,
+          &quot;on&quot;
+        ],
+        &quot;additionalProperties&quot;: false
+      },
+      &quot;outputSchema&quot;: {
+        &quot;type&quot;: &quot;object&quot;,
+        &quot;additionalProperties&quot;: true
+      },
+      &quot;annotations&quot;: {
+        &quot;readOnlyHint&quot;: false,
+        &quot;destructiveHint&quot;: false,
+        &quot;idempotentHint&quot;: true
+      },
+      &quot;_meta&quot;: {
+        &quot;fastmcp&quot;: {
+          &quot;tags&quot;: []
+        }
+      }
+    },
+    {
+      &quot;name&quot;: &quot;set_thermostat&quot;,
+      &quot;title&quot;: &quot;Set Thermostat&quot;,
+      &quot;description&quot;: &quot;Setează temperatura dorită a termostatului camerei.&quot;,
+      &quot;inputSchema&quot;: {
+        &quot;type&quot;: &quot;object&quot;,
+        &quot;properties&quot;: {
+          &quot;temp_c&quot;: {
+            &quot;description&quot;: &quot;Temperatura dorită, în grade Celsius (10-30).&quot;,
+            &quot;maximum&quot;: 30,
+            &quot;minimum&quot;: 10,
+            &quot;type&quot;: &quot;number&quot;
+          }
+        },
+        &quot;required&quot;: [
+          &quot;temp_c&quot;
+        ],
+        &quot;additionalProperties&quot;: false
+      },
+      &quot;outputSchema&quot;: {
+        &quot;type&quot;: &quot;object&quot;,
+        &quot;additionalProperties&quot;: true
+      },
+      &quot;annotations&quot;: {
+        &quot;readOnlyHint&quot;: false,
+        &quot;destructiveHint&quot;: false,
+        &quot;idempotentHint&quot;: true
+      },
+      &quot;_meta&quot;: {
+        &quot;fastmcp&quot;: {
+          &quot;tags&quot;: []
+        }
+      }
+    },
+    {
+      &quot;name&quot;: &quot;reset_building&quot;,
+      &quot;title&quot;: &quot;Reset Building&quot;,
+      &quot;description&quot;: &quot;Oprește toate dispozitivele și readuce termostatul la 21 °C. Șterge starea curentă a clădirii.&quot;,
+      &quot;inputSchema&quot;: {
+        &quot;type&quot;: &quot;object&quot;,
+        &quot;properties&quot;: {},
+        &quot;additionalProperties&quot;: false
+      },
+      &quot;outputSchema&quot;: {
+        &quot;type&quot;: &quot;object&quot;,
+        &quot;additionalProperties&quot;: true
+      },
+      &quot;annotations&quot;: {
+        &quot;readOnlyHint&quot;: false,
+        &quot;destructiveHint&quot;: true,
+        &quot;idempotentHint&quot;: true
+      },
+      &quot;_meta&quot;: {
+        &quot;fastmcp&quot;: {
+          &quot;tags&quot;: []
+        }
+      }
+    }
+  ]
+}</pre></details>
+</section>
+<section id="b2">
+<h2><span class="ex">B2</span> Validarea schemei</h2>
+<p class="task"><code>set_thermostat</code> cu 24, apoi cu 50. Ce returnează serverul? Excepție sau eroare de execuție (<code>isError</code>)? Ajunge funcția să ruleze? Comparați cu <code>hours=abc</code> din Laboratorul 1.</p>
+<h3>Rezultat (Inspector CLI)</h3>
+<pre class="term">npx @modelcontextprotocol/inspector --cli .venv/Scripts/python.exe server.py --method tools/call --tool-name set_thermostat --tool-arg temp_c=24</pre>
+<pre class="log">{
+  &quot;content&quot;: [
+    {
+      &quot;type&quot;: &quot;text&quot;,
+      &quot;text&quot;: &quot;{\&quot;ok\&quot;:true,\&quot;temp_c\&quot;:24.0}&quot;
+    }
+  ],
+  &quot;structuredContent&quot;: {
+    &quot;ok&quot;: true,
+    &quot;temp_c&quot;: 24
+  },
+  &quot;isError&quot;: false
+}</pre>
+<pre class="term">npx @modelcontextprotocol/inspector --cli .venv/Scripts/python.exe server.py --method tools/call --tool-name set_thermostat --tool-arg temp_c=50</pre>
+<pre class="log">{
+  &quot;content&quot;: [
+    {
+      &quot;type&quot;: &quot;text&quot;,
+      &quot;text&quot;: &quot;1 validation error for call[set_thermostat]\ntemp_c\n  Input should be less than or equal to 30 [type=less_than_equal, input_value=50, input_type=int]\n    For further information visit https://errors.pydantic.dev/2.14/v/less_than_equal&quot;
+    }
+  ],
+  &quot;isError&quot;: true
+}</pre>
+<p class="muted">stderr al serverului: <code>WARNING Invalid arguments for tool 'set_thermostat': {'error_count': 1, 'error_types': ['less_than_equal']}</code></p>
+<h3>Răspuns</h3>
+<ul>
+<li>La <b>24</b>: <code>{"ok": true, "temp_c": 24.0}</code>, cu <code>isError: false</code>.</li>
+<li>La <b>50</b>: serverul întoarce un rezultat normal MCP cu <code>isError: true</code> și textul <i>„Input should be less than or equal to 30 [type=less_than_equal, input_value=50]”</i>. Este o <b>eroare de execuție a instrumentului</b>, nu o excepție de protocol (eroare JSON-RPC). Linia <code>{"error":{"code":"tool_is_error"…}}</code> o adaugă doar Inspector CLI, ca rezumat. Modelul ar primi textul erorii și s-ar putea corecta.</li>
+<li><b>Funcția nu rulează.</b> FastMCP validează argumentele cu schema înainte de apel. Dovada (vezi B3, aceeași conexiune): după <code>set_thermostat(24)</code> și <code>set_thermostat(50)</code>, <code>get_building_state</code> arată <code>termostat_c: 24.0</code>, nu 50.</li>
+<li><b>Comparație cu <code>hours=abc</code> (Laboratorul 1):</b> mecanismul e același (validare Pydantic pe server, <code>isError: true</code>, funcția nu rulează). Diferă tipul erorii. Atunci era o eroare de <b>tip</b> (<code>float_type</code>, „abc” nu e număr), venită din adnotarea <code>hours: float</code>. Acum e o eroare de <b>domeniu</b> (<code>less_than_equal</code>): 50 este un număr valid, dar în afara intervalului <code>Field(ge=10, le=30)</code>. Constrângerea de domeniu apare în schemă (<code>minimum</code>/<code>maximum</code>), deci modelul o vede înainte să apeleze.</li>
+</ul>
+</section>
+<section id="b3">
+<h2><span class="ex">B3</span> Regula de domeniu</h2>
+<p class="task"><code>set_device_state</code> radiator=true, apoi aer_conditionat=true; <code>get_building_state</code>; reconectare. Ce stare găsiți și de ce?</p>
+<h3>Rezultat: o singură conexiune, apoi reconectare</h3>
+<p class="muted">Ca în Inspector-ul web: un client FastMCP deschide <b>o conexiune</b> (un proces de server), face apelurile B2 și B3, se deconectează, apoi se reconectează.</p>
+<div class="table-wrap"><table><thead><tr><th>Conexiune</th><th>Apel</th><th>isError</th><th>Rezultat</th></tr></thead><tbody><tr><td>1</td><td><code>set_thermostat({&quot;temp_c&quot;: 24})</code></td><td class='num '>false</td><td><code>{&quot;ok&quot;:true,&quot;temp_c&quot;:24.0}</code></td></tr><tr><td>1</td><td><code>set_thermostat({&quot;temp_c&quot;: 50})</code></td><td class='num fail'>true</td><td><code>1 validation error for call[set_thermostat]
+temp_c
+  Input should be less than or equal to 30 [type=less_than_equal, input_value=50, input_type=int]
+    For further infor</code></td></tr><tr><td>1</td><td><code>get_building_state({})</code></td><td class='num '>false</td><td><code>{&quot;pornite&quot;:[],&quot;termostat_c&quot;:24.0}</code></td></tr><tr><td>1</td><td><code>set_device_state({&quot;name&quot;: &quot;radiator&quot;, &quot;on&quot;: true})</code></td><td class='num '>false</td><td><code>{&quot;ok&quot;:true,&quot;nume&quot;:&quot;radiator&quot;,&quot;pornit&quot;:true}</code></td></tr><tr><td>1</td><td><code>set_device_state({&quot;name&quot;: &quot;aer_conditionat&quot;, &quot;on&quot;: true})</code></td><td class='num '>false</td><td><code>{&quot;ok&quot;:false,&quot;motiv&quot;:&quot;Conflict cu radiator, care este pornit: RIDICAT - încălzire și răcire simultană, consum inutil.&quot;}</code></td></tr><tr><td>1</td><td><code>get_building_state({})</code></td><td class='num '>false</td><td><code>{&quot;pornite&quot;:[&quot;radiator&quot;],&quot;termostat_c&quot;:24.0}</code></td></tr><tr><td>2</td><td><code>get_building_state({})</code></td><td class='num '>false</td><td><code>{&quot;pornite&quot;:[],&quot;termostat_c&quot;:21.0}</code></td></tr></tbody></table></div>
+<h3>Răspuns</h3>
+<ul>
+<li>Al doilea apel întoarce <code>{&quot;ok&quot;:false,&quot;motiv&quot;:&quot;Conflict cu radiator, care este pornit: RIDICAT - încălzire și răcire simultană, consum inutil.&quot;}</code>. Refuzul este o <b>dată</b> (<code>ok: false</code> + <code>motiv</code>, cu <code>isError: false</code>), nu o eroare de validare. Schema era respectată; regula de domeniu din corpul funcției a oprit acțiunea.</li>
+<li><code>get_building_state</code> în aceeași conexiune arată <code>pornite: ["radiator"]</code> (și termostatul la 24 de la B2).</li>
+<li><b>După reconectare</b> starea e cea inițială: <code>pornite: []</code>, <code>termostat_c: 21.0</code>. Inspector pornește <code>server.py</code> ca <b>proces copil nou</b> la fiecare conexiune, iar starea (<code>PORNITE</code>, <code>TERMOSTAT</code>) trăiește în variabilele globale ale procesului. Procesul vechi s-a oprit și starea s-a pierdut. Din același motiv, starea din Inspector și cea din agent (<code>chat.py</code> pornește propriul proces de server) nu se văd între ele.</li>
+</ul>
+<div class="callout warn"><b>Capcană observată cu Inspector CLI:</b> fiecare comandă <code>--cli … tools/call</code> pornește un proces nou de server. Rulat așa, exercițiul dă alt rezultat: <code>aer_conditionat</code> pornește <b>cu succes</b>, pentru că în procesul nou radiatorul nu e pornit, iar <code>get_building_state</code> întoarce mereu starea goală. Regula de domeniu se poate testa doar într-o conexiune care rămâne deschisă (Inspector web sau un client propriu).</div>
+<details><summary>Ieșirile Inspector CLI (3 procese separate)</summary><pre class="log">{
+  &quot;content&quot;: [
+    {
+      &quot;type&quot;: &quot;text&quot;,
+      &quot;text&quot;: &quot;{\&quot;ok\&quot;:true,\&quot;nume\&quot;:\&quot;radiator\&quot;,\&quot;pornit\&quot;:true}&quot;
+    }
+  ],
+  &quot;structuredContent&quot;: {
+    &quot;ok&quot;: true,
+    &quot;nume&quot;: &quot;radiator&quot;,
+    &quot;pornit&quot;: true
+  },
+  &quot;isError&quot;: false
+}
+
+{
+  &quot;content&quot;: [
+    {
+      &quot;type&quot;: &quot;text&quot;,
+      &quot;text&quot;: &quot;{\&quot;ok\&quot;:true,\&quot;nume\&quot;:\&quot;aer_conditionat\&quot;,\&quot;pornit\&quot;:true}&quot;
+    }
+  ],
+  &quot;structuredContent&quot;: {
+    &quot;ok&quot;: true,
+    &quot;nume&quot;: &quot;aer_conditionat&quot;,
+    &quot;pornit&quot;: true
+  },
+  &quot;isError&quot;: false
+}
+
+{
+  &quot;content&quot;: [
+    {
+      &quot;type&quot;: &quot;text&quot;,
+      &quot;text&quot;: &quot;{\&quot;pornite\&quot;:[],\&quot;termostat_c\&quot;:21.0}&quot;
+    }
+  ],
+  &quot;structuredContent&quot;: {
+    &quot;pornite&quot;: [],
+    &quot;termostat_c&quot;: 21
+  },
+  &quot;isError&quot;: false
+}</pre></details>
+</section>
+<section id="b4">
+<h2><span class="ex">B4</span> Confirmarea (mock)</h2>
+<p class="task">„Pornește radiatorul” (d), „Pornește aerul condiționat” (d), „Ce este pornit acum?”. Pentru care a cerut acordul? De ce? Câte apeluri au modificat efectiv starea?</p>
+<h3>Rezultat</h3>
+<div class="table-wrap"><table><thead><tr><th>#</th><th>Întrebare</th><th>Apel · confirmare · rezultat</th></tr></thead><tbody><tr><td>1</td><td>Pornește radiatorul</td><td><code>set_device_state({&quot;name&quot;: &quot;radiator&quot;, &quot;on&quot;: true})</code> <span class='tag ok'>aprobat</span><br><span class='muted'>→ {&quot;ok&quot;:true,&quot;nume&quot;:&quot;radiator&quot;,&quot;pornit&quot;:true}</span></td></tr><tr><td>2</td><td>Pornește aerul condiționat</td><td><code>set_device_state({&quot;name&quot;: &quot;aer_conditionat&quot;, &quot;on&quot;: true})</code> <span class='tag ok'>aprobat</span><br><span class='muted'>→ {&quot;ok&quot;:false,&quot;motiv&quot;:&quot;Conflict cu radiator, care este pornit: RIDICAT - încălzire și răcire simultană, consum inutil.&quot;}</span></td></tr><tr><td>3</td><td>Ce este pornit acum?</td><td><code>get_building_state({})</code> <span class='muted'>fără confirmare</span><br><span class='muted'>→ {&quot;pornite&quot;:[&quot;radiator&quot;],&quot;termostat_c&quot;:21.0}</span></td></tr></tbody></table></div>
+<h3>Răspuns</h3>
+<ul>
+<li>Agentul a cerut acordul la <b>primele două</b> întrebări (<code>set_device_state</code>) și <b>nu</b> l-a cerut la „Ce este pornit acum?” (<code>get_building_state</code>).</li>
+<li>Motivul: politica de refuz implicit din <code>call_tool</code>. Cere confirmare pentru orice instrument care nu declară <code>readOnlyHint: true</code>. <code>set_device_state</code> are <code>readOnlyHint: false</code>, iar <code>get_building_state</code> are <code>true</code>. Fără eticheta <code>[DISTRUCTIV]</code>, pentru că <code>destructiveHint</code> e <code>false</code>.</li>
+<li><b>Un singur apel</b> a modificat efectiv starea: pornirea radiatorului. Pornirea aerului condiționat a fost aprobată de om, dar respinsă de regula de domeniu din server (<code>ok: false</code>, conflict RIDICAT). Confirmarea omului nu ocolește celelalte straturi de protecție. În log, acest refuz apare cu <code>eroare: false</code>, fiind o dată, nu o eroare.</li>
+</ul>
+<details><summary>Transcriptul chat.py</summary><pre class="term">Tu:   ? Agentul vrea să ruleze set_device_state({&#x27;name&#x27;: &#x27;radiator&#x27;, &#x27;on&#x27;: True}). Permiteți? [d/N]   [instrument] set_device_state({&#x27;name&#x27;: &#x27;radiator&#x27;, &#x27;on&#x27;: True}) -&gt; {&quot;ok&quot;:true,&quot;nume&quot;:&quot;radiator&quot;,&quot;pornit&quot;:true}
+Agent: [mock] Rezultatele instrumentelor:
+- {&quot;ok&quot;:true,&quot;nume&quot;:&quot;radiator&quot;,&quot;pornit&quot;:true} 
+
+Tu:   ? Agentul vrea să ruleze set_device_state({&#x27;name&#x27;: &#x27;aer_conditionat&#x27;, &#x27;on&#x27;: True}). Permiteți? [d/N]   [instrument] set_device_state({&#x27;name&#x27;: &#x27;aer_conditionat&#x27;, &#x27;on&#x27;: True}) -&gt; {&quot;ok&quot;:false,&quot;motiv&quot;:&quot;Conflict cu radiator, care este pornit: RIDICAT - încălzire și răcire simultană, consum inutil.&quot;}
+Agent: [mock] Rezultatele instrumentelor:
+- {&quot;ok&quot;:false,&quot;motiv&quot;:&quot;Conflict cu radiator, care este pornit: RIDICAT - încălzire și răcire simultană, consum inutil.&quot;} 
+
+Tu:   [instrument] get_building_state({}) -&gt; {&quot;pornite&quot;:[&quot;radiator&quot;],&quot;termostat_c&quot;:21.0}
+Agent: [mock] Rezultatele instrumentelor:
+- {&quot;pornite&quot;:[&quot;radiator&quot;],&quot;termostat_c&quot;:21.0}</pre></details>
+<details><summary>Logul complet (logs\agent-20261022-195705.jsonl)</summary><pre class="log">{&quot;ts&quot;: &quot;2026-10-22T19:57:05.684&quot;, &quot;tip&quot;: &quot;reset&quot;}
+{&quot;ts&quot;: &quot;2026-10-22T19:57:07.330&quot;, &quot;tip&quot;: &quot;intrebare&quot;, &quot;text&quot;: &quot;Pornește radiatorul&quot;, &quot;mesaje_taiate&quot;: 0}
+{&quot;ts&quot;: &quot;2026-10-22T19:57:07.333&quot;, &quot;tip&quot;: &quot;cerere_model&quot;, &quot;pas&quot;: 1, &quot;mesaje&quot;: 2, &quot;durata_ms&quot;: 2, &quot;prompt_tokens&quot;: 94}
+{&quot;ts&quot;: &quot;2026-10-22T19:57:07.333&quot;, &quot;tip&quot;: &quot;apel&quot;, &quot;pas&quot;: 1, &quot;nume&quot;: &quot;set_device_state&quot;, &quot;argumente&quot;: {&quot;name&quot;: &quot;radiator&quot;, &quot;on&quot;: true}}
+{&quot;ts&quot;: &quot;2026-10-22T19:57:07.334&quot;, &quot;tip&quot;: &quot;confirmare&quot;, &quot;pas&quot;: 1, &quot;nume&quot;: &quot;set_device_state&quot;, &quot;aprobat&quot;: true}
+{&quot;ts&quot;: &quot;2026-10-22T19:57:07.396&quot;, &quot;tip&quot;: &quot;rezultat&quot;, &quot;pas&quot;: 1, &quot;nume&quot;: &quot;set_device_state&quot;, &quot;eroare&quot;: false, &quot;text&quot;: &quot;{\&quot;ok\&quot;:true,\&quot;nume\&quot;:\&quot;radiator\&quot;,\&quot;pornit\&quot;:true}&quot;, &quot;trunchiat&quot;: false}
+{&quot;ts&quot;: &quot;2026-10-22T19:57:07.396&quot;, &quot;tip&quot;: &quot;cerere_model&quot;, &quot;pas&quot;: 2, &quot;mesaje&quot;: 4, &quot;durata_ms&quot;: 0, &quot;prompt_tokens&quot;: 169}
+{&quot;ts&quot;: &quot;2026-10-22T19:57:07.397&quot;, &quot;tip&quot;: &quot;raspuns&quot;, &quot;text&quot;: &quot;[mock] Rezultatele instrumentelor:\n- {\&quot;ok\&quot;:true,\&quot;nume\&quot;:\&quot;radiator\&quot;,\&quot;pornit\&quot;:true}&quot;, &quot;pas&quot;: 2}
+{&quot;ts&quot;: &quot;2026-10-22T19:57:07.397&quot;, &quot;tip&quot;: &quot;intrebare&quot;, &quot;text&quot;: &quot;Pornește aerul condiționat&quot;, &quot;mesaje_taiate&quot;: 0}
+{&quot;ts&quot;: &quot;2026-10-22T19:57:07.397&quot;, &quot;tip&quot;: &quot;cerere_model&quot;, &quot;pas&quot;: 1, &quot;mesaje&quot;: 6, &quot;durata_ms&quot;: 0, &quot;prompt_tokens&quot;: 215}
+{&quot;ts&quot;: &quot;2026-10-22T19:57:07.397&quot;, &quot;tip&quot;: &quot;apel&quot;, &quot;pas&quot;: 1, &quot;nume&quot;: &quot;set_device_state&quot;, &quot;argumente&quot;: {&quot;name&quot;: &quot;aer_conditionat&quot;, &quot;on&quot;: true}}
+{&quot;ts&quot;: &quot;2026-10-22T19:57:07.397&quot;, &quot;tip&quot;: &quot;confirmare&quot;, &quot;pas&quot;: 1, &quot;nume&quot;: &quot;set_device_state&quot;, &quot;aprobat&quot;: true}
+{&quot;ts&quot;: &quot;2026-10-22T19:57:07.400&quot;, &quot;tip&quot;: &quot;rezultat&quot;, &quot;pas&quot;: 1, &quot;nume&quot;: &quot;set_device_state&quot;, &quot;eroare&quot;: false, &quot;text&quot;: &quot;{\&quot;ok\&quot;:false,\&quot;motiv\&quot;:\&quot;Conflict cu radiator, care este pornit: RIDICAT - încălzire și răcire simultană, consum inutil.\&quot;}&quot;, &quot;trunchiat&quot;: false}
+{&quot;ts&quot;: &quot;2026-10-22T19:57:07.401&quot;, &quot;tip&quot;: &quot;cerere_model&quot;, &quot;pas&quot;: 2, &quot;mesaje&quot;: 8, &quot;durata_ms&quot;: 0, &quot;prompt_tokens&quot;: 310}
+{&quot;ts&quot;: &quot;2026-10-22T19:57:07.401&quot;, &quot;tip&quot;: &quot;raspuns&quot;, &quot;text&quot;: &quot;[mock] Rezultatele instrumentelor:\n- {\&quot;ok\&quot;:false,\&quot;motiv\&quot;:\&quot;Conflict cu radiator, care este pornit: RIDICAT - încălzire și răcire simultană, consum inutil.\&quot;}&quot;, &quot;pas&quot;: 2}
+{&quot;ts&quot;: &quot;2026-10-22T19:57:07.401&quot;, &quot;tip&quot;: &quot;intrebare&quot;, &quot;text&quot;: &quot;Ce este pornit acum?&quot;, &quot;mesaje_taiate&quot;: 0}
+{&quot;ts&quot;: &quot;2026-10-22T19:57:07.402&quot;, &quot;tip&quot;: &quot;cerere_model&quot;, &quot;pas&quot;: 1, &quot;mesaje&quot;: 10, &quot;durata_ms&quot;: 0, &quot;prompt_tokens&quot;: 373}
+{&quot;ts&quot;: &quot;2026-10-22T19:57:07.402&quot;, &quot;tip&quot;: &quot;apel&quot;, &quot;pas&quot;: 1, &quot;nume&quot;: &quot;get_building_state&quot;, &quot;argumente&quot;: {}}
+{&quot;ts&quot;: &quot;2026-10-22T19:57:07.405&quot;, &quot;tip&quot;: &quot;rezultat&quot;, &quot;pas&quot;: 1, &quot;nume&quot;: &quot;get_building_state&quot;, &quot;eroare&quot;: false, &quot;text&quot;: &quot;{\&quot;pornite\&quot;:[\&quot;radiator\&quot;],\&quot;termostat_c\&quot;:21.0}&quot;, &quot;trunchiat&quot;: false}
+{&quot;ts&quot;: &quot;2026-10-22T19:57:07.405&quot;, &quot;tip&quot;: &quot;cerere_model&quot;, &quot;pas&quot;: 2, &quot;mesaje&quot;: 12, &quot;durata_ms&quot;: 0, &quot;prompt_tokens&quot;: 439}
+{&quot;ts&quot;: &quot;2026-10-22T19:57:07.406&quot;, &quot;tip&quot;: &quot;raspuns&quot;, &quot;text&quot;: &quot;[mock] Rezultatele instrumentelor:\n- {\&quot;pornite\&quot;:[\&quot;radiator\&quot;],\&quot;termostat_c\&quot;:21.0}&quot;, &quot;pas&quot;: 2}</pre></details>
+</section>
+<section id="b5">
+<h2><span class="ex">B5</span> Refuzul și starea (mock)</h2>
+<p class="task">„Resetează clădirea” → n. Ce text vede modelul? Cum apare în log? Repetați cu d. Apoi <code>/reset</code> și „Ce este pornit acum?”. Ce a șters <code>/reset</code> și ce nu?</p>
+<div class="callout"><b>Secvența rulată:</b> am pornit întâi lampa, ca reset-ul să aibă ce șterge. După reset-ul aprobat am pornit radiatorul, ca să se vadă că <code>/reset</code> nu atinge starea serverului: <code>Pornește lampa → d → Resetează clădirea → n → Ce este pornit acum? → Resetează clădirea → d → Ce este pornit acum? → Pornește radiatorul → d → /istoric → /reset → /istoric → Ce este pornit acum?</code></div>
+<h3>Rezultat</h3>
+<div class="table-wrap"><table><thead><tr><th>#</th><th>Întrebare</th><th>Apel · confirmare · rezultat</th></tr></thead><tbody><tr><td>1</td><td>Pornește lampa</td><td><code>set_device_state({&quot;name&quot;: &quot;lampa_led&quot;, &quot;on&quot;: true})</code> <span class='tag ok'>aprobat</span><br><span class='muted'>→ {&quot;ok&quot;:true,&quot;nume&quot;:&quot;lampa_led&quot;,&quot;pornit&quot;:true}</span></td></tr><tr><td>2</td><td>Resetează clădirea</td><td><code>reset_building({})</code> <span class='tag bad'>refuzat</span><br><span class='muted'>→ Utilizatorul a refuzat acest apel; nu a fost executat.</span></td></tr><tr><td>3</td><td>Ce este pornit acum?</td><td><code>get_building_state({})</code> <span class='muted'>fără confirmare</span><br><span class='muted'>→ {&quot;pornite&quot;:[&quot;lampa_led&quot;],&quot;termostat_c&quot;:21.0}</span></td></tr><tr><td>4</td><td>Resetează clădirea</td><td><code>reset_building({})</code> <span class='tag ok'>aprobat</span><br><span class='muted'>→ {&quot;ok&quot;:true,&quot;mesaj&quot;:&quot;Clădirea a fost resetată.&quot;}</span></td></tr><tr><td>5</td><td>Ce este pornit acum?</td><td><code>get_building_state({})</code> <span class='muted'>fără confirmare</span><br><span class='muted'>→ {&quot;pornite&quot;:[],&quot;termostat_c&quot;:21.0}</span></td></tr><tr><td>6</td><td>Pornește radiatorul</td><td><code>set_device_state({&quot;name&quot;: &quot;radiator&quot;, &quot;on&quot;: true})</code> <span class='tag ok'>aprobat</span><br><span class='muted'>→ {&quot;ok&quot;:true,&quot;nume&quot;:&quot;radiator&quot;,&quot;pornit&quot;:true}</span></td></tr><tr><td>7</td><td>Ce este pornit acum?</td><td><code>get_building_state({})</code> <span class='muted'>fără confirmare</span><br><span class='muted'>→ {&quot;pornite&quot;:[&quot;radiator&quot;],&quot;termostat_c&quot;:21.0}</span></td></tr></tbody></table></div>
+<h3>Răspuns</h3>
+<ul>
+<li><b>Ce vede modelul la refuz:</b> un mesaj <code>tool</code> cu textul <code>„Utilizatorul a refuzat acest apel; nu a fost executat.”</code>. Refuzul este un rezultat normal pentru model, nu o excepție, iar modelul îl poate explica utilizatorului.</li>
+<li><b>În log:</b> <code>apel</code> → <code>confirmare</code> cu <code>"aprobat": false</code> → <code>rezultat</code> cu <code>"eroare": true</code>. <code>analyze_log.py</code> numără refuzul la „refuzuri ale utilizatorului: 1”. Serverul nu a fost apelat, iar lampa a rămas pornită.</li>
+<li><b>Cu d:</b> <code>confirmare</code> cu <code>"aprobat": true</code>, serverul răspunde „Clădirea a fost resetată.”, iar starea devine <code>pornite: []</code>, 21 °C.</li>
+<li><b><code>/reset</code></b> a șters <b>conversația</b>: <code>/istoric</code> a scăzut de la 25 de mesaje la 1 (doar mesajul <code>system</code>), iar în log apare un nou eveniment <code>reset</code>. <b>Nu</b> a șters starea clădirii: „Ce este pornit acum?” arată tot <code>pornite: ["radiator"]</code>. Conversația trăiește în <code>agent.messages</code>; starea trăiește în procesul serverului MCP (secțiunea 1.5). chat.py afișează și el: „starea clădirii din server nu s-a schimbat”.</li>
+</ul>
+<div class="callout"><b>Fragment de log</b> (B5, refuzul): confirmarea cu <code>aprobat: false</code> și starea neschimbată după aceea.</div>
+<pre class="log">{&quot;ts&quot;: &quot;2026-10-22T19:57:13.187&quot;, &quot;tip&quot;: &quot;intrebare&quot;, &quot;text&quot;: &quot;Resetează clădirea&quot;, &quot;mesaje_taiate&quot;: 0}
+{&quot;ts&quot;: &quot;2026-10-22T19:57:13.188&quot;, &quot;tip&quot;: &quot;cerere_model&quot;, &quot;pas&quot;: 1, &quot;mesaje&quot;: 6, &quot;durata_ms&quot;: 0, &quot;prompt_tokens&quot;: 213}
+{&quot;ts&quot;: &quot;2026-10-22T19:57:13.188&quot;, &quot;tip&quot;: &quot;apel&quot;, &quot;pas&quot;: 1, &quot;nume&quot;: &quot;reset_building&quot;, &quot;argumente&quot;: {}}
+{&quot;ts&quot;: &quot;2026-10-22T19:57:13.188&quot;, &quot;tip&quot;: &quot;confirmare&quot;, &quot;pas&quot;: 1, &quot;nume&quot;: &quot;reset_building&quot;, &quot;aprobat&quot;: false}
+{&quot;ts&quot;: &quot;2026-10-22T19:57:13.188&quot;, &quot;tip&quot;: &quot;rezultat&quot;, &quot;pas&quot;: 1, &quot;nume&quot;: &quot;reset_building&quot;, &quot;eroare&quot;: true, &quot;text&quot;: &quot;Utilizatorul a refuzat acest apel; nu a fost executat.&quot;, &quot;trunchiat&quot;: false}
+{&quot;ts&quot;: &quot;2026-10-22T19:57:13.189&quot;, &quot;tip&quot;: &quot;cerere_model&quot;, &quot;pas&quot;: 2, &quot;mesaje&quot;: 8, &quot;durata_ms&quot;: 0, &quot;prompt_tokens&quot;: 279}
+{&quot;ts&quot;: &quot;2026-10-22T19:57:13.189&quot;, &quot;tip&quot;: &quot;raspuns&quot;, &quot;text&quot;: &quot;[mock] Rezultatele instrumentelor:\n- Utilizatorul a refuzat acest apel; nu a fost executat.&quot;, &quot;pas&quot;: 2}
+{&quot;ts&quot;: &quot;2026-10-22T19:57:13.189&quot;, &quot;tip&quot;: &quot;apel&quot;, &quot;pas&quot;: 1, &quot;nume&quot;: &quot;get_building_state&quot;, &quot;argumente&quot;: {}}
+{&quot;ts&quot;: &quot;2026-10-22T19:57:13.193&quot;, &quot;tip&quot;: &quot;rezultat&quot;, &quot;pas&quot;: 1, &quot;nume&quot;: &quot;get_building_state&quot;, &quot;eroare&quot;: false, &quot;text&quot;: &quot;{\&quot;pornite\&quot;:[\&quot;lampa_led\&quot;],\&quot;termostat_c\&quot;:21.0}&quot;, &quot;trunchiat&quot;: false}</pre>
+<details><summary>Transcriptul chat.py</summary><pre class="term">Tu:   ? Agentul vrea să ruleze set_device_state({&#x27;name&#x27;: &#x27;lampa_led&#x27;, &#x27;on&#x27;: True}). Permiteți? [d/N]   [instrument] set_device_state({&#x27;name&#x27;: &#x27;lampa_led&#x27;, &#x27;on&#x27;: True}) -&gt; {&quot;ok&quot;:true,&quot;nume&quot;:&quot;lampa_led&quot;,&quot;pornit&quot;:true}
+Agent: [mock] Rezultatele instrumentelor:
+- {&quot;ok&quot;:true,&quot;nume&quot;:&quot;lampa_led&quot;,&quot;pornit&quot;:true} 
+
+Tu:   ? Agentul vrea să ruleze reset_building({}) [DISTRUCTIV]. Permiteți? [d/N]   [instrument] reset_building({}) -&gt; Utilizatorul a refuzat acest apel; nu a fost executat.
+Agent: [mock] Rezultatele instrumentelor:
+- Utilizatorul a refuzat acest apel; nu a fost executat. 
+
+Tu:   [instrument] get_building_state({}) -&gt; {&quot;pornite&quot;:[&quot;lampa_led&quot;],&quot;termostat_c&quot;:21.0}
+Agent: [mock] Rezultatele instrumentelor:
+- {&quot;pornite&quot;:[&quot;lampa_led&quot;],&quot;termostat_c&quot;:21.0} 
+
+Tu:   ? Agentul vrea să ruleze reset_building({}) [DISTRUCTIV]. Permiteți? [d/N]   [instrument] reset_building({}) -&gt; {&quot;ok&quot;:true,&quot;mesaj&quot;:&quot;Clădirea a fost resetată.&quot;}
+Agent: [mock] Rezultatele instrumentelor:
+- {&quot;ok&quot;:true,&quot;mesaj&quot;:&quot;Clădirea a fost resetată.&quot;} 
+
+Tu:   [instrument] get_building_state({}) -&gt; {&quot;pornite&quot;:[],&quot;termostat_c&quot;:21.0}
+Agent: [mock] Rezultatele instrumentelor:
+- {&quot;pornite&quot;:[],&quot;termostat_c&quot;:21.0} 
+
+Tu:   ? Agentul vrea să ruleze set_device_state({&#x27;name&#x27;: &#x27;radiator&#x27;, &#x27;on&#x27;: True}). Permiteți? [d/N]   [instrument] set_device_state({&#x27;name&#x27;: &#x27;radiator&#x27;, &#x27;on&#x27;: True}) -&gt; {&quot;ok&quot;:true,&quot;nume&quot;:&quot;radiator&quot;,&quot;pornit&quot;:true}
+Agent: [mock] Rezultatele instrumentelor:
+- {&quot;ok&quot;:true,&quot;nume&quot;:&quot;radiator&quot;,&quot;pornit&quot;:true} 
+
+Tu: (istoric: 25 mesaje)
+Tu: (conversație nouă; starea clădirii din server nu s-a schimbat)
+Tu: (istoric: 1 mesaje)
+Tu:   [instrument] get_building_state({}) -&gt; {&quot;pornite&quot;:[&quot;radiator&quot;],&quot;termostat_c&quot;:21.0}
+Agent: [mock] Rezultatele instrumentelor:
+- {&quot;pornite&quot;:[&quot;radiator&quot;],&quot;termostat_c&quot;:21.0}</pre></details>
+<details><summary>Logul complet (logs\agent-20261022-195711.jsonl)</summary><pre class="log">{&quot;ts&quot;: &quot;2026-10-22T19:57:11.395&quot;, &quot;tip&quot;: &quot;reset&quot;}
+{&quot;ts&quot;: &quot;2026-10-22T19:57:13.121&quot;, &quot;tip&quot;: &quot;intrebare&quot;, &quot;text&quot;: &quot;Pornește lampa&quot;, &quot;mesaje_taiate&quot;: 0}
+{&quot;ts&quot;: &quot;2026-10-22T19:57:13.122&quot;, &quot;tip&quot;: &quot;cerere_model&quot;, &quot;pas&quot;: 1, &quot;mesaje&quot;: 2, &quot;durata_ms&quot;: 1, &quot;prompt_tokens&quot;: 93}
+{&quot;ts&quot;: &quot;2026-10-22T19:57:13.123&quot;, &quot;tip&quot;: &quot;apel&quot;, &quot;pas&quot;: 1, &quot;nume&quot;: &quot;set_device_state&quot;, &quot;argumente&quot;: {&quot;name&quot;: &quot;lampa_led&quot;, &quot;on&quot;: true}}
+{&quot;ts&quot;: &quot;2026-10-22T19:57:13.130&quot;, &quot;tip&quot;: &quot;confirmare&quot;, &quot;pas&quot;: 1, &quot;nume&quot;: &quot;set_device_state&quot;, &quot;aprobat&quot;: true}
+{&quot;ts&quot;: &quot;2026-10-22T19:57:13.187&quot;, &quot;tip&quot;: &quot;rezultat&quot;, &quot;pas&quot;: 1, &quot;nume&quot;: &quot;set_device_state&quot;, &quot;eroare&quot;: false, &quot;text&quot;: &quot;{\&quot;ok\&quot;:true,\&quot;nume\&quot;:\&quot;lampa_led\&quot;,\&quot;pornit\&quot;:true}&quot;, &quot;trunchiat&quot;: false}
+{&quot;ts&quot;: &quot;2026-10-22T19:57:13.187&quot;, &quot;tip&quot;: &quot;cerere_model&quot;, &quot;pas&quot;: 2, &quot;mesaje&quot;: 4, &quot;durata_ms&quot;: 0, &quot;prompt_tokens&quot;: 168}
+{&quot;ts&quot;: &quot;2026-10-22T19:57:13.187&quot;, &quot;tip&quot;: &quot;raspuns&quot;, &quot;text&quot;: &quot;[mock] Rezultatele instrumentelor:\n- {\&quot;ok\&quot;:true,\&quot;nume\&quot;:\&quot;lampa_led\&quot;,\&quot;pornit\&quot;:true}&quot;, &quot;pas&quot;: 2}
+{&quot;ts&quot;: &quot;2026-10-22T19:57:13.187&quot;, &quot;tip&quot;: &quot;intrebare&quot;, &quot;text&quot;: &quot;Resetează clădirea&quot;, &quot;mesaje_taiate&quot;: 0}
+{&quot;ts&quot;: &quot;2026-10-22T19:57:13.188&quot;, &quot;tip&quot;: &quot;cerere_model&quot;, &quot;pas&quot;: 1, &quot;mesaje&quot;: 6, &quot;durata_ms&quot;: 0, &quot;prompt_tokens&quot;: 213}
+{&quot;ts&quot;: &quot;2026-10-22T19:57:13.188&quot;, &quot;tip&quot;: &quot;apel&quot;, &quot;pas&quot;: 1, &quot;nume&quot;: &quot;reset_building&quot;, &quot;argumente&quot;: {}}
+{&quot;ts&quot;: &quot;2026-10-22T19:57:13.188&quot;, &quot;tip&quot;: &quot;confirmare&quot;, &quot;pas&quot;: 1, &quot;nume&quot;: &quot;reset_building&quot;, &quot;aprobat&quot;: false}
+{&quot;ts&quot;: &quot;2026-10-22T19:57:13.188&quot;, &quot;tip&quot;: &quot;rezultat&quot;, &quot;pas&quot;: 1, &quot;nume&quot;: &quot;reset_building&quot;, &quot;eroare&quot;: true, &quot;text&quot;: &quot;Utilizatorul a refuzat acest apel; nu a fost executat.&quot;, &quot;trunchiat&quot;: false}
+{&quot;ts&quot;: &quot;2026-10-22T19:57:13.189&quot;, &quot;tip&quot;: &quot;cerere_model&quot;, &quot;pas&quot;: 2, &quot;mesaje&quot;: 8, &quot;durata_ms&quot;: 0, &quot;prompt_tokens&quot;: 279}
+{&quot;ts&quot;: &quot;2026-10-22T19:57:13.189&quot;, &quot;tip&quot;: &quot;raspuns&quot;, &quot;text&quot;: &quot;[mock] Rezultatele instrumentelor:\n- Utilizatorul a refuzat acest apel; nu a fost executat.&quot;, &quot;pas&quot;: 2}
+{&quot;ts&quot;: &quot;2026-10-22T19:57:13.189&quot;, &quot;tip&quot;: &quot;intrebare&quot;, &quot;text&quot;: &quot;Ce este pornit acum?&quot;, &quot;mesaje_taiate&quot;: 0}
+{&quot;ts&quot;: &quot;2026-10-22T19:57:13.189&quot;, &quot;tip&quot;: &quot;cerere_model&quot;, &quot;pas&quot;: 1, &quot;mesaje&quot;: 10, &quot;durata_ms&quot;: 0, &quot;prompt_tokens&quot;: 325}
+{&quot;ts&quot;: &quot;2026-10-22T19:57:13.189&quot;, &quot;tip&quot;: &quot;apel&quot;, &quot;pas&quot;: 1, &quot;nume&quot;: &quot;get_building_state&quot;, &quot;argumente&quot;: {}}
+{&quot;ts&quot;: &quot;2026-10-22T19:57:13.193&quot;, &quot;tip&quot;: &quot;rezultat&quot;, &quot;pas&quot;: 1, &quot;nume&quot;: &quot;get_building_state&quot;, &quot;eroare&quot;: false, &quot;text&quot;: &quot;{\&quot;pornite\&quot;:[\&quot;lampa_led\&quot;],\&quot;termostat_c\&quot;:21.0}&quot;, &quot;trunchiat&quot;: false}
+{&quot;ts&quot;: &quot;2026-10-22T19:57:13.193&quot;, &quot;tip&quot;: &quot;cerere_model&quot;, &quot;pas&quot;: 2, &quot;mesaje&quot;: 12, &quot;durata_ms&quot;: 0, &quot;prompt_tokens&quot;: 391}
+{&quot;ts&quot;: &quot;2026-10-22T19:57:13.193&quot;, &quot;tip&quot;: &quot;raspuns&quot;, &quot;text&quot;: &quot;[mock] Rezultatele instrumentelor:\n- {\&quot;pornite\&quot;:[\&quot;lampa_led\&quot;],\&quot;termostat_c\&quot;:21.0}&quot;, &quot;pas&quot;: 2}
+{&quot;ts&quot;: &quot;2026-10-22T19:57:13.193&quot;, &quot;tip&quot;: &quot;intrebare&quot;, &quot;text&quot;: &quot;Resetează clădirea&quot;, &quot;mesaje_taiate&quot;: 0}
+{&quot;ts&quot;: &quot;2026-10-22T19:57:13.194&quot;, &quot;tip&quot;: &quot;cerere_model&quot;, &quot;pas&quot;: 1, &quot;mesaje&quot;: 14, &quot;durata_ms&quot;: 0, &quot;prompt_tokens&quot;: 435}
+{&quot;ts&quot;: &quot;2026-10-22T19:57:13.194&quot;, &quot;tip&quot;: &quot;apel&quot;, &quot;pas&quot;: 1, &quot;nume&quot;: &quot;reset_building&quot;, &quot;argumente&quot;: {}}
+{&quot;ts&quot;: &quot;2026-10-22T19:57:13.194&quot;, &quot;tip&quot;: &quot;confirmare&quot;, &quot;pas&quot;: 1, &quot;nume&quot;: &quot;reset_building&quot;, &quot;aprobat&quot;: true}
+{&quot;ts&quot;: &quot;2026-10-22T19:57:13.197&quot;, &quot;tip&quot;: &quot;rezultat&quot;, &quot;pas&quot;: 1, &quot;nume&quot;: &quot;reset_building&quot;, &quot;eroare&quot;: false, &quot;text&quot;: &quot;{\&quot;ok\&quot;:true,\&quot;mesaj\&quot;:\&quot;Clădirea a fost resetată.\&quot;}&quot;, &quot;trunchiat&quot;: false}
+{&quot;ts&quot;: &quot;2026-10-22T19:57:13.197&quot;, &quot;tip&quot;: &quot;cerere_model&quot;, &quot;pas&quot;: 2, &quot;mesaje&quot;: 16, &quot;durata_ms&quot;: 0, &quot;prompt_tokens&quot;: 501}
+{&quot;ts&quot;: &quot;2026-10-22T19:57:13.197&quot;, &quot;tip&quot;: &quot;raspuns&quot;, &quot;text&quot;: &quot;[mock] Rezultatele instrumentelor:\n- {\&quot;ok\&quot;:true,\&quot;mesaj\&quot;:\&quot;Clădirea a fost resetată.\&quot;}&quot;, &quot;pas&quot;: 2}
+{&quot;ts&quot;: &quot;2026-10-22T19:57:13.198&quot;, &quot;tip&quot;: &quot;intrebare&quot;, &quot;text&quot;: &quot;Ce este pornit acum?&quot;, &quot;mesaje_taiate&quot;: 0}
+{&quot;ts&quot;: &quot;2026-10-22T19:57:13.198&quot;, &quot;tip&quot;: &quot;cerere_model&quot;, &quot;pas&quot;: 1, &quot;mesaje&quot;: 18, &quot;durata_ms&quot;: 0, &quot;prompt_tokens&quot;: 546}
+{&quot;ts&quot;: &quot;2026-10-22T19:57:13.198&quot;, &quot;tip&quot;: &quot;apel&quot;, &quot;pas&quot;: 1, &quot;nume&quot;: &quot;get_building_state&quot;, &quot;argumente&quot;: {}}
+{&quot;ts&quot;: &quot;2026-10-22T19:57:13.201&quot;, &quot;tip&quot;: &quot;rezultat&quot;, &quot;pas&quot;: 1, &quot;nume&quot;: &quot;get_building_state&quot;, &quot;eroare&quot;: false, &quot;text&quot;: &quot;{\&quot;pornite\&quot;:[],\&quot;termostat_c\&quot;:21.0}&quot;, &quot;trunchiat&quot;: false}
+{&quot;ts&quot;: &quot;2026-10-22T19:57:13.201&quot;, &quot;tip&quot;: &quot;cerere_model&quot;, &quot;pas&quot;: 2, &quot;mesaje&quot;: 20, &quot;durata_ms&quot;: 0, &quot;prompt_tokens&quot;: 609}
+{&quot;ts&quot;: &quot;2026-10-22T19:57:13.201&quot;, &quot;tip&quot;: &quot;raspuns&quot;, &quot;text&quot;: &quot;[mock] Rezultatele instrumentelor:\n- {\&quot;pornite\&quot;:[],\&quot;termostat_c\&quot;:21.0}&quot;, &quot;pas&quot;: 2}
+{&quot;ts&quot;: &quot;2026-10-22T19:57:13.202&quot;, &quot;tip&quot;: &quot;intrebare&quot;, &quot;text&quot;: &quot;Pornește radiatorul&quot;, &quot;mesaje_taiate&quot;: 0}
+{&quot;ts&quot;: &quot;2026-10-22T19:57:13.202&quot;, &quot;tip&quot;: &quot;cerere_model&quot;, &quot;pas&quot;: 1, &quot;mesaje&quot;: 22, &quot;durata_ms&quot;: 0, &quot;prompt_tokens&quot;: 650}
+{&quot;ts&quot;: &quot;2026-10-22T19:57:13.202&quot;, &quot;tip&quot;: &quot;apel&quot;, &quot;pas&quot;: 1, &quot;nume&quot;: &quot;set_device_state&quot;, &quot;argumente&quot;: {&quot;name&quot;: &quot;radiator&quot;, &quot;on&quot;: true}}
+{&quot;ts&quot;: &quot;2026-10-22T19:57:13.202&quot;, &quot;tip&quot;: &quot;confirmare&quot;, &quot;pas&quot;: 1, &quot;nume&quot;: &quot;set_device_state&quot;, &quot;aprobat&quot;: true}
+{&quot;ts&quot;: &quot;2026-10-22T19:57:13.204&quot;, &quot;tip&quot;: &quot;rezultat&quot;, &quot;pas&quot;: 1, &quot;nume&quot;: &quot;set_device_state&quot;, &quot;eroare&quot;: false, &quot;text&quot;: &quot;{\&quot;ok\&quot;:true,\&quot;nume\&quot;:\&quot;radiator\&quot;,\&quot;pornit\&quot;:true}&quot;, &quot;trunchiat&quot;: false}
+{&quot;ts&quot;: &quot;2026-10-22T19:57:13.204&quot;, &quot;tip&quot;: &quot;cerere_model&quot;, &quot;pas&quot;: 2, &quot;mesaje&quot;: 24, &quot;durata_ms&quot;: 0, &quot;prompt_tokens&quot;: 725}
+{&quot;ts&quot;: &quot;2026-10-22T19:57:13.205&quot;, &quot;tip&quot;: &quot;raspuns&quot;, &quot;text&quot;: &quot;[mock] Rezultatele instrumentelor:\n- {\&quot;ok\&quot;:true,\&quot;nume\&quot;:\&quot;radiator\&quot;,\&quot;pornit\&quot;:true}&quot;, &quot;pas&quot;: 2}
+{&quot;ts&quot;: &quot;2026-10-22T19:57:13.205&quot;, &quot;tip&quot;: &quot;reset&quot;}
+{&quot;ts&quot;: &quot;2026-10-22T19:57:13.205&quot;, &quot;tip&quot;: &quot;intrebare&quot;, &quot;text&quot;: &quot;Ce este pornit acum?&quot;, &quot;mesaje_taiate&quot;: 0}
+{&quot;ts&quot;: &quot;2026-10-22T19:57:13.206&quot;, &quot;tip&quot;: &quot;cerere_model&quot;, &quot;pas&quot;: 1, &quot;mesaje&quot;: 2, &quot;durata_ms&quot;: 0, &quot;prompt_tokens&quot;: 94}
+{&quot;ts&quot;: &quot;2026-10-22T19:57:13.206&quot;, &quot;tip&quot;: &quot;apel&quot;, &quot;pas&quot;: 1, &quot;nume&quot;: &quot;get_building_state&quot;, &quot;argumente&quot;: {}}
+{&quot;ts&quot;: &quot;2026-10-22T19:57:13.208&quot;, &quot;tip&quot;: &quot;rezultat&quot;, &quot;pas&quot;: 1, &quot;nume&quot;: &quot;get_building_state&quot;, &quot;eroare&quot;: false, &quot;text&quot;: &quot;{\&quot;pornite\&quot;:[\&quot;radiator\&quot;],\&quot;termostat_c\&quot;:21.0}&quot;, &quot;trunchiat&quot;: false}
+{&quot;ts&quot;: &quot;2026-10-22T19:57:13.208&quot;, &quot;tip&quot;: &quot;cerere_model&quot;, &quot;pas&quot;: 2, &quot;mesaje&quot;: 4, &quot;durata_ms&quot;: 0, &quot;prompt_tokens&quot;: 160}
+{&quot;ts&quot;: &quot;2026-10-22T19:57:13.209&quot;, &quot;tip&quot;: &quot;raspuns&quot;, &quot;text&quot;: &quot;[mock] Rezultatele instrumentelor:\n- {\&quot;pornite\&quot;:[\&quot;radiator\&quot;],\&quot;termostat_c\&quot;:21.0}&quot;, &quot;pas&quot;: 2}</pre></details>
+<details><summary>python analyze_log.py</summary><pre class="term">Fișier: C:\Users\catalin\OneDrive\Documents\GitHub\si_lab02\logs\agent-20261022-195711.jsonl
+Evenimente pe tip: {&#x27;reset&#x27;: 2, &#x27;pornire&#x27;: 1, &#x27;intrebare&#x27;: 7, &#x27;cerere_model&#x27;: 14, &#x27;apel&#x27;: 7, &#x27;confirmare&#x27;: 4, &#x27;rezultat&#x27;: 7, &#x27;raspuns&#x27;: 7}
+Apeluri pe instrument: {&#x27;set_device_state&#x27;: 2, &#x27;reset_building&#x27;: 2, &#x27;get_building_state&#x27;: 3}
+Apeluri cu eroare: {&#x27;reset_building&#x27;: 1} | refuzuri ale utilizatorului: 1
+Cereri către model: 14 | durata medie: 0 ms
+Tokeni în prompt: primul 93, ultimul 160, maxim 725</pre></details>
+</section>
+<section id="b6">
+<h2><span class="ex">B6</span> Validare înainte sau după confirmare? (mock)</h2>
+<p class="task">„Setează termostatul la 50 de grade” și acceptați. Utilizatorul a fost întrebat despre un apel care avea să fie respins oricum. Cum ați proiecta altfel agentul?</p>
+<h3>Rezultat</h3>
+<div class="table-wrap"><table><thead><tr><th>#</th><th>Întrebare</th><th>Apel · confirmare · rezultat</th></tr></thead><tbody><tr><td>1</td><td>Setează termostatul la 50 de grade</td><td><code>set_thermostat({&quot;temp_c&quot;: 50.0})</code> <span class='tag ok'>aprobat</span><br><span class='muted'>→ Eroare la apelul set_thermostat: 1 validation error for call[set_thermostat]
+temp_c
+  Input should be less than or equal</span></td></tr><tr><td>2</td><td>Ce este pornit acum?</td><td><code>get_building_state({})</code> <span class='muted'>fără confirmare</span><br><span class='muted'>→ {&quot;pornite&quot;:[],&quot;termostat_c&quot;:21.0}</span></td></tr></tbody></table></div>
+<p>Utilizatorul a fost întrebat <i>„Agentul vrea să ruleze set_thermostat({'temp_c': 50.0}). Permiteți?”</i>, a răspuns <b>d</b>, iar serverul a respins apoi apelul la validare (<code>less_than_equal</code>). Termostatul a rămas la 21 °C.</p>
+<h3>Răspuns: altă proiectare</h3>
+<ul>
+<li><b>Validare în agent, înainte de confirmare.</b> Schema fiecărui instrument (<code>inputSchema</code>, cu <code>minimum: 10</code>, <code>maximum: 30</code>, <code>required</code>, tipuri) ajunge deja la agent prin <code>list_tools</code>. Agentul poate valida argumentele cu un validator JSON Schema înainte să întrebe omul. Dacă apelul e invalid, întoarce eroarea direct modelului (care se poate corecta), fără confirmare și fără drum la server.</li>
+<li>Omul este întrebat doar despre apeluri care <b>pot</b> rula. Așa se evită „oboseala de confirmare”: un utilizator întrebat des despre apeluri fără sens începe să apese „d” fără să citească.</li>
+<li><b>Serverul validează în continuare.</b> Verificarea din agent e o optimizare de UX, nu un strat de securitate: agentul poate avea o schemă veche, iar alt client poate să nu valideze deloc. Nici regulile de domeniu (conflictul radiator/AC) nu sunt în schemă, deci pe acelea doar serverul le poate verifica. O variantă mai bună ar fi o operație de tip „dry-run”/„preview” expusă de server.</li>
+<li>Bonus: la confirmare, agentul poate afișa și limitele din schemă (de ex. „temp_c = 50, interval permis 10–30”).</li>
+</ul>
+<h3>Prototip testat</h3>
+<p>Am scris <code>AgentCuPrevalidare</code>, o subclasă a lui <code>Agent</code> care construiește câte un <code>jsonschema.Draft202012Validator</code> din schema primită prin <code>list_tools</code> și validează în <code>call_tool</code>, înainte de confirmare. <code>agent.py</code> din proiect nu a fost modificat. Rezultatele cu mock:</p>
+<div class="table-wrap"><table><thead><tr><th>Intrare</th><th>Așteptat</th><th>Confirmări cerute</th><th>Ce primește modelul</th></tr></thead><tbody><tr><td><code>Setează termostatul la 50 de grade</code></td><td>invalid: 50 &gt; 30</td><td class='num'>0</td><td><code>Argumente invalide (verificate de agent, înainte de confirmare): temp_c: 50.0 is greater than the maximum of 30</code></td></tr><tr><td><code>Setează termostatul la 24 de grade</code></td><td>valid</td><td class='num'>1</td><td><code>{&quot;ok&quot;:true,&quot;temp_c&quot;:24.0}</code></td></tr><tr><td><code>apel: estimate_energy {&quot;name&quot;: &quot;radiator&quot;, &quot;hours&quot;: &quot;abc&quot;}</code></td><td>invalid: tip greșit</td><td class='num'>0</td><td><code>Argumente invalide (verificate de agent, înainte de confirmare): hours: &#x27;abc&#x27; is not of type &#x27;number&#x27;</code></td></tr><tr><td><code>apel: set_device_state {&quot;name&quot;: &quot;radiator&quot;}</code></td><td>invalid: lipsește &#x27;on&#x27;</td><td class='num'>0</td><td><code>Argumente invalide (verificate de agent, înainte de confirmare): (rădăcină): &#x27;on&#x27; is a required property</code></td></tr></tbody></table></div>
+<pre class="log">class AgentCuPrevalidare(Agent):
+    async def __aenter__(self):
+        await super().__aenter__()
+        self.validatori = {t[&quot;function&quot;][&quot;name&quot;]: Draft202012Validator(t[&quot;function&quot;][&quot;parameters&quot;])
+                           for t in self.tools}
+        return self
+
+    async def call_tool(self, call, pas):
+        nume = call.function.name
+        validator = self.validatori.get(nume)
+        if validator is not None:
+            args = json.loads(call.function.arguments or &quot;{}&quot;)
+            erori = [f&quot;{&#x27;/&#x27;.join(map(str, e.path)) or &#x27;(rădăcină)&#x27;}: {e.message}&quot;
+                     for e in validator.iter_errors(args)]
+            if erori:   # nu întrebăm omul, nu apelăm serverul
+                self.log.write(&quot;validare_agent&quot;, pas=pas, nume=nume, erori=erori)
+                return self._rezultat(pas, nume, args, &quot;Argumente invalide (verificate de agent, &quot;
+                                      &quot;înainte de confirmare): &quot; + &quot;; &quot;.join(erori), True)
+        return await super().call_tool(call, pas)</pre>
+<details><summary>Transcriptul chat.py (B6 original)</summary><pre class="term">Tu:   ? Agentul vrea să ruleze set_thermostat({&#x27;temp_c&#x27;: 50.0}). Permiteți? [d/N]   [instrument] set_thermostat({&#x27;temp_c&#x27;: 50.0}) -&gt; Eroare la apelul set_thermostat: 1 validation error for call[set_thermostat]
+temp_c
+  Input should be less than or equal to 30 [type=less_than_equal, 
+Agent: [mock] Rezultatele instrumentelor:
+- Eroare la apelul set_thermostat: 1 validation error for call[set_thermostat]
+temp_c
+  Input should be less than or equal to 30 [type=less_than_equal, input_value=50.0, input_type=float]
+    For further information visit https://errors.pydantic.dev/2.14/v/less_than_equal 
+
+Tu:   [instrument] get_building_state({}) -&gt; {&quot;pornite&quot;:[],&quot;termostat_c&quot;:21.0}
+Agent: [mock] Rezultatele instrumentelor:
+- {&quot;pornite&quot;:[],&quot;termostat_c&quot;:21.0}</pre></details>
+<details><summary>Logul prototipului (logs\agent-20261022-200328.jsonl)</summary><pre class="log">{&quot;ts&quot;: &quot;2026-10-22T20:03:28.652&quot;, &quot;tip&quot;: &quot;reset&quot;}
+{&quot;ts&quot;: &quot;2026-10-22T20:03:30.332&quot;, &quot;tip&quot;: &quot;intrebare&quot;, &quot;text&quot;: &quot;Setează termostatul la 50 de grade&quot;, &quot;mesaje_taiate&quot;: 0}
+{&quot;ts&quot;: &quot;2026-10-22T20:03:30.332&quot;, &quot;tip&quot;: &quot;cerere_model&quot;, &quot;pas&quot;: 1, &quot;mesaje&quot;: 2, &quot;durata_ms&quot;: 0, &quot;prompt_tokens&quot;: 98}
+{&quot;ts&quot;: &quot;2026-10-22T20:03:30.333&quot;, &quot;tip&quot;: &quot;apel&quot;, &quot;pas&quot;: 1, &quot;nume&quot;: &quot;set_thermostat&quot;, &quot;argumente&quot;: {&quot;temp_c&quot;: 50.0}}
+{&quot;ts&quot;: &quot;2026-10-22T20:03:30.334&quot;, &quot;tip&quot;: &quot;validare_agent&quot;, &quot;pas&quot;: 1, &quot;nume&quot;: &quot;set_thermostat&quot;, &quot;erori&quot;: [&quot;temp_c: 50.0 is greater than the maximum of 30&quot;]}
+{&quot;ts&quot;: &quot;2026-10-22T20:03:30.334&quot;, &quot;tip&quot;: &quot;rezultat&quot;, &quot;pas&quot;: 1, &quot;nume&quot;: &quot;set_thermostat&quot;, &quot;eroare&quot;: true, &quot;text&quot;: &quot;Argumente invalide (verificate de agent, înainte de confirmare): temp_c: 50.0 is greater than the maximum of 30&quot;, &quot;trunchiat&quot;: false}
+{&quot;ts&quot;: &quot;2026-10-22T20:03:30.334&quot;, &quot;tip&quot;: &quot;cerere_model&quot;, &quot;pas&quot;: 2, &quot;mesaje&quot;: 4, &quot;durata_ms&quot;: 0, &quot;prompt_tokens&quot;: 182}
+{&quot;ts&quot;: &quot;2026-10-22T20:03:30.335&quot;, &quot;tip&quot;: &quot;raspuns&quot;, &quot;text&quot;: &quot;[mock] Rezultatele instrumentelor:\n- Argumente invalide (verificate de agent, înainte de confirmare): temp_c: 50.0 is greater than the maximum of 30&quot;, &quot;pas&quot;: 2}
+{&quot;ts&quot;: &quot;2026-10-22T20:03:30.335&quot;, &quot;tip&quot;: &quot;intrebare&quot;, &quot;text&quot;: &quot;Setează termostatul la 24 de grade&quot;, &quot;mesaje_taiate&quot;: 0}
+{&quot;ts&quot;: &quot;2026-10-22T20:03:30.335&quot;, &quot;tip&quot;: &quot;cerere_model&quot;, &quot;pas&quot;: 1, &quot;mesaje&quot;: 6, &quot;durata_ms&quot;: 0, &quot;prompt_tokens&quot;: 246}
+{&quot;ts&quot;: &quot;2026-10-22T20:03:30.335&quot;, &quot;tip&quot;: &quot;apel&quot;, &quot;pas&quot;: 1, &quot;nume&quot;: &quot;set_thermostat&quot;, &quot;argumente&quot;: {&quot;temp_c&quot;: 24.0}}
+{&quot;ts&quot;: &quot;2026-10-22T20:03:30.336&quot;, &quot;tip&quot;: &quot;confirmare&quot;, &quot;pas&quot;: 1, &quot;nume&quot;: &quot;set_thermostat&quot;, &quot;aprobat&quot;: true}
+{&quot;ts&quot;: &quot;2026-10-22T20:03:30.341&quot;, &quot;tip&quot;: &quot;rezultat&quot;, &quot;pas&quot;: 1, &quot;nume&quot;: &quot;set_thermostat&quot;, &quot;eroare&quot;: false, &quot;text&quot;: &quot;{\&quot;ok\&quot;:true,\&quot;temp_c\&quot;:24.0}&quot;, &quot;trunchiat&quot;: false}
+{&quot;ts&quot;: &quot;2026-10-22T20:03:30.342&quot;, &quot;tip&quot;: &quot;cerere_model&quot;, &quot;pas&quot;: 2, &quot;mesaje&quot;: 8, &quot;durata_ms&quot;: 0, &quot;prompt_tokens&quot;: 309}
+{&quot;ts&quot;: &quot;2026-10-22T20:03:30.342&quot;, &quot;tip&quot;: &quot;raspuns&quot;, &quot;text&quot;: &quot;[mock] Rezultatele instrumentelor:\n- {\&quot;ok\&quot;:true,\&quot;temp_c\&quot;:24.0}&quot;, &quot;pas&quot;: 2}
+{&quot;ts&quot;: &quot;2026-10-22T20:03:30.342&quot;, &quot;tip&quot;: &quot;intrebare&quot;, &quot;text&quot;: &quot;apel: estimate_energy {\&quot;name\&quot;: \&quot;radiator\&quot;, \&quot;hours\&quot;: \&quot;abc\&quot;}&quot;, &quot;mesaje_taiate&quot;: 0}
+{&quot;ts&quot;: &quot;2026-10-22T20:03:30.342&quot;, &quot;tip&quot;: &quot;cerere_model&quot;, &quot;pas&quot;: 1, &quot;mesaje&quot;: 10, &quot;durata_ms&quot;: 0, &quot;prompt_tokens&quot;: 360}
+{&quot;ts&quot;: &quot;2026-10-22T20:03:30.343&quot;, &quot;tip&quot;: &quot;apel&quot;, &quot;pas&quot;: 1, &quot;nume&quot;: &quot;estimate_energy&quot;, &quot;argumente&quot;: {&quot;name&quot;: &quot;radiator&quot;, &quot;hours&quot;: &quot;abc&quot;}}
+{&quot;ts&quot;: &quot;2026-10-22T20:03:30.343&quot;, &quot;tip&quot;: &quot;validare_agent&quot;, &quot;pas&quot;: 1, &quot;nume&quot;: &quot;estimate_energy&quot;, &quot;erori&quot;: [&quot;hours: &#x27;abc&#x27; is not of type &#x27;number&#x27;&quot;]}
+{&quot;ts&quot;: &quot;2026-10-22T20:03:30.343&quot;, &quot;tip&quot;: &quot;rezultat&quot;, &quot;pas&quot;: 1, &quot;nume&quot;: &quot;estimate_energy&quot;, &quot;eroare&quot;: true, &quot;text&quot;: &quot;Argumente invalide (verificate de agent, înainte de confirmare): hours: &#x27;abc&#x27; is not of type &#x27;number&#x27;&quot;, &quot;trunchiat&quot;: false}
+{&quot;ts&quot;: &quot;2026-10-22T20:03:30.343&quot;, &quot;tip&quot;: &quot;cerere_model&quot;, &quot;pas&quot;: 2, &quot;mesaje&quot;: 12, &quot;durata_ms&quot;: 0, &quot;prompt_tokens&quot;: 449}
+{&quot;ts&quot;: &quot;2026-10-22T20:03:30.344&quot;, &quot;tip&quot;: &quot;raspuns&quot;, &quot;text&quot;: &quot;[mock] Rezultatele instrumentelor:\n- Argumente invalide (verificate de agent, înainte de confirmare): hours: &#x27;abc&#x27; is not of type &#x27;number&#x27;&quot;, &quot;pas&quot;: 2}
+{&quot;ts&quot;: &quot;2026-10-22T20:03:30.344&quot;, &quot;tip&quot;: &quot;intrebare&quot;, &quot;text&quot;: &quot;apel: set_device_state {\&quot;name\&quot;: \&quot;radiator\&quot;}&quot;, &quot;mesaje_taiate&quot;: 0}
+{&quot;ts&quot;: &quot;2026-10-22T20:03:30.344&quot;, &quot;tip&quot;: &quot;cerere_model&quot;, &quot;pas&quot;: 1, &quot;mesaje&quot;: 14, &quot;durata_ms&quot;: 0, &quot;prompt_tokens&quot;: 513}
+{&quot;ts&quot;: &quot;2026-10-22T20:03:30.344&quot;, &quot;tip&quot;: &quot;apel&quot;, &quot;pas&quot;: 1, &quot;nume&quot;: &quot;set_device_state&quot;, &quot;argumente&quot;: {&quot;name&quot;: &quot;radiator&quot;}}
+{&quot;ts&quot;: &quot;2026-10-22T20:03:30.344&quot;, &quot;tip&quot;: &quot;validare_agent&quot;, &quot;pas&quot;: 1, &quot;nume&quot;: &quot;set_device_state&quot;, &quot;erori&quot;: [&quot;(rădăcină): &#x27;on&#x27; is a required property&quot;]}
+{&quot;ts&quot;: &quot;2026-10-22T20:03:30.345&quot;, &quot;tip&quot;: &quot;rezultat&quot;, &quot;pas&quot;: 1, &quot;nume&quot;: &quot;set_device_state&quot;, &quot;eroare&quot;: true, &quot;text&quot;: &quot;Argumente invalide (verificate de agent, înainte de confirmare): (rădăcină): &#x27;on&#x27; is a required property&quot;, &quot;trunchiat&quot;: false}
+{&quot;ts&quot;: &quot;2026-10-22T20:03:30.345&quot;, &quot;tip&quot;: &quot;cerere_model&quot;, &quot;pas&quot;: 2, &quot;mesaje&quot;: 16, &quot;durata_ms&quot;: 0, &quot;prompt_tokens&quot;: 598}
+{&quot;ts&quot;: &quot;2026-10-22T20:03:30.345&quot;, &quot;tip&quot;: &quot;raspuns&quot;, &quot;text&quot;: &quot;[mock] Rezultatele instrumentelor:\n- Argumente invalide (verificate de agent, înainte de confirmare): (rădăcină): &#x27;on&#x27; is a required property&quot;, &quot;pas&quot;: 2}</pre></details>
+</section>
+<section id="b7">
+<h2><span class="ex">B7</span> Un ordin vag <span class="opt">model real</span></h2>
+<p class="task">Cu Gemini: „Mi-e frig, fă ceva” și „Oprește tot”. Câte confirmări? Instrumente potrivite? A depășit limitele termostatului? Ce s-ar fi întâmplat fără confirmare?</p>
+<div class="callout warn"><b>Model:</b> <code>gemini-3.5-flash-lite</code> (varianta „lite”, din cota gratuită). Am făcut 2 rulări independente, fiecare într-o sesiune nouă, cu server nou. Confirmările au fost <b>aprobate automat</b> de un callback, echivalent cu a tasta „d” în <code>chat.py</code>, ca să se vadă tot ce ar face modelul. Fiecare cerere de confirmare a fost înregistrată (în log: <code>confirmare</code>).</div>
+<h3>Rularea 1 (logs\agent-20261022-195728.jsonl)</h3>
+<div class="table-wrap"><table><thead><tr><th>Întrebare</th><th>Cereri model</th><th>Apeluri (în ordine)</th><th>Confirmări</th><th>Răspuns final</th></tr></thead><tbody><tr><td>Mi-e frig, fă ceva</td><td class='num'>6</td><td><code>get_building_state({})</code> <span class='muted'>pas 1</span><br><code>list_devices({})</code> <span class='muted'>pas 2</span><br><code>get_device_info({&quot;name&quot;: &quot;radiator&quot;})</code> <span class='muted'>pas 3</span><br><code>set_thermostat({&quot;temp_c&quot;: 24})</code> <span class='muted'>pas 4</span> <span class='tag miss'>confirmare</span><br><code>set_device_state({&quot;on&quot;: true, &quot;name&quot;: &quot;radiator&quot;})</code> <span class='muted'>pas 5</span> <span class='tag miss'>confirmare</span></td><td class='num'>2</td><td>Am crescut temperatura termostatului la 24 °C și am pornit radiatorul ca să se încălzească.</td></tr><tr><td>Oprește tot</td><td class='num'>2</td><td><code>reset_building({})</code> <span class='muted'>pas 1</span> <span class='tag miss'>confirmare</span></td><td class='num'>1</td><td>Am oprit toate dispozitivele și am resetat termostatul la 21 °C.</td></tr></tbody></table></div>
+<h3>Rularea 2 (logs\agent-20261022-200057.jsonl)</h3>
+<div class="table-wrap"><table><thead><tr><th>Întrebare</th><th>Cereri model</th><th>Apeluri (în ordine)</th><th>Confirmări</th><th>Răspuns final</th></tr></thead><tbody><tr><td>Mi-e frig, fă ceva</td><td class='num'>5</td><td><code>get_building_state({})</code> <span class='muted'>pas 1</span><br><code>list_devices({})</code> <span class='muted'>pas 2</span><br><code>get_device_info({&quot;name&quot;: &quot;radiator&quot;})</code> <span class='muted'>pas 3</span><br><code>set_thermostat({&quot;temp_c&quot;: 24})</code> <span class='muted'>pas 4</span> <span class='tag miss'>confirmare</span><br><code>set_device_state({&quot;name&quot;: &quot;radiator&quot;, &quot;on&quot;: true})</code> <span class='muted'>pas 4</span> <span class='tag miss'>confirmare</span></td><td class='num'>2</td><td>Am crescut temperatura la 24 °C și am pornit radiatorul ca să se încălzească.</td></tr><tr><td>Oprește tot</td><td class='num'>2</td><td><code>reset_building({})</code> <span class='muted'>pas 1</span> <span class='tag miss'>confirmare</span></td><td class='num'>1</td><td>Am oprit toate dispozitivele și am resetat termostatul la 21 °C.</td></tr></tbody></table></div>
+<h3>Răspuns</h3>
+<ul>
+<li><b>Confirmări:</b> câte <b>3</b> în fiecare rulare. Două la „Mi-e frig” (<code>set_thermostat(24)</code> și <code>set_device_state(radiator, on)</code>) și una la „Oprește tot” (<code>reset_building</code>, marcată <code>[DISTRUCTIV]</code>). Apelurile de citire au rulat fără confirmare.</li>
+<li><b>„Mi-e frig, fă ceva”: alegeri potrivite.</b> Modelul a citit întâi contextul (<code>get_building_state</code> → <code>list_devices</code> → <code>get_device_info(radiator)</code>, câte un pas fiecare), apoi a acționat: termostat la 24 °C și radiator pornit. Nu a pornit aerul condiționat, deci nu a încercat ceva ce regula de domeniu ar fi refuzat. Diferența dintre rulări: în prima a cerut cele două acțiuni în pași separați (pas 4 și 5, 8 cereri); în a doua, în același pas (pas 4, 7 cereri).</li>
+<li><b>Limitele termostatului:</b> <b>nu</b> le-a depășit. A ales 24 °C, în intervalul 10–30 din schemă, și nu a apărut nicio eroare de validare.</li>
+<li><b>„Oprește tot”: discutabil.</b> Modelul a ales <code>reset_building</code>, instrumentul <b>distructiv</b>, deși exista o variantă nedistructivă: <code>set_device_state(radiator, off)</code>, singurul dispozitiv pornit. Reset-ul a readus și termostatul la 21 °C, ceea ce utilizatorul nu a cerut (a cerut oprirea dispozitivelor, nu anularea setării de 24 °C). Ordinul vag a fost interpretat mai larg decât intenția probabilă.</li>
+<li><b>Fără confirmare:</b> toate cele 3 acțiuni s-ar fi executat automat, inclusiv <code>reset_building</code>, care șterge toată starea clădirii fără ca utilizatorul să vadă vreun argument. Aici efectul e mic și reversibil, dar același mecanism ar executa orice ar cere modelul: o interpretare greșită a unui ordin vag sau o instrucțiune venită prin prompt injection (de ex. dintr-un câmp <code>note</code>). Confirmarea l-ar fi lăsat pe utilizator să refuze reset-ul și să ceară doar oprirea radiatorului. Rezultatele au fost aceleași în ambele rulări, dar două rulări sunt o impresie, nu o statistică.</li>
+<li><b>Cost și durată:</b> tokenii din prompt pornesc de la 620 (lista celor 8 instrumente) și ajung la ~950. Durata unei cereri a variat între 11 și 75 s. <code>durata_ms</code> e măsurată în jurul lui <code>create_chat</code>, deci include și reîncercările conectorului la 429/503, pe care logul nu le înregistrează separat.</li>
+</ul>
+<details><summary>Transcript rularea 1</summary><pre class="term">Tu: Mi-e frig, fă ceva
+  ? Agentul vrea să ruleze set_thermostat({&#x27;temp_c&#x27;: 24}). Permiteți? [d/N] d
+  ? Agentul vrea să ruleze set_device_state({&#x27;on&#x27;: True, &#x27;name&#x27;: &#x27;radiator&#x27;}). Permiteți? [d/N] d
+Agent: Am crescut temperatura termostatului la 24 °C și am pornit radiatorul ca să se încălzească.
+Tu: Oprește tot
+  ? Agentul vrea să ruleze reset_building({}) [DISTRUCTIV]. Permiteți? [d/N] d
+Agent: Am oprit toate dispozitivele și am resetat termostatul la 21 °C.</pre></details>
+<details><summary>Transcript rularea 2</summary><pre class="term">Tu: Mi-e frig, fă ceva
+  ? Agentul vrea să ruleze set_thermostat({&#x27;temp_c&#x27;: 24}). Permiteți? [d/N] d
+  ? Agentul vrea să ruleze set_device_state({&#x27;name&#x27;: &#x27;radiator&#x27;, &#x27;on&#x27;: True}). Permiteți? [d/N] d
+Agent: Am crescut temperatura la 24 °C și am pornit radiatorul ca să se încălzească.
+Tu: Oprește tot
+  ? Agentul vrea să ruleze reset_building({}) [DISTRUCTIV]. Permiteți? [d/N] d
+Agent: Am oprit toate dispozitivele și am resetat termostatul la 21 °C.</pre></details>
+<details><summary>Log rularea 1 (logs\agent-20261022-195728.jsonl)</summary><pre class="log">{&quot;ts&quot;: &quot;2026-10-22T19:57:28.776&quot;, &quot;tip&quot;: &quot;reset&quot;}
+{&quot;ts&quot;: &quot;2026-10-22T19:57:30.469&quot;, &quot;tip&quot;: &quot;intrebare&quot;, &quot;text&quot;: &quot;Mi-e frig, fă ceva&quot;, &quot;mesaje_taiate&quot;: 0}
+{&quot;ts&quot;: &quot;2026-10-22T19:58:06.553&quot;, &quot;tip&quot;: &quot;cerere_model&quot;, &quot;pas&quot;: 1, &quot;mesaje&quot;: 2, &quot;durata_ms&quot;: 36084, &quot;prompt_tokens&quot;: 620}
+{&quot;ts&quot;: &quot;2026-10-22T19:58:06.554&quot;, &quot;tip&quot;: &quot;apel&quot;, &quot;pas&quot;: 1, &quot;nume&quot;: &quot;get_building_state&quot;, &quot;argumente&quot;: {}}
+{&quot;ts&quot;: &quot;2026-10-22T19:58:06.611&quot;, &quot;tip&quot;: &quot;rezultat&quot;, &quot;pas&quot;: 1, &quot;nume&quot;: &quot;get_building_state&quot;, &quot;eroare&quot;: false, &quot;text&quot;: &quot;{\&quot;pornite\&quot;:[],\&quot;termostat_c\&quot;:21.0}&quot;, &quot;trunchiat&quot;: false}
+{&quot;ts&quot;: &quot;2026-10-22T19:58:17.876&quot;, &quot;tip&quot;: &quot;cerere_model&quot;, &quot;pas&quot;: 2, &quot;mesaje&quot;: 4, &quot;durata_ms&quot;: 11264, &quot;prompt_tokens&quot;: 662}
+{&quot;ts&quot;: &quot;2026-10-22T19:58:17.877&quot;, &quot;tip&quot;: &quot;apel&quot;, &quot;pas&quot;: 2, &quot;nume&quot;: &quot;list_devices&quot;, &quot;argumente&quot;: {}}
+{&quot;ts&quot;: &quot;2026-10-22T19:58:17.885&quot;, &quot;tip&quot;: &quot;rezultat&quot;, &quot;pas&quot;: 2, &quot;nume&quot;: &quot;list_devices&quot;, &quot;eroare&quot;: false, &quot;text&quot;: &quot;[\&quot;aer_conditionat\&quot;,\&quot;jaluzele\&quot;,\&quot;lampa_led\&quot;,\&quot;radiator\&quot;,\&quot;ventilatie\&quot;]&quot;, &quot;trunchiat&quot;: false}
+{&quot;ts&quot;: &quot;2026-10-22T19:58:35.581&quot;, &quot;tip&quot;: &quot;cerere_model&quot;, &quot;pas&quot;: 3, &quot;mesaje&quot;: 6, &quot;durata_ms&quot;: 17696, &quot;prompt_tokens&quot;: 706}
+{&quot;ts&quot;: &quot;2026-10-22T19:58:35.584&quot;, &quot;tip&quot;: &quot;apel&quot;, &quot;pas&quot;: 3, &quot;nume&quot;: &quot;get_device_info&quot;, &quot;argumente&quot;: {&quot;name&quot;: &quot;radiator&quot;}}
+{&quot;ts&quot;: &quot;2026-10-22T19:58:35.594&quot;, &quot;tip&quot;: &quot;rezultat&quot;, &quot;pas&quot;: 3, &quot;nume&quot;: &quot;get_device_info&quot;, &quot;eroare&quot;: false, &quot;text&quot;: &quot;{\&quot;nume\&quot;:\&quot;radiator\&quot;,\&quot;categorie\&quot;:\&quot;încălzire\&quot;,\&quot;putere_w\&quot;:1500,\&quot;note\&quot;:\&quot;Controlat de termostatul camerei.\&quot;}&quot;, &quot;trunchiat&quot;: false}
+{&quot;ts&quot;: &quot;2026-10-22T19:58:47.346&quot;, &quot;tip&quot;: &quot;cerere_model&quot;, &quot;pas&quot;: 4, &quot;mesaje&quot;: 8, &quot;durata_ms&quot;: 11751, &quot;prompt_tokens&quot;: 777}
+{&quot;ts&quot;: &quot;2026-10-22T19:58:47.348&quot;, &quot;tip&quot;: &quot;apel&quot;, &quot;pas&quot;: 4, &quot;nume&quot;: &quot;set_thermostat&quot;, &quot;argumente&quot;: {&quot;temp_c&quot;: 24}}
+{&quot;ts&quot;: &quot;2026-10-22T19:58:47.349&quot;, &quot;tip&quot;: &quot;confirmare&quot;, &quot;pas&quot;: 4, &quot;nume&quot;: &quot;set_thermostat&quot;, &quot;aprobat&quot;: true}
+{&quot;ts&quot;: &quot;2026-10-22T19:58:47.356&quot;, &quot;tip&quot;: &quot;rezultat&quot;, &quot;pas&quot;: 4, &quot;nume&quot;: &quot;set_thermostat&quot;, &quot;eroare&quot;: false, &quot;text&quot;: &quot;{\&quot;ok\&quot;:true,\&quot;temp_c\&quot;:24.0}&quot;, &quot;trunchiat&quot;: false}
+{&quot;ts&quot;: &quot;2026-10-22T20:00:02.210&quot;, &quot;tip&quot;: &quot;cerere_model&quot;, &quot;pas&quot;: 5, &quot;mesaje&quot;: 10, &quot;durata_ms&quot;: 74854, &quot;prompt_tokens&quot;: 823}
+{&quot;ts&quot;: &quot;2026-10-22T20:00:02.212&quot;, &quot;tip&quot;: &quot;apel&quot;, &quot;pas&quot;: 5, &quot;nume&quot;: &quot;set_device_state&quot;, &quot;argumente&quot;: {&quot;on&quot;: true, &quot;name&quot;: &quot;radiator&quot;}}
+{&quot;ts&quot;: &quot;2026-10-22T20:00:02.212&quot;, &quot;tip&quot;: &quot;confirmare&quot;, &quot;pas&quot;: 5, &quot;nume&quot;: &quot;set_device_state&quot;, &quot;aprobat&quot;: true}
+{&quot;ts&quot;: &quot;2026-10-22T20:00:02.218&quot;, &quot;tip&quot;: &quot;rezultat&quot;, &quot;pas&quot;: 5, &quot;nume&quot;: &quot;set_device_state&quot;, &quot;eroare&quot;: false, &quot;text&quot;: &quot;{\&quot;ok\&quot;:true,\&quot;nume\&quot;:\&quot;radiator\&quot;,\&quot;pornit\&quot;:true}&quot;, &quot;trunchiat&quot;: false}
+{&quot;ts&quot;: &quot;2026-10-22T20:00:23.955&quot;, &quot;tip&quot;: &quot;cerere_model&quot;, &quot;pas&quot;: 6, &quot;mesaje&quot;: 12, &quot;durata_ms&quot;: 21737, &quot;prompt_tokens&quot;: 877}
+{&quot;ts&quot;: &quot;2026-10-22T20:00:23.955&quot;, &quot;tip&quot;: &quot;raspuns&quot;, &quot;text&quot;: &quot;Am crescut temperatura termostatului la 24 °C și am pornit radiatorul ca să se încălzească.&quot;, &quot;pas&quot;: 6}
+{&quot;ts&quot;: &quot;2026-10-22T20:00:23.955&quot;, &quot;tip&quot;: &quot;intrebare&quot;, &quot;text&quot;: &quot;Oprește tot&quot;, &quot;mesaje_taiate&quot;: 0}
+{&quot;ts&quot;: &quot;2026-10-22T20:00:39.879&quot;, &quot;tip&quot;: &quot;cerere_model&quot;, &quot;pas&quot;: 1, &quot;mesaje&quot;: 14, &quot;durata_ms&quot;: 15923, &quot;prompt_tokens&quot;: 910}
+{&quot;ts&quot;: &quot;2026-10-22T20:00:39.880&quot;, &quot;tip&quot;: &quot;apel&quot;, &quot;pas&quot;: 1, &quot;nume&quot;: &quot;reset_building&quot;, &quot;argumente&quot;: {}}
+{&quot;ts&quot;: &quot;2026-10-22T20:00:39.881&quot;, &quot;tip&quot;: &quot;confirmare&quot;, &quot;pas&quot;: 1, &quot;nume&quot;: &quot;reset_building&quot;, &quot;aprobat&quot;: true}
+{&quot;ts&quot;: &quot;2026-10-22T20:00:39.888&quot;, &quot;tip&quot;: &quot;rezultat&quot;, &quot;pas&quot;: 1, &quot;nume&quot;: &quot;reset_building&quot;, &quot;eroare&quot;: false, &quot;text&quot;: &quot;{\&quot;ok\&quot;:true,\&quot;mesaj\&quot;:\&quot;Clădirea a fost resetată.\&quot;}&quot;, &quot;trunchiat&quot;: false}
+{&quot;ts&quot;: &quot;2026-10-22T20:00:55.952&quot;, &quot;tip&quot;: &quot;cerere_model&quot;, &quot;pas&quot;: 2, &quot;mesaje&quot;: 16, &quot;durata_ms&quot;: 16064, &quot;prompt_tokens&quot;: 951}
+{&quot;ts&quot;: &quot;2026-10-22T20:00:55.953&quot;, &quot;tip&quot;: &quot;raspuns&quot;, &quot;text&quot;: &quot;Am oprit toate dispozitivele și am resetat termostatul la 21 °C.&quot;, &quot;pas&quot;: 2}</pre></details>
+<details><summary>Log rularea 2 (logs\agent-20261022-200057.jsonl)</summary><pre class="log">{&quot;ts&quot;: &quot;2026-10-22T20:00:57.477&quot;, &quot;tip&quot;: &quot;reset&quot;}
+{&quot;ts&quot;: &quot;2026-10-22T20:00:59.155&quot;, &quot;tip&quot;: &quot;intrebare&quot;, &quot;text&quot;: &quot;Mi-e frig, fă ceva&quot;, &quot;mesaje_taiate&quot;: 0}
+{&quot;ts&quot;: &quot;2026-10-22T20:01:19.127&quot;, &quot;tip&quot;: &quot;cerere_model&quot;, &quot;pas&quot;: 1, &quot;mesaje&quot;: 2, &quot;durata_ms&quot;: 19972, &quot;prompt_tokens&quot;: 620}
+{&quot;ts&quot;: &quot;2026-10-22T20:01:19.128&quot;, &quot;tip&quot;: &quot;apel&quot;, &quot;pas&quot;: 1, &quot;nume&quot;: &quot;get_building_state&quot;, &quot;argumente&quot;: {}}
+{&quot;ts&quot;: &quot;2026-10-22T20:01:19.143&quot;, &quot;tip&quot;: &quot;rezultat&quot;, &quot;pas&quot;: 1, &quot;nume&quot;: &quot;get_building_state&quot;, &quot;eroare&quot;: false, &quot;text&quot;: &quot;{\&quot;pornite\&quot;:[],\&quot;termostat_c\&quot;:21.0}&quot;, &quot;trunchiat&quot;: false}
+{&quot;ts&quot;: &quot;2026-10-22T20:01:30.016&quot;, &quot;tip&quot;: &quot;cerere_model&quot;, &quot;pas&quot;: 2, &quot;mesaje&quot;: 4, &quot;durata_ms&quot;: 10872, &quot;prompt_tokens&quot;: 662}
+{&quot;ts&quot;: &quot;2026-10-22T20:01:30.016&quot;, &quot;tip&quot;: &quot;apel&quot;, &quot;pas&quot;: 2, &quot;nume&quot;: &quot;list_devices&quot;, &quot;argumente&quot;: {}}
+{&quot;ts&quot;: &quot;2026-10-22T20:01:30.024&quot;, &quot;tip&quot;: &quot;rezultat&quot;, &quot;pas&quot;: 2, &quot;nume&quot;: &quot;list_devices&quot;, &quot;eroare&quot;: false, &quot;text&quot;: &quot;[\&quot;aer_conditionat\&quot;,\&quot;jaluzele\&quot;,\&quot;lampa_led\&quot;,\&quot;radiator\&quot;,\&quot;ventilatie\&quot;]&quot;, &quot;trunchiat&quot;: false}
+{&quot;ts&quot;: &quot;2026-10-22T20:01:45.156&quot;, &quot;tip&quot;: &quot;cerere_model&quot;, &quot;pas&quot;: 3, &quot;mesaje&quot;: 6, &quot;durata_ms&quot;: 15132, &quot;prompt_tokens&quot;: 706}
+{&quot;ts&quot;: &quot;2026-10-22T20:01:45.157&quot;, &quot;tip&quot;: &quot;apel&quot;, &quot;pas&quot;: 3, &quot;nume&quot;: &quot;get_device_info&quot;, &quot;argumente&quot;: {&quot;name&quot;: &quot;radiator&quot;}}
+{&quot;ts&quot;: &quot;2026-10-22T20:01:45.162&quot;, &quot;tip&quot;: &quot;rezultat&quot;, &quot;pas&quot;: 3, &quot;nume&quot;: &quot;get_device_info&quot;, &quot;eroare&quot;: false, &quot;text&quot;: &quot;{\&quot;nume\&quot;:\&quot;radiator\&quot;,\&quot;categorie\&quot;:\&quot;încălzire\&quot;,\&quot;putere_w\&quot;:1500,\&quot;note\&quot;:\&quot;Controlat de termostatul camerei.\&quot;}&quot;, &quot;trunchiat&quot;: false}
+{&quot;ts&quot;: &quot;2026-10-22T20:02:06.056&quot;, &quot;tip&quot;: &quot;cerere_model&quot;, &quot;pas&quot;: 4, &quot;mesaje&quot;: 8, &quot;durata_ms&quot;: 20893, &quot;prompt_tokens&quot;: 777}
+{&quot;ts&quot;: &quot;2026-10-22T20:02:06.057&quot;, &quot;tip&quot;: &quot;apel&quot;, &quot;pas&quot;: 4, &quot;nume&quot;: &quot;set_thermostat&quot;, &quot;argumente&quot;: {&quot;temp_c&quot;: 24}}
+{&quot;ts&quot;: &quot;2026-10-22T20:02:06.058&quot;, &quot;tip&quot;: &quot;confirmare&quot;, &quot;pas&quot;: 4, &quot;nume&quot;: &quot;set_thermostat&quot;, &quot;aprobat&quot;: true}
+{&quot;ts&quot;: &quot;2026-10-22T20:02:06.065&quot;, &quot;tip&quot;: &quot;rezultat&quot;, &quot;pas&quot;: 4, &quot;nume&quot;: &quot;set_thermostat&quot;, &quot;eroare&quot;: false, &quot;text&quot;: &quot;{\&quot;ok\&quot;:true,\&quot;temp_c\&quot;:24.0}&quot;, &quot;trunchiat&quot;: false}
+{&quot;ts&quot;: &quot;2026-10-22T20:02:06.065&quot;, &quot;tip&quot;: &quot;apel&quot;, &quot;pas&quot;: 4, &quot;nume&quot;: &quot;set_device_state&quot;, &quot;argumente&quot;: {&quot;name&quot;: &quot;radiator&quot;, &quot;on&quot;: true}}
+{&quot;ts&quot;: &quot;2026-10-22T20:02:06.066&quot;, &quot;tip&quot;: &quot;confirmare&quot;, &quot;pas&quot;: 4, &quot;nume&quot;: &quot;set_device_state&quot;, &quot;aprobat&quot;: true}
+{&quot;ts&quot;: &quot;2026-10-22T20:02:06.070&quot;, &quot;tip&quot;: &quot;rezultat&quot;, &quot;pas&quot;: 4, &quot;nume&quot;: &quot;set_device_state&quot;, &quot;eroare&quot;: false, &quot;text&quot;: &quot;{\&quot;ok\&quot;:true,\&quot;nume\&quot;:\&quot;radiator\&quot;,\&quot;pornit\&quot;:true}&quot;, &quot;trunchiat&quot;: false}
+{&quot;ts&quot;: &quot;2026-10-22T20:02:21.344&quot;, &quot;tip&quot;: &quot;cerere_model&quot;, &quot;pas&quot;: 5, &quot;mesaje&quot;: 11, &quot;durata_ms&quot;: 15274, &quot;prompt_tokens&quot;: 876}
+{&quot;ts&quot;: &quot;2026-10-22T20:02:21.346&quot;, &quot;tip&quot;: &quot;raspuns&quot;, &quot;text&quot;: &quot;Am crescut temperatura la 24 °C și am pornit radiatorul ca să se încălzească.&quot;, &quot;pas&quot;: 5}
+{&quot;ts&quot;: &quot;2026-10-22T20:02:21.347&quot;, &quot;tip&quot;: &quot;intrebare&quot;, &quot;text&quot;: &quot;Oprește tot&quot;, &quot;mesaje_taiate&quot;: 0}
+{&quot;ts&quot;: &quot;2026-10-22T20:02:36.526&quot;, &quot;tip&quot;: &quot;cerere_model&quot;, &quot;pas&quot;: 1, &quot;mesaje&quot;: 13, &quot;durata_ms&quot;: 15178, &quot;prompt_tokens&quot;: 906}
+{&quot;ts&quot;: &quot;2026-10-22T20:02:36.527&quot;, &quot;tip&quot;: &quot;apel&quot;, &quot;pas&quot;: 1, &quot;nume&quot;: &quot;reset_building&quot;, &quot;argumente&quot;: {}}
+{&quot;ts&quot;: &quot;2026-10-22T20:02:36.528&quot;, &quot;tip&quot;: &quot;confirmare&quot;, &quot;pas&quot;: 1, &quot;nume&quot;: &quot;reset_building&quot;, &quot;aprobat&quot;: true}
+{&quot;ts&quot;: &quot;2026-10-22T20:02:36.535&quot;, &quot;tip&quot;: &quot;rezultat&quot;, &quot;pas&quot;: 1, &quot;nume&quot;: &quot;reset_building&quot;, &quot;eroare&quot;: false, &quot;text&quot;: &quot;{\&quot;ok\&quot;:true,\&quot;mesaj\&quot;:\&quot;Clădirea a fost resetată.\&quot;}&quot;, &quot;trunchiat&quot;: false}
+{&quot;ts&quot;: &quot;2026-10-22T20:02:52.240&quot;, &quot;tip&quot;: &quot;cerere_model&quot;, &quot;pas&quot;: 2, &quot;mesaje&quot;: 15, &quot;durata_ms&quot;: 15705, &quot;prompt_tokens&quot;: 947}
+{&quot;ts&quot;: &quot;2026-10-22T20:02:52.241&quot;, &quot;tip&quot;: &quot;raspuns&quot;, &quot;text&quot;: &quot;Am oprit toate dispozitivele și am resetat termostatul la 21 °C.&quot;, &quot;pas&quot;: 2}</pre></details>
+<details><summary>python analyze_log.py (ambele rulări)</summary><pre class="term">Fișier: C:\Users\catalin\OneDrive\Documents\GitHub\si_lab02\logs\agent-20261022-195728.jsonl
+Evenimente pe tip: {&#x27;reset&#x27;: 1, &#x27;pornire&#x27;: 1, &#x27;intrebare&#x27;: 2, &#x27;cerere_model&#x27;: 8, &#x27;apel&#x27;: 6, &#x27;rezultat&#x27;: 6, &#x27;confirmare&#x27;: 3, &#x27;raspuns&#x27;: 2}
+Apeluri pe instrument: {&#x27;get_building_state&#x27;: 1, &#x27;list_devices&#x27;: 1, &#x27;get_device_info&#x27;: 1, &#x27;set_thermostat&#x27;: 1, &#x27;set_device_state&#x27;: 1, &#x27;reset_building&#x27;: 1}
+Apeluri cu eroare: - | refuzuri ale utilizatorului: 0
+Cereri către model: 8 | durata medie: 25672 ms
+Tokeni în prompt: primul 620, ultimul 951, maxim 951
+
+Fișier: C:\Users\catalin\OneDrive\Documents\GitHub\si_lab02\logs\agent-20261022-200057.jsonl
+Evenimente pe tip: {&#x27;reset&#x27;: 1, &#x27;pornire&#x27;: 1, &#x27;intrebare&#x27;: 2, &#x27;cerere_model&#x27;: 7, &#x27;apel&#x27;: 6, &#x27;rezultat&#x27;: 6, &#x27;confirmare&#x27;: 3, &#x27;raspuns&#x27;: 2}
+Apeluri pe instrument: {&#x27;get_building_state&#x27;: 1, &#x27;list_devices&#x27;: 1, &#x27;get_device_info&#x27;: 1, &#x27;set_thermostat&#x27;: 1, &#x27;set_device_state&#x27;: 1, &#x27;reset_building&#x27;: 1}
+Apeluri cu eroare: - | refuzuri ale utilizatorului: 0
+Cereri către model: 7 | durata medie: 16147 ms
+Tokeni în prompt: primul 620, ultimul 947, maxim 947</pre></details>
+</section>
+<section id="teste">
+<h2>Verificări automate</h2>
+<p class="muted">Aserțiuni verificate pe ieșirile Inspector, pe rezultatele sesiunii MCP și pe logurile JSONL ale agentului.</p>
+<div class="table-wrap"><table><thead><tr><th>Ex.</th><th>Verificare</th><th>Rezultat</th></tr></thead><tbody><tr><td>B1</td><td>tools/list întoarce 8 instrumente <span class=muted>(8)</span></td><td class='pass'>✓ trecut</td></tr><tr><td>B1</td><td>exact 5 instrumente cu readOnlyHint: true <span class=muted>(list_devices, get_device_info, check_conflict, estimate_energy, get_building_state)</span></td><td class='pass'>✓ trecut</td></tr><tr><td>B1</td><td>reset_building are destructiveHint: true</td><td class='pass'>✓ trecut</td></tr><tr><td>B1</td><td>set_device_state / set_thermostat: destructiveHint false, idempotentHint true</td><td class='pass'>✓ trecut</td></tr><tr><td>B2</td><td>set_thermostat(24): isError false</td><td class='pass'>✓ trecut</td></tr><tr><td>B2</td><td>set_thermostat(50): isError true, eroare less_than_equal</td><td class='pass'>✓ trecut</td></tr><tr><td>B2</td><td>după 50, termostatul a rămas 24 (funcția nu a rulat) <span class=muted>({&quot;pornite&quot;:[],&quot;termostat_c&quot;:24.0})</span></td><td class='pass'>✓ trecut</td></tr><tr><td>B3</td><td>aer_conditionat după radiator: ok=false (regula de domeniu)</td><td class='pass'>✓ trecut</td></tr><tr><td>B3</td><td>în aceeași conexiune: pornite = [radiator]</td><td class='pass'>✓ trecut</td></tr><tr><td>B3</td><td>după reconectare: starea inițială (pornite = [], 21 °C)</td><td class='pass'>✓ trecut</td></tr><tr><td>B3</td><td>CLI (proces nou la fiecare apel): aer_conditionat pornește fără conflict</td><td class='pass'>✓ trecut</td></tr><tr><td>B4</td><td>confirmare cerută pentru cele 2 „Pornește …”</td><td class='pass'>✓ trecut</td></tr><tr><td>B4</td><td>„Ce este pornit acum?” fără confirmare (get_building_state e readOnly)</td><td class='pass'>✓ trecut</td></tr><tr><td>B4</td><td>aer_conditionat aprobat de om, dar refuzat de server (ok=false)</td><td class='pass'>✓ trecut</td></tr><tr><td>B4</td><td>starea finală: doar radiatorul pornit</td><td class='pass'>✓ trecut</td></tr><tr><td>B5</td><td>reset refuzat: confirmare aprobat=false</td><td class='pass'>✓ trecut</td></tr><tr><td>B5</td><td>reset refuzat: rezultat eroare=true cu textul de refuz</td><td class='pass'>✓ trecut</td></tr><tr><td>B5</td><td>după refuz, lampa e tot pornită</td><td class='pass'>✓ trecut</td></tr><tr><td>B5</td><td>reset aprobat: clădirea goală</td><td class='pass'>✓ trecut</td></tr><tr><td>B5</td><td>/istoric: 25 mesaje înainte de /reset, 1 după</td><td class='pass'>✓ trecut</td></tr><tr><td>B5</td><td>după /reset, radiatorul e tot pornit (starea serverului nu s-a șters)</td><td class='pass'>✓ trecut</td></tr><tr><td>B6</td><td>termostat 50: confirmare cerută ȘI aprobată, apoi respinsă de server</td><td class='pass'>✓ trecut</td></tr><tr><td>B6</td><td>termostatul a rămas la 21 °C</td><td class='pass'>✓ trecut</td></tr><tr><td>B6 prototip</td><td>„Setează termostatul la 50 de grade” (invalid: 50 &gt; 30) → 0 confirmări <span class=muted>(0 confirmări)</span></td><td class='pass'>✓ trecut</td></tr><tr><td>B6 prototip</td><td>„Setează termostatul la 24 de grade” (valid) → 1 confirmări <span class=muted>(1 confirmări)</span></td><td class='pass'>✓ trecut</td></tr><tr><td>B6 prototip</td><td>„apel: estimate_energy {&quot;name&quot;: &quot;radiator&quot;, &quot;hours&quot;: &quot;abc&quot;}” (invalid: tip greșit) → 0 confirmări <span class=muted>(0 confirmări)</span></td><td class='pass'>✓ trecut</td></tr><tr><td>B6 prototip</td><td>„apel: set_device_state {&quot;name&quot;: &quot;radiator&quot;}” (invalid: lipsește &#x27;on&#x27;) → 0 confirmări <span class=muted>(0 confirmări)</span></td><td class='pass'>✓ trecut</td></tr><tr><td>B7</td><td>B7_r1: 3 confirmări (set_thermostat, set_device_state, reset_building)</td><td class='pass'>✓ trecut</td></tr><tr><td>B7</td><td>B7_r1: termostatul setat în limite (10–30 °C)</td><td class='pass'>✓ trecut</td></tr><tr><td>B7</td><td>B7_r1: nicio eroare de instrument</td><td class='pass'>✓ trecut</td></tr><tr><td>B7</td><td>B7_r2: 3 confirmări (set_thermostat, set_device_state, reset_building)</td><td class='pass'>✓ trecut</td></tr><tr><td>B7</td><td>B7_r2: termostatul setat în limite (10–30 °C)</td><td class='pass'>✓ trecut</td></tr><tr><td>B7</td><td>B7_r2: nicio eroare de instrument</td><td class='pass'>✓ trecut</td></tr></tbody></table></div>
+<h3>Cum se reproduce</h3>
+<pre class="term"># B1-B3
+npx @modelcontextprotocol/inspector python server.py                 # web
+npx @modelcontextprotocol/inspector --cli python server.py --method tools/list
+npx @modelcontextprotocol/inspector --cli python server.py --method tools/call --tool-name set_thermostat --tool-arg temp_c=50
+
+# B4-B6: în .env  LLM_PROVIDER=mock
+python chat.py
+
+# B7: în .env  LLM_PROVIDER=gemini
+python chat.py
+python analyze_log.py</pre>
+</section>
+</main>
+</body>
+</html>

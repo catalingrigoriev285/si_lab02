@@ -1,0 +1,385 @@
+<!doctype html>
+<html lang="ro">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Laborator 2 – Partea C</title>
+<style>
+:root {
+  --bg: #fbfaf8; --surface: #ffffff; --text: #1d1d1f; --muted: #6b6b70; --border: #e3e1dc;
+  --accent: #2f5fb3; --accent-soft: #e9effa; --code-bg: #f3f2ef; --term-bg: #1e1f24; --term-text: #e6e6e6;
+  --ok: #1f7a3d; --ok-soft: #e4f3e9; --bad: #b3261e; --bad-soft: #fbe9e7; --warn: #8a5a00; --warn-soft: #fdf3dc;
+  --hist: #5a4fb3; --hist-soft: #ecebfa;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #141517; --surface: #1c1d21; --text: #e8e8ea; --muted: #9a9aa2; --border: #2e3036;
+    --accent: #8ab0f0; --accent-soft: #1f2a3d; --code-bg: #25272c; --term-bg: #0e0f11; --term-text: #dcdcdc;
+    --ok: #6fd08f; --ok-soft: #173222; --bad: #f08b84; --bad-soft: #3a1d1b; --warn: #e8bf6a; --warn-soft: #33290f;
+    --hist: #b3abf5; --hist-soft: #26233f;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #141517; --surface: #1c1d21; --text: #e8e8ea; --muted: #9a9aa2; --border: #2e3036;
+  --accent: #8ab0f0; --accent-soft: #1f2a3d; --code-bg: #25272c; --term-bg: #0e0f11; --term-text: #dcdcdc;
+  --ok: #6fd08f; --ok-soft: #173222; --bad: #f08b84; --bad-soft: #3a1d1b; --warn: #e8bf6a; --warn-soft: #33290f;
+  --hist: #b3abf5; --hist-soft: #26233f;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--text);
+  font: 16px/1.6 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+main { max-width: 1040px; margin: 0 auto; padding: 32px 16px 80px; }
+header h1 { font-size: 1.9rem; margin: 0 0 4px; letter-spacing: -0.01em; }
+header .sub { color: var(--muted); margin: 0 0 16px; }
+nav { position: sticky; top: 0; z-index: 5; background: var(--bg); padding: 10px 0; margin-bottom: 8px;
+  border-bottom: 1px solid var(--border); display: flex; gap: 6px; flex-wrap: wrap; }
+nav a { text-decoration: none; color: var(--accent); background: var(--accent-soft); padding: 3px 12px;
+  border-radius: 999px; font-weight: 600; font-size: .9rem; }
+section { background: var(--surface); border: 1px solid var(--border); border-radius: 12px;
+  padding: 20px 22px; margin: 22px 0; }
+h2 { margin: 0 0 8px; font-size: 1.35rem; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+h3 { font-size: 1rem; margin: 20px 0 8px; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; }
+.ex { background: var(--accent); color: var(--surface); border-radius: 6px; padding: 0 8px; font-size: 1rem; }
+.opt { font-size: .75rem; font-weight: 600; color: var(--warn); background: var(--warn-soft);
+  padding: 1px 8px; border-radius: 999px; }
+.task { color: var(--muted); border-left: 3px solid var(--border); padding-left: 12px; margin: 6px 0 0; }
+code { font-family: ui-monospace, "Cascadia Code", Consolas, monospace; font-size: .86em;
+  background: var(--code-bg); padding: 1px 5px; border-radius: 4px; overflow-wrap: anywhere; }
+pre { font-family: ui-monospace, "Cascadia Code", Consolas, monospace; font-size: .8rem; line-height: 1.5;
+  padding: 12px 14px; border-radius: 8px; overflow-x: auto; margin: 8px 0; }
+pre.log { background: var(--code-bg); color: var(--text); white-space: pre; }
+pre.term { background: var(--term-bg); color: var(--term-text); white-space: pre-wrap; }
+.table-wrap { overflow-x: auto; margin: 8px 0; }
+table { border-collapse: collapse; width: 100%; font-size: .9rem; margin: 0; }
+th, td { border-bottom: 1px solid var(--border); padding: 7px 10px; text-align: left; vertical-align: top; }
+th { font-weight: 600; background: var(--code-bg); }
+td.num { text-align: center; white-space: nowrap; font-variant-numeric: tabular-nums; }
+td.flow { font-size: .78rem; color: var(--muted); }
+td.flow sub { font-size: .7em; }
+tr.total td { font-weight: 600; background: var(--code-bg); }
+td.pass { color: var(--ok); font-weight: 600; white-space: nowrap; }
+td.fail { color: var(--bad); font-weight: 600; white-space: nowrap; }
+.muted { color: var(--muted); font-size: .9em; }
+.tag { font-size: .72rem; font-weight: 700; padding: 1px 7px; border-radius: 999px; white-space: nowrap; }
+.tag.ok { color: var(--ok); background: var(--ok-soft); }
+.tag.bad { color: var(--bad); background: var(--bad-soft); }
+.tag.miss { color: var(--warn); background: var(--warn-soft); }
+.tag.hist { color: var(--hist); background: var(--hist-soft); }
+.callout { background: var(--accent-soft); border-radius: 8px; padding: 10px 14px; margin: 12px 0 4px; font-size: .93rem; }
+.callout.warn { background: var(--warn-soft); }
+ul { padding-left: 20px; }
+li { margin: 6px 0; }
+details { margin: 8px 0; border: 1px solid var(--border); border-radius: 8px; padding: 4px 12px; }
+details summary { cursor: pointer; font-weight: 600; font-size: .9rem; padding: 4px 0; color: var(--accent); }
+.meta { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 10px; margin: 14px 0; }
+.meta div { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 10px 14px; }
+.meta b { display: block; font-size: .75rem; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; }
+.score { font-size: 1.5rem; font-weight: 700; color: var(--ok); }
+</style>
+</head>
+<body>
+<main>
+<header>
+<h1>Laborator 2 – Partea C</h1>
+<p class="sub">Exercițiile 5.4: gestiunea stării (fereastra de istoric, trunchiere, bucle, <code>tool_choice</code>). Toate rezultatele sunt din rulări reale, pe 22.10.2026.</p>
+<div class="meta">
+<div><b>C1, C3, C4, C5</b>mock (<code>mock-1</code>)</div>
+<div><b>C2, C5</b><code>gemini-3.5-flash-lite</code></div>
+<div><b>Constante</b>schimbate într-o copie a proiectului; <code>agent.py</code> neatins</div>
+<div><b>Verificări automate</b><span class="score">20/20</span> trecute</div>
+</div>
+</header>
+<nav><a href="#c1">C1</a><a href="#c2">C2</a><a href="#c3">C3</a><a href="#c4">C4</a><a href="#c5">C5</a><a href="#teste">Teste</a></nav>
+
+<section id="c1">
+<h2><span class="ex">C1</span> Fereastra de istoric (mock)</h2>
+<p class="task"><code>MAX_TURNS = 2</code>; patru întrebări, cu <code>/istoric</code> după fiecare. Cum evoluează numărul de mesaje? De ce se oprește din crescut? Verificați <code>mesaje_taiate</code>. (Așteptat: 5, 9, 9, 9.)</p>
+<h3>Rezultat</h3>
+<div class="table-wrap"><table><thead><tr><th>#</th><th>Întrebare</th><th>Apel</th><th><code>mesaje_taiate</code></th><th>Mesaje trimise la pasul 1</th><th><code>/istoric</code> după</th><th>Tokeni prompt (pas 1)</th></tr></thead>
+<tbody><tr><td>1</td><td>Cât consumă radiatorul în 1 ore?</td><td><code>estimate_energy({&quot;name&quot;: &quot;radiator&quot;, &quot;hours&quot;: 1.0})</code></td><td class='num'>0</td><td class='num'>2</td><td class='num'>5</td><td class='num'>97</td></tr><tr><td>2</td><td>Cât consumă lampa în 3 ore?</td><td><code>estimate_energy({&quot;name&quot;: &quot;lampa_led&quot;, &quot;hours&quot;: 3.0})</code></td><td class='num'>0</td><td class='num'>6</td><td class='num'>9</td><td class='num'>221</td></tr><tr><td>3</td><td>Care sunt dispozitivele? Vreau lista.</td><td><code>list_devices({})</code></td><td class='num'>4</td><td class='num'>6</td><td class='num'>9</td><td class='num'>224</td></tr><tr><td>4</td><td>Ce este pornit acum?</td><td><code>get_building_state({})</code></td><td class='num'>4</td><td class='num'>6</td><td class='num'>9</td><td class='num'>221</td></tr></tbody></table></div>
+<h3>Răspuns</h3>
+<ul>
+<li><b>Evoluția:</b> 5, 9, 9, 9 mesaje, exact ca în enunț. O tură are aici 4 mesaje: <code>user</code>, <code>assistant</code> cu <code>tool_calls</code>, <code>tool</code> și <code>assistant</code> cu răspunsul final. Împreună cu mesajul <code>system</code>: 1 + 4 = 5 după prima întrebare și 1 + 4 + 4 = 9 după a doua.</li>
+<li><b>De ce se oprește:</b> la a treia întrebare există 3 ture, mai multe decât <code>MAX_TURNS = 2</code>. <code>trim_history</code> păstrează mesajul <code>system</code> și ultimele 2 ture, adică cea anterioară și cea nouă. Prima tură (4 mesaje) este eliminată, deci <code>mesaje_taiate: 4</code>. Se adaugă 4 mesaje și se scot 4, iar istoricul rămâne la 9.</li>
+<li><b>În log:</b> <code>mesaje_taiate</code> este 0, 0, 4, 4. Câmpul <code>mesaje</code> din <code>cerere_model</code> (pasul 1) crește 2 → 6, apoi rămâne 6. Tokenii din prompt nu mai cresc nici ei (~220–300), spre deosebire de A1, unde urcau continuu.</li>
+<li><b>Prețul:</b> la a patra întrebare modelul nu mai „știe” nimic despre radiator: prima tură nu mai e în <code>messages</code>.</li>
+</ul>
+<details><summary>Transcriptul chat.py</summary><pre class="term">Tu:   [instrument] estimate_energy({&#x27;name&#x27;: &#x27;radiator&#x27;, &#x27;hours&#x27;: 1.0}) -&gt; {&quot;nume&quot;:&quot;radiator&quot;,&quot;ore&quot;:1.0,&quot;energie_kwh&quot;:1.5}
+Agent: [mock] Rezultatele instrumentelor:
+- {&quot;nume&quot;:&quot;radiator&quot;,&quot;ore&quot;:1.0,&quot;energie_kwh&quot;:1.5} 
+
+Tu: (istoric: 5 mesaje)
+Tu:   [instrument] estimate_energy({&#x27;name&#x27;: &#x27;lampa_led&#x27;, &#x27;hours&#x27;: 3.0}) -&gt; {&quot;nume&quot;:&quot;lampa_led&quot;,&quot;ore&quot;:3.0,&quot;energie_kwh&quot;:0.03}
+Agent: [mock] Rezultatele instrumentelor:
+- {&quot;nume&quot;:&quot;lampa_led&quot;,&quot;ore&quot;:3.0,&quot;energie_kwh&quot;:0.03} 
+
+Tu: (istoric: 9 mesaje)
+Tu:   [instrument] list_devices({}) -&gt; [&quot;aer_conditionat&quot;,&quot;jaluzele&quot;,&quot;lampa_led&quot;,&quot;radiator&quot;,&quot;ventilatie&quot;]
+Agent: [mock] Rezultatele instrumentelor:
+- [&quot;aer_conditionat&quot;,&quot;jaluzele&quot;,&quot;lampa_led&quot;,&quot;radiator&quot;,&quot;ventilatie&quot;] 
+
+Tu: (istoric: 9 mesaje)
+Tu:   [instrument] get_building_state({}) -&gt; {&quot;pornite&quot;:[],&quot;termostat_c&quot;:21.0}
+Agent: [mock] Rezultatele instrumentelor:
+- {&quot;pornite&quot;:[],&quot;termostat_c&quot;:21.0} 
+
+Tu: (istoric: 9 mesaje)</pre></details>
+<details><summary>Logul complet (logs/C1-agent-20261022-211919.jsonl)</summary><pre class="log">{&quot;ts&quot;: &quot;2026-10-22T21:19:19.975&quot;, &quot;tip&quot;: &quot;reset&quot;}
+{&quot;ts&quot;: &quot;2026-10-22T21:19:22.030&quot;, &quot;tip&quot;: &quot;intrebare&quot;, &quot;text&quot;: &quot;Cât consumă radiatorul în 1 ore?&quot;, &quot;mesaje_taiate&quot;: 0}
+{&quot;ts&quot;: &quot;2026-10-22T21:19:22.039&quot;, &quot;tip&quot;: &quot;cerere_model&quot;, &quot;pas&quot;: 1, &quot;mesaje&quot;: 2, &quot;durata_ms&quot;: 5, &quot;prompt_tokens&quot;: 97}
+{&quot;ts&quot;: &quot;2026-10-22T21:19:22.040&quot;, &quot;tip&quot;: &quot;apel&quot;, &quot;pas&quot;: 1, &quot;nume&quot;: &quot;estimate_energy&quot;, &quot;argumente&quot;: {&quot;name&quot;: &quot;radiator&quot;, &quot;hours&quot;: 1.0}}
+{&quot;ts&quot;: &quot;2026-10-22T21:19:22.528&quot;, &quot;tip&quot;: &quot;rezultat&quot;, &quot;pas&quot;: 1, &quot;nume&quot;: &quot;estimate_energy&quot;, &quot;eroare&quot;: false, &quot;text&quot;: &quot;{\&quot;nume\&quot;:\&quot;radiator\&quot;,\&quot;ore\&quot;:1.0,\&quot;energie_kwh\&quot;:1.5}&quot;, &quot;trunchiat&quot;: false}
+{&quot;ts&quot;: &quot;2026-10-22T21:19:22.530&quot;, &quot;tip&quot;: &quot;cerere_model&quot;, &quot;pas&quot;: 2, &quot;mesaje&quot;: 4, &quot;durata_ms&quot;: 0, &quot;prompt_tokens&quot;: 173}
+{&quot;ts&quot;: &quot;2026-10-22T21:19:22.533&quot;, &quot;tip&quot;: &quot;raspuns&quot;, &quot;text&quot;: &quot;[mock] Rezultatele instrumentelor:\n- {\&quot;nume\&quot;:\&quot;radiator\&quot;,\&quot;ore\&quot;:1.0,\&quot;energie_kwh\&quot;:1.5}&quot;, &quot;pas&quot;: 2}
+{&quot;ts&quot;: &quot;2026-10-22T21:19:22.534&quot;, &quot;tip&quot;: &quot;intrebare&quot;, &quot;text&quot;: &quot;Cât consumă lampa în 3 ore?&quot;, &quot;mesaje_taiate&quot;: 0}
+{&quot;ts&quot;: &quot;2026-10-22T21:19:22.537&quot;, &quot;tip&quot;: &quot;cerere_model&quot;, &quot;pas&quot;: 1, &quot;mesaje&quot;: 6, &quot;durata_ms&quot;: 0, &quot;prompt_tokens&quot;: 221}
+{&quot;ts&quot;: &quot;2026-10-22T21:19:22.539&quot;, &quot;tip&quot;: &quot;apel&quot;, &quot;pas&quot;: 1, &quot;nume&quot;: &quot;estimate_energy&quot;, &quot;argumente&quot;: {&quot;name&quot;: &quot;lampa_led&quot;, &quot;hours&quot;: 3.0}}
+{&quot;ts&quot;: &quot;2026-10-22T21:19:22.557&quot;, &quot;tip&quot;: &quot;rezultat&quot;, &quot;pas&quot;: 1, &quot;nume&quot;: &quot;estimate_energy&quot;, &quot;eroare&quot;: false, &quot;text&quot;: &quot;{\&quot;nume\&quot;:\&quot;lampa_led\&quot;,\&quot;ore\&quot;:3.0,\&quot;energie_kwh\&quot;:0.03}&quot;, &quot;trunchiat&quot;: false}
+{&quot;ts&quot;: &quot;2026-10-22T21:19:22.559&quot;, &quot;tip&quot;: &quot;cerere_model&quot;, &quot;pas&quot;: 2, &quot;mesaje&quot;: 8, &quot;durata_ms&quot;: 0, &quot;prompt_tokens&quot;: 298}
+{&quot;ts&quot;: &quot;2026-10-22T21:19:22.559&quot;, &quot;tip&quot;: &quot;raspuns&quot;, &quot;text&quot;: &quot;[mock] Rezultatele instrumentelor:\n- {\&quot;nume\&quot;:\&quot;lampa_led\&quot;,\&quot;ore\&quot;:3.0,\&quot;energie_kwh\&quot;:0.03}&quot;, &quot;pas&quot;: 2}
+{&quot;ts&quot;: &quot;2026-10-22T21:19:22.561&quot;, &quot;tip&quot;: &quot;intrebare&quot;, &quot;text&quot;: &quot;Care sunt dispozitivele? Vreau lista.&quot;, &quot;mesaje_taiate&quot;: 4}
+{&quot;ts&quot;: &quot;2026-10-22T21:19:22.563&quot;, &quot;tip&quot;: &quot;cerere_model&quot;, &quot;pas&quot;: 1, &quot;mesaje&quot;: 6, &quot;durata_ms&quot;: 0, &quot;prompt_tokens&quot;: 224}
+{&quot;ts&quot;: &quot;2026-10-22T21:19:22.563&quot;, &quot;tip&quot;: &quot;apel&quot;, &quot;pas&quot;: 1, &quot;nume&quot;: &quot;list_devices&quot;, &quot;argumente&quot;: {}}
+{&quot;ts&quot;: &quot;2026-10-22T21:19:22.586&quot;, &quot;tip&quot;: &quot;rezultat&quot;, &quot;pas&quot;: 1, &quot;nume&quot;: &quot;list_devices&quot;, &quot;eroare&quot;: false, &quot;text&quot;: &quot;[\&quot;aer_conditionat\&quot;,\&quot;jaluzele\&quot;,\&quot;lampa_led\&quot;,\&quot;radiator\&quot;,\&quot;ventilatie\&quot;]&quot;, &quot;trunchiat&quot;: false}
+{&quot;ts&quot;: &quot;2026-10-22T21:19:22.589&quot;, &quot;tip&quot;: &quot;cerere_model&quot;, &quot;pas&quot;: 2, &quot;mesaje&quot;: 8, &quot;durata_ms&quot;: 0, &quot;prompt_tokens&quot;: 295}
+{&quot;ts&quot;: &quot;2026-10-22T21:19:22.591&quot;, &quot;tip&quot;: &quot;raspuns&quot;, &quot;text&quot;: &quot;[mock] Rezultatele instrumentelor:\n- [\&quot;aer_conditionat\&quot;,\&quot;jaluzele\&quot;,\&quot;lampa_led\&quot;,\&quot;radiator\&quot;,\&quot;ventilatie\&quot;]&quot;, &quot;pas&quot;: 2}
+{&quot;ts&quot;: &quot;2026-10-22T21:19:22.592&quot;, &quot;tip&quot;: &quot;intrebare&quot;, &quot;text&quot;: &quot;Ce este pornit acum?&quot;, &quot;mesaje_taiate&quot;: 4}
+{&quot;ts&quot;: &quot;2026-10-22T21:19:22.593&quot;, &quot;tip&quot;: &quot;cerere_model&quot;, &quot;pas&quot;: 1, &quot;mesaje&quot;: 6, &quot;durata_ms&quot;: 0, &quot;prompt_tokens&quot;: 221}
+{&quot;ts&quot;: &quot;2026-10-22T21:19:22.594&quot;, &quot;tip&quot;: &quot;apel&quot;, &quot;pas&quot;: 1, &quot;nume&quot;: &quot;get_building_state&quot;, &quot;argumente&quot;: {}}
+{&quot;ts&quot;: &quot;2026-10-22T21:19:22.614&quot;, &quot;tip&quot;: &quot;rezultat&quot;, &quot;pas&quot;: 1, &quot;nume&quot;: &quot;get_building_state&quot;, &quot;eroare&quot;: false, &quot;text&quot;: &quot;{\&quot;pornite\&quot;:[],\&quot;termostat_c\&quot;:21.0}&quot;, &quot;trunchiat&quot;: false}
+{&quot;ts&quot;: &quot;2026-10-22T21:19:22.619&quot;, &quot;tip&quot;: &quot;cerere_model&quot;, &quot;pas&quot;: 2, &quot;mesaje&quot;: 8, &quot;durata_ms&quot;: 0, &quot;prompt_tokens&quot;: 284}
+{&quot;ts&quot;: &quot;2026-10-22T21:19:22.620&quot;, &quot;tip&quot;: &quot;raspuns&quot;, &quot;text&quot;: &quot;[mock] Rezultatele instrumentelor:\n- {\&quot;pornite\&quot;:[],\&quot;termostat_c\&quot;:21.0}&quot;, &quot;pas&quot;: 2}</pre></details>
+<details><summary>python analyze_log.py</summary><pre class="term">Fișier: C:\Users\catalin\AppData\Local\Temp\claude\c--Users-catalin-OneDrive-Documents-GitHub-si-lab02\59b88388-f828-4cc2-a384-d58f13d5d6d9\scratchpad\partC\cfg_C1\logs\agent-20261022-211919.jsonl
+Evenimente pe tip: {&#x27;reset&#x27;: 1, &#x27;pornire&#x27;: 1, &#x27;intrebare&#x27;: 4, &#x27;cerere_model&#x27;: 8, &#x27;apel&#x27;: 4, &#x27;rezultat&#x27;: 4, &#x27;raspuns&#x27;: 4}
+Apeluri pe instrument: {&#x27;estimate_energy&#x27;: 2, &#x27;list_devices&#x27;: 1, &#x27;get_building_state&#x27;: 1}
+Apeluri cu eroare: - | refuzuri ale utilizatorului: 0
+Cereri către model: 8 | durata medie: 1 ms
+Tokeni în prompt: primul 97, ultimul 284, maxim 298</pre></details>
+</section>
+<section id="c2">
+<h2><span class="ex">C2</span> Uitarea <span class="opt">model real</span></h2>
+<p class="task">Cu Gemini și <code>MAX_TURNS = 6</code>: „Cât consumă radiatorul în 3 ore?”, apoi „Și în 5 ore?”. Repetați cu <code>MAX_TURNS = 1</code>. Ce diferență observați? Ce ar trebui să facă un agent bun în al doilea caz?</p>
+<h3>Rezultat: <code>MAX_TURNS = 6</code></h3>
+<div class="table-wrap"><table><thead><tr><th>Întrebare</th><th><code>mesaje_taiate</code></th><th>Mesaje trimise</th><th>Apel</th><th>Răspuns</th><th><code>/istoric</code></th></tr></thead>
+<tbody><tr><td>Cât consumă radiatorul în 3 ore?</td><td class='num'>0</td><td class='num'>2</td><td><code>estimate_energy({&quot;hours&quot;: 3, &quot;name&quot;: &quot;radiator&quot;})</code></td><td>Radiatorul consumă 4,5 kWh în 3 ore.</td><td class='num'>5</td></tr><tr><td>Și în 5 ore?</td><td class='num'>0</td><td class='num'>6</td><td><code>estimate_energy({&quot;hours&quot;: 5, &quot;name&quot;: &quot;radiator&quot;})</code></td><td>Radiatorul consumă 7,5 kWh în 5 ore.</td><td class='num'>9</td></tr></tbody></table></div>
+<h3>Rezultat: <code>MAX_TURNS = 1</code></h3>
+<div class="table-wrap"><table><thead><tr><th>Întrebare</th><th><code>mesaje_taiate</code></th><th>Mesaje trimise</th><th>Apel</th><th>Răspuns</th><th><code>/istoric</code></th></tr></thead>
+<tbody><tr><td>Cât consumă radiatorul în 3 ore?</td><td class='num'>0</td><td class='num'>2</td><td><code>estimate_energy({&quot;name&quot;: &quot;radiator&quot;, &quot;hours&quot;: 3})</code></td><td>Radiatorul consumă 4,5 kWh în 3 ore.</td><td class='num'>5</td></tr><tr><td>Și în 5 ore?</td><td class='num'>4</td><td class='num'>2</td><td><code>get_building_state({})</code></td><td>În acest moment nu există niciun dispozitiv pornit în clădire, deci consumul estimat pentru următoarele 5 ore este 0 kWh.</td><td class='num'>5</td></tr></tbody></table></div>
+<h3>Răspuns</h3>
+<ul>
+<li><b>Cu <code>MAX_TURNS = 6</code></b>, întrebarea anterioară e în istoric. Gemini a înțeles că „Și în 5 ore?” se referă la radiator și a apelat <code>estimate_energy(radiator, 5)</code> → <b>7,5 kWh</b> (corect: 1500 W × 5 h).</li>
+<li><b>Cu <code>MAX_TURNS = 1</code></b>, la a doua întrebare <code>trim_history</code> a tăiat prima tură (<code>mesaje_taiate: 4</code>), iar modelul a primit doar <code>system</code> + „Și în 5 ore?”. Nu a mai avut de unde ști despre radiator. A interpretat întrebarea altfel, a apelat <code>get_building_state</code> și a răspuns sigur pe el: <i>„În acest moment nu există niciun dispozitiv pornit în clădire, deci consumul estimat pentru următoarele 5 ore este 0 kWh.”</i>. Răspunsul e fluent și pare plauzibil, dar <b>răspunde la altă întrebare</b>. Utilizatorul nu are niciun semnal că agentul a uitat.</li>
+<li><b>Ce ar trebui să facă un agent bun:</b>
+<ul>
+<li><b>să ceară clarificări</b> când întrebarea e eliptică și referentul lipsește („La ce dispozitiv vă referiți?”), în loc să ghicească; acest comportament poate fi cerut explicit în promptul de sistem;</li>
+<li><b>să nu uite pe tăcute:</b> să păstreze un rezumat al turelor tăiate sau o memorie de fapte importante (de ex. „subiectul curent: radiator”), ca în tema facultativă 5;</li>
+<li>să aleagă <code>MAX_TURNS</code> realist: 1 e un caz extrem, fiindcă orice întrebare de continuare se pierde;</li>
+<li>eventual să anunțe utilizatorul că o parte din conversație a fost scoasă din context.</li>
+</ul></li>
+</ul>
+<details><summary>Transcript MAX_TURNS = 6</summary><pre class="term">Tu:   [instrument] estimate_energy({&#x27;hours&#x27;: 3, &#x27;name&#x27;: &#x27;radiator&#x27;}) -&gt; {&quot;nume&quot;:&quot;radiator&quot;,&quot;ore&quot;:3.0,&quot;energie_kwh&quot;:4.5}
+Agent: Radiatorul consumă 4,5 kWh în 3 ore. 
+
+Tu: (istoric: 5 mesaje)
+Tu:   [instrument] estimate_energy({&#x27;hours&#x27;: 5, &#x27;name&#x27;: &#x27;radiator&#x27;}) -&gt; {&quot;nume&quot;:&quot;radiator&quot;,&quot;ore&quot;:5.0,&quot;energie_kwh&quot;:7.5}
+Agent: Radiatorul consumă 7,5 kWh în 5 ore. 
+
+Tu: (istoric: 9 mesaje)</pre></details>
+<details><summary>Transcript MAX_TURNS = 1</summary><pre class="term">Tu:   [instrument] estimate_energy({&#x27;name&#x27;: &#x27;radiator&#x27;, &#x27;hours&#x27;: 3}) -&gt; {&quot;nume&quot;:&quot;radiator&quot;,&quot;ore&quot;:3.0,&quot;energie_kwh&quot;:4.5}
+Agent: Radiatorul consumă 4,5 kWh în 3 ore. 
+
+Tu: (istoric: 5 mesaje)
+Tu:   [instrument] get_building_state({}) -&gt; {&quot;pornite&quot;:[],&quot;termostat_c&quot;:21.0}
+Agent: În acest moment nu există niciun dispozitiv pornit în clădire, deci consumul estimat pentru următoarele 5 ore este 0 kWh. 
+
+Tu: (istoric: 5 mesaje)</pre></details>
+<details><summary>Log MAX_TURNS = 1 (logs/C2_t1-agent-20261022-212035.jsonl)</summary><pre class="log">{&quot;ts&quot;: &quot;2026-10-22T21:20:35.984&quot;, &quot;tip&quot;: &quot;reset&quot;}
+{&quot;ts&quot;: &quot;2026-10-22T21:20:37.806&quot;, &quot;tip&quot;: &quot;intrebare&quot;, &quot;text&quot;: &quot;Cât consumă radiatorul în 3 ore?&quot;, &quot;mesaje_taiate&quot;: 0}
+{&quot;ts&quot;: &quot;2026-10-22T21:20:40.721&quot;, &quot;tip&quot;: &quot;cerere_model&quot;, &quot;pas&quot;: 1, &quot;mesaje&quot;: 2, &quot;durata_ms&quot;: 2912, &quot;prompt_tokens&quot;: 624}
+{&quot;ts&quot;: &quot;2026-10-22T21:20:40.724&quot;, &quot;tip&quot;: &quot;apel&quot;, &quot;pas&quot;: 1, &quot;nume&quot;: &quot;estimate_energy&quot;, &quot;argumente&quot;: {&quot;name&quot;: &quot;radiator&quot;, &quot;hours&quot;: 3}}
+{&quot;ts&quot;: &quot;2026-10-22T21:20:41.573&quot;, &quot;tip&quot;: &quot;rezultat&quot;, &quot;pas&quot;: 1, &quot;nume&quot;: &quot;estimate_energy&quot;, &quot;eroare&quot;: false, &quot;text&quot;: &quot;{\&quot;nume\&quot;:\&quot;radiator\&quot;,\&quot;ore\&quot;:3.0,\&quot;energie_kwh\&quot;:4.5}&quot;, &quot;trunchiat&quot;: false}
+{&quot;ts&quot;: &quot;2026-10-22T21:20:42.609&quot;, &quot;tip&quot;: &quot;cerere_model&quot;, &quot;pas&quot;: 2, &quot;mesaje&quot;: 4, &quot;durata_ms&quot;: 1033, &quot;prompt_tokens&quot;: 680}
+{&quot;ts&quot;: &quot;2026-10-22T21:20:42.613&quot;, &quot;tip&quot;: &quot;raspuns&quot;, &quot;text&quot;: &quot;Radiatorul consumă 4,5 kWh în 3 ore.&quot;, &quot;pas&quot;: 2}
+{&quot;ts&quot;: &quot;2026-10-22T21:20:42.618&quot;, &quot;tip&quot;: &quot;intrebare&quot;, &quot;text&quot;: &quot;Și în 5 ore?&quot;, &quot;mesaje_taiate&quot;: 4}
+{&quot;ts&quot;: &quot;2026-10-22T21:20:43.949&quot;, &quot;tip&quot;: &quot;cerere_model&quot;, &quot;pas&quot;: 1, &quot;mesaje&quot;: 2, &quot;durata_ms&quot;: 1326, &quot;prompt_tokens&quot;: 620}
+{&quot;ts&quot;: &quot;2026-10-22T21:20:43.950&quot;, &quot;tip&quot;: &quot;apel&quot;, &quot;pas&quot;: 1, &quot;nume&quot;: &quot;get_building_state&quot;, &quot;argumente&quot;: {}}
+{&quot;ts&quot;: &quot;2026-10-22T21:20:43.980&quot;, &quot;tip&quot;: &quot;rezultat&quot;, &quot;pas&quot;: 1, &quot;nume&quot;: &quot;get_building_state&quot;, &quot;eroare&quot;: false, &quot;text&quot;: &quot;{\&quot;pornite\&quot;:[],\&quot;termostat_c\&quot;:21.0}&quot;, &quot;trunchiat&quot;: false}
+{&quot;ts&quot;: &quot;2026-10-22T21:20:46.258&quot;, &quot;tip&quot;: &quot;cerere_model&quot;, &quot;pas&quot;: 2, &quot;mesaje&quot;: 4, &quot;durata_ms&quot;: 2277, &quot;prompt_tokens&quot;: 662}
+{&quot;ts&quot;: &quot;2026-10-22T21:20:46.264&quot;, &quot;tip&quot;: &quot;raspuns&quot;, &quot;text&quot;: &quot;În acest moment nu există niciun dispozitiv pornit în clădire, deci consumul estimat pentru următoarele 5 ore este 0 kWh.&quot;, &quot;pas&quot;: 2}</pre></details>
+</section>
+<section id="c3">
+<h2><span class="ex">C3</span> Rezultate tăiate (mock)</h2>
+<p class="task"><code>MAX_TOOL_CHARS = 40</code>; „Care sunt dispozitivele? Vreau lista.” Ce vede modelul? Ce ar putea greși un model real cu o listă tăiată?</p>
+<h3>Rezultat</h3>
+<div class="table-wrap"><table><thead><tr><th>Configurație</th><th>Ce primește modelul (mesajul <code>tool</code>)</th><th><code>trunchiat</code></th></tr></thead><tbody>
+<tr><td>implicit (<code>MAX_TOOL_CHARS = 1500</code>)</td><td><code>[&quot;aer_conditionat&quot;,&quot;jaluzele&quot;,&quot;lampa_led&quot;,&quot;radiator&quot;,&quot;ventilatie&quot;]</code></td><td class="num"><code>false</code></td></tr>
+<tr><td><code>MAX_TOOL_CHARS = 40</code></td><td><code>[&quot;aer_conditionat&quot;,&quot;jaluzele&quot;,&quot;lampa_led
+[... trunchiat: 26 caractere omise]</code></td><td class="num"><code>true</code></td></tr>
+</tbody></table></div>
+<h3>Răspuns</h3>
+<ul>
+<li><b>Ce vede modelul:</b> primele 40 de caractere din lista JSON, <code>["aer_conditionat","jaluzele","lampa_led</code>, urmate de nota <code>[... trunchiat: 26 caractere omise]</code>. Lipsesc <code>radiator</code> și <code>ventilatie</code>, iar JSON-ul e invalid (ghilimea și paranteza nu se închid). În log, evenimentul <code>rezultat</code> are <code>"trunchiat": true</code>.</li>
+<li><b>Ce ar putea greși un model real:</b>
+<ul>
+<li>ar răspunde că în clădire sunt doar 3 dispozitive, omițând radiatorul și ventilația;</li>
+<li>ar crede că radiatorul „nu există” și ar refuza o întrebare ulterioară despre el, sau ar ghici alt nume;</li>
+<li>ar ignora nota și ar trata lista ca fiind completă (modelele mici o fac des);</li>
+<li>la un rezultat structurat (dicționar), ar putea lua o valoare tăiată la jumătate drept corectă (de ex. <code>"putere_w": 15</code> din 1500).</li>
+</ul>
+Nota de la final ajută: un model bun poate spune „lista e incompletă” sau poate cere din nou datele în bucăți mai mici. Mock-ul doar repetă textul.</li>
+<li>Limita protejează contextul de un singur rezultat uriaș, dar trebuie aleasă în funcție de mărimea rezultatelor reale. 40 e intenționat absurd. Am revenit la valoarea inițială de 1500: <code>agent.py</code> din proiect nu a fost modificat.</li>
+</ul>
+<details><summary>Logul complet (logs/C3-agent-20261022-211935.jsonl)</summary><pre class="log">{&quot;ts&quot;: &quot;2026-10-22T21:19:35.175&quot;, &quot;tip&quot;: &quot;reset&quot;}
+{&quot;ts&quot;: &quot;2026-10-22T21:19:36.710&quot;, &quot;tip&quot;: &quot;intrebare&quot;, &quot;text&quot;: &quot;Care sunt dispozitivele? Vreau lista.&quot;, &quot;mesaje_taiate&quot;: 0}
+{&quot;ts&quot;: &quot;2026-10-22T21:19:36.711&quot;, &quot;tip&quot;: &quot;cerere_model&quot;, &quot;pas&quot;: 1, &quot;mesaje&quot;: 2, &quot;durata_ms&quot;: 0, &quot;prompt_tokens&quot;: 99}
+{&quot;ts&quot;: &quot;2026-10-22T21:19:36.711&quot;, &quot;tip&quot;: &quot;apel&quot;, &quot;pas&quot;: 1, &quot;nume&quot;: &quot;list_devices&quot;, &quot;argumente&quot;: {}}
+{&quot;ts&quot;: &quot;2026-10-22T21:19:36.848&quot;, &quot;tip&quot;: &quot;rezultat&quot;, &quot;pas&quot;: 1, &quot;nume&quot;: &quot;list_devices&quot;, &quot;eroare&quot;: false, &quot;text&quot;: &quot;[\&quot;aer_conditionat\&quot;,\&quot;jaluzele\&quot;,\&quot;lampa_led\n[... trunchiat: 26 caractere omise]&quot;, &quot;trunchiat&quot;: true}
+{&quot;ts&quot;: &quot;2026-10-22T21:19:36.849&quot;, &quot;tip&quot;: &quot;cerere_model&quot;, &quot;pas&quot;: 2, &quot;mesaje&quot;: 4, &quot;durata_ms&quot;: 0, &quot;prompt_tokens&quot;: 171}
+{&quot;ts&quot;: &quot;2026-10-22T21:19:36.849&quot;, &quot;tip&quot;: &quot;raspuns&quot;, &quot;text&quot;: &quot;[mock] Rezultatele instrumentelor:\n- [\&quot;aer_conditionat\&quot;,\&quot;jaluzele\&quot;,\&quot;lampa_led\n[... trunchiat: 26 caractere omise]&quot;, &quot;pas&quot;: 2}</pre></details>
+</section>
+<section id="c4">
+<h2><span class="ex">C4</span> Bucla (mock)</h2>
+<p class="task">„bucla”: câte apeluri s-au executat înainte de oprire? Ce eveniment apare în log? Apoi <code>MAX_REPEAT = 10</code>, <code>MAX_STEPS = 4</code>: ce mecanism s-a declanșat și de ce?</p>
+<h3>Rezultat</h3>
+<div class="table-wrap"><table><thead><tr><th>Configurație</th><th>Cereri model</th><th>Apeluri executate</th><th>Eveniment de oprire</th><th>Răspuns</th></tr></thead><tbody>
+<tr><td>implicit (<code>MAX_REPEAT = 2</code>, <code>MAX_STEPS = 6</code>)</td><td class="num">3</td><td class="num">2</td><td><code>{&quot;tip&quot;: &quot;bucla_detectata&quot;, &quot;pas&quot;: 3, &quot;apeluri&quot;: [&quot;list_devices&quot;]}</code></td><td>(M-am oprit: modelul cere în mod repetat același apel.)</td></tr>
+<tr><td><code>MAX_REPEAT = 10</code>, <code>MAX_STEPS = 4</code></td><td class="num">4</td><td class="num">4</td><td><code>{&quot;tip&quot;: &quot;limita_pasi&quot;, &quot;pasi&quot;: 4}</code></td><td>(Am atins limita de pași a agentului.)</td></tr>
+</tbody></table></div>
+<h3>Răspuns</h3>
+<ul>
+<li><b>Cu valorile implicite</b> s-au executat <b>2 apeluri</b> <code>list_devices()</code> (pașii 1 și 2). La pasul 3 modelul a cerut același apel a treia oară; contorul a ajuns la 3 &gt; <code>MAX_REPEAT = 2</code>. Agentul a scris <code>bucla_detectata</code> și s-a oprit <b>fără să mai execute</b> apelul: au fost 3 cereri către model, dar doar 2 rezultate.</li>
+<li><b>Cu <code>MAX_REPEAT = 10</code>, <code>MAX_STEPS = 4</code></b> s-au executat <b>4 apeluri</b> și a apărut <code>limita_pasi</code>. De data asta s-a declanșat limita totală de pași: același apel s-a repetat doar de 4 ori, sub pragul de 10, deci detecția repetiției nu s-a activat. Bucla <code>for pas in range(1, MAX_STEPS + 1)</code> s-a terminat fără răspuns final. Rezultatul ultimului apel a intrat în istoric, dar modelul nu l-a mai văzut, deci acel apel a fost irosit. Evenimentul <code>raspuns</code> nu are câmpul <code>pas</code>, fiindcă vine din afara buclei.</li>
+<li>Cele două mecanisme se completează. <code>MAX_REPEAT</code> prinde rapid o buclă „identică” și economisește apeluri. <code>MAX_STEPS</code> e plasa de siguranță pentru buclele în care argumentele diferă puțin de fiecare dată și pe care detecția repetiției nu le vede. Am revenit la valorile inițiale (proiectul nu a fost modificat).</li>
+</ul>
+<div class="callout"><b>Fragment de log</b> (C4, valori implicite): 2 apeluri executate, al treilea oprit de <code>bucla_detectata</code>.</div>
+<pre class="log">{&quot;ts&quot;: &quot;2026-10-22T21:19:43.060&quot;, &quot;tip&quot;: &quot;intrebare&quot;, &quot;text&quot;: &quot;bucla&quot;, &quot;mesaje_taiate&quot;: 0}
+{&quot;ts&quot;: &quot;2026-10-22T21:19:43.061&quot;, &quot;tip&quot;: &quot;cerere_model&quot;, &quot;pas&quot;: 1, &quot;mesaje&quot;: 2, &quot;durata_ms&quot;: 0, &quot;prompt_tokens&quot;: 91}
+{&quot;ts&quot;: &quot;2026-10-22T21:19:43.062&quot;, &quot;tip&quot;: &quot;apel&quot;, &quot;pas&quot;: 1, &quot;nume&quot;: &quot;list_devices&quot;, &quot;argumente&quot;: {}}
+{&quot;ts&quot;: &quot;2026-10-22T21:19:43.139&quot;, &quot;tip&quot;: &quot;rezultat&quot;, &quot;pas&quot;: 1, &quot;nume&quot;: &quot;list_devices&quot;, &quot;eroare&quot;: false, &quot;text&quot;: &quot;[\&quot;aer_conditionat\&quot;,\&quot;jaluzele\&quot;,\&quot;lampa_led\&quot;,\&quot;radiator\&quot;,\&quot;ventilatie\&quot;]&quot;, &quot;trunchiat&quot;: false}
+{&quot;ts&quot;: &quot;2026-10-22T21:19:43.139&quot;, &quot;tip&quot;: &quot;cerere_model&quot;, &quot;pas&quot;: 2, &quot;mesaje&quot;: 4, &quot;durata_ms&quot;: 0, &quot;prompt_tokens&quot;: 162}
+{&quot;ts&quot;: &quot;2026-10-22T21:19:43.139&quot;, &quot;tip&quot;: &quot;apel&quot;, &quot;pas&quot;: 2, &quot;nume&quot;: &quot;list_devices&quot;, &quot;argumente&quot;: {}}
+{&quot;ts&quot;: &quot;2026-10-22T21:19:43.142&quot;, &quot;tip&quot;: &quot;rezultat&quot;, &quot;pas&quot;: 2, &quot;nume&quot;: &quot;list_devices&quot;, &quot;eroare&quot;: false, &quot;text&quot;: &quot;[\&quot;aer_conditionat\&quot;,\&quot;jaluzele\&quot;,\&quot;lampa_led\&quot;,\&quot;radiator\&quot;,\&quot;ventilatie\&quot;]&quot;, &quot;trunchiat&quot;: false}
+{&quot;ts&quot;: &quot;2026-10-22T21:19:43.144&quot;, &quot;tip&quot;: &quot;cerere_model&quot;, &quot;pas&quot;: 3, &quot;mesaje&quot;: 6, &quot;durata_ms&quot;: 1, &quot;prompt_tokens&quot;: 233}
+{&quot;ts&quot;: &quot;2026-10-22T21:19:43.147&quot;, &quot;tip&quot;: &quot;bucla_detectata&quot;, &quot;pas&quot;: 3, &quot;apeluri&quot;: [&quot;list_devices&quot;]}
+{&quot;ts&quot;: &quot;2026-10-22T21:19:43.149&quot;, &quot;tip&quot;: &quot;raspuns&quot;, &quot;text&quot;: &quot;(M-am oprit: modelul cere în mod repetat același apel.)&quot;, &quot;pas&quot;: 3}</pre>
+<details><summary>Transcripturi chat.py</summary><pre class="term">Tu:   [instrument] list_devices({}) -&gt; [&quot;aer_conditionat&quot;,&quot;jaluzele&quot;,&quot;lampa_led&quot;,&quot;radiator&quot;,&quot;ventilatie&quot;]
+  [instrument] list_devices({}) -&gt; [&quot;aer_conditionat&quot;,&quot;jaluzele&quot;,&quot;lampa_led&quot;,&quot;radiator&quot;,&quot;ventilatie&quot;]
+Agent: (M-am oprit: modelul cere în mod repetat același apel.)
+
+--- MAX_REPEAT=10, MAX_STEPS=4 ---
+Tu:   [instrument] list_devices({}) -&gt; [&quot;aer_conditionat&quot;,&quot;jaluzele&quot;,&quot;lampa_led&quot;,&quot;radiator&quot;,&quot;ventilatie&quot;]
+  [instrument] list_devices({}) -&gt; [&quot;aer_conditionat&quot;,&quot;jaluzele&quot;,&quot;lampa_led&quot;,&quot;radiator&quot;,&quot;ventilatie&quot;]
+  [instrument] list_devices({}) -&gt; [&quot;aer_conditionat&quot;,&quot;jaluzele&quot;,&quot;lampa_led&quot;,&quot;radiator&quot;,&quot;ventilatie&quot;]
+  [instrument] list_devices({}) -&gt; [&quot;aer_conditionat&quot;,&quot;jaluzele&quot;,&quot;lampa_led&quot;,&quot;radiator&quot;,&quot;ventilatie&quot;]
+Agent: (Am atins limita de pași a agentului.)</pre></details>
+<details><summary>Log MAX_REPEAT=10, MAX_STEPS=4 (logs/C4_steps-agent-20261022-211947.jsonl)</summary><pre class="log">{&quot;ts&quot;: &quot;2026-10-22T21:19:47.791&quot;, &quot;tip&quot;: &quot;reset&quot;}
+{&quot;ts&quot;: &quot;2026-10-22T21:19:49.342&quot;, &quot;tip&quot;: &quot;intrebare&quot;, &quot;text&quot;: &quot;bucla&quot;, &quot;mesaje_taiate&quot;: 0}
+{&quot;ts&quot;: &quot;2026-10-22T21:19:49.342&quot;, &quot;tip&quot;: &quot;cerere_model&quot;, &quot;pas&quot;: 1, &quot;mesaje&quot;: 2, &quot;durata_ms&quot;: 0, &quot;prompt_tokens&quot;: 91}
+{&quot;ts&quot;: &quot;2026-10-22T21:19:49.343&quot;, &quot;tip&quot;: &quot;apel&quot;, &quot;pas&quot;: 1, &quot;nume&quot;: &quot;list_devices&quot;, &quot;argumente&quot;: {}}
+{&quot;ts&quot;: &quot;2026-10-22T21:19:49.458&quot;, &quot;tip&quot;: &quot;rezultat&quot;, &quot;pas&quot;: 1, &quot;nume&quot;: &quot;list_devices&quot;, &quot;eroare&quot;: false, &quot;text&quot;: &quot;[\&quot;aer_conditionat\&quot;,\&quot;jaluzele\&quot;,\&quot;lampa_led\&quot;,\&quot;radiator\&quot;,\&quot;ventilatie\&quot;]&quot;, &quot;trunchiat&quot;: false}
+{&quot;ts&quot;: &quot;2026-10-22T21:19:49.461&quot;, &quot;tip&quot;: &quot;cerere_model&quot;, &quot;pas&quot;: 2, &quot;mesaje&quot;: 4, &quot;durata_ms&quot;: 0, &quot;prompt_tokens&quot;: 162}
+{&quot;ts&quot;: &quot;2026-10-22T21:19:49.464&quot;, &quot;tip&quot;: &quot;apel&quot;, &quot;pas&quot;: 2, &quot;nume&quot;: &quot;list_devices&quot;, &quot;argumente&quot;: {}}
+{&quot;ts&quot;: &quot;2026-10-22T21:19:49.477&quot;, &quot;tip&quot;: &quot;rezultat&quot;, &quot;pas&quot;: 2, &quot;nume&quot;: &quot;list_devices&quot;, &quot;eroare&quot;: false, &quot;text&quot;: &quot;[\&quot;aer_conditionat\&quot;,\&quot;jaluzele\&quot;,\&quot;lampa_led\&quot;,\&quot;radiator\&quot;,\&quot;ventilatie\&quot;]&quot;, &quot;trunchiat&quot;: false}
+{&quot;ts&quot;: &quot;2026-10-22T21:19:49.480&quot;, &quot;tip&quot;: &quot;cerere_model&quot;, &quot;pas&quot;: 3, &quot;mesaje&quot;: 6, &quot;durata_ms&quot;: 0, &quot;prompt_tokens&quot;: 233}
+{&quot;ts&quot;: &quot;2026-10-22T21:19:49.483&quot;, &quot;tip&quot;: &quot;apel&quot;, &quot;pas&quot;: 3, &quot;nume&quot;: &quot;list_devices&quot;, &quot;argumente&quot;: {}}
+{&quot;ts&quot;: &quot;2026-10-22T21:19:49.495&quot;, &quot;tip&quot;: &quot;rezultat&quot;, &quot;pas&quot;: 3, &quot;nume&quot;: &quot;list_devices&quot;, &quot;eroare&quot;: false, &quot;text&quot;: &quot;[\&quot;aer_conditionat\&quot;,\&quot;jaluzele\&quot;,\&quot;lampa_led\&quot;,\&quot;radiator\&quot;,\&quot;ventilatie\&quot;]&quot;, &quot;trunchiat&quot;: false}
+{&quot;ts&quot;: &quot;2026-10-22T21:19:49.496&quot;, &quot;tip&quot;: &quot;cerere_model&quot;, &quot;pas&quot;: 4, &quot;mesaje&quot;: 8, &quot;durata_ms&quot;: 0, &quot;prompt_tokens&quot;: 304}
+{&quot;ts&quot;: &quot;2026-10-22T21:19:49.498&quot;, &quot;tip&quot;: &quot;apel&quot;, &quot;pas&quot;: 4, &quot;nume&quot;: &quot;list_devices&quot;, &quot;argumente&quot;: {}}
+{&quot;ts&quot;: &quot;2026-10-22T21:19:49.508&quot;, &quot;tip&quot;: &quot;rezultat&quot;, &quot;pas&quot;: 4, &quot;nume&quot;: &quot;list_devices&quot;, &quot;eroare&quot;: false, &quot;text&quot;: &quot;[\&quot;aer_conditionat\&quot;,\&quot;jaluzele\&quot;,\&quot;lampa_led\&quot;,\&quot;radiator\&quot;,\&quot;ventilatie\&quot;]&quot;, &quot;trunchiat&quot;: false}
+{&quot;ts&quot;: &quot;2026-10-22T21:19:49.509&quot;, &quot;tip&quot;: &quot;limita_pasi&quot;, &quot;pasi&quot;: 4}
+{&quot;ts&quot;: &quot;2026-10-22T21:19:49.510&quot;, &quot;tip&quot;: &quot;raspuns&quot;, &quot;text&quot;: &quot;(Am atins limita de pași a agentului.)&quot;}</pre></details>
+</section>
+<section id="c5">
+<h2><span class="ex">C5</span> <code>tool_choice</code> <span class="opt">mock, apoi model real</span></h2>
+<p class="task"><code>TOOL_CHOICE = "required"</code> + „Cât face 12 ori 12?”; apoi <code>"none"</code> + „Ce conflict există între radiator și aer condiționat?”. Repetați cu Gemini; acceptă furnizorul valorile? Am pus ambele întrebări în fiecare configurație, plus <code>auto</code> ca referință.</p>
+<h3>Rezultat: mock</h3>
+<div class="table-wrap"><table><thead><tr><th>tool_choice</th><th>Întrebare</th><th>Cereri model</th><th>Apeluri</th><th>Răspuns final</th></tr></thead>
+<tbody><tr><td><code>auto</code></td><td>Cât face 12 ori 12?</td><td class='num'>1</td><td><span class='muted'>niciun apel</span></td><td>[mock] Nu am nevoie de instrumente pentru asta.</td></tr><tr><td><code>auto</code></td><td>Ce conflict există între radiator și aer condiționat?</td><td class='num'>2</td><td><code>check_conflict({&quot;device_a&quot;: &quot;radiator&quot;, &quot;device_b&quot;: &quot;aer_conditionat&quot;})</code></td><td>[mock] Rezultatele instrumentelor:
+- RIDICAT - încălzire și răcire simultană, consum inutil.</td></tr><tr><td><code>required</code></td><td>Cât face 12 ori 12?</td><td class='num'>2</td><td><code>list_devices({})</code></td><td>[mock] Rezultatele instrumentelor:
+- [&quot;aer_conditionat&quot;,&quot;jaluzele&quot;,&quot;lampa_led&quot;,&quot;radiator&quot;,&quot;ventilatie&quot;]</td></tr><tr><td><code>required</code></td><td>Ce conflict există între radiator și aer condiționat?</td><td class='num'>2</td><td><code>check_conflict({&quot;device_a&quot;: &quot;radiator&quot;, &quot;device_b&quot;: &quot;aer_conditionat&quot;})</code></td><td>[mock] Rezultatele instrumentelor:
+- RIDICAT - încălzire și răcire simultană, consum inutil.</td></tr><tr><td><code>none</code></td><td>Cât face 12 ori 12?</td><td class='num'>1</td><td><span class='muted'>niciun apel</span></td><td>[mock] (am răspuns fără instrumente, tool_choice=none)</td></tr><tr><td><code>none</code></td><td>Ce conflict există între radiator și aer condiționat?</td><td class='num'>1</td><td><span class='muted'>niciun apel</span></td><td>[mock] (am răspuns fără instrumente, tool_choice=none)</td></tr></tbody></table></div>
+<h3>Rezultat: Gemini (<code>gemini-3.5-flash-lite</code>)</h3>
+<div class="table-wrap"><table><thead><tr><th>tool_choice</th><th>Întrebare</th><th>Cereri model</th><th>Apeluri</th><th>Răspuns final</th></tr></thead>
+<tbody><tr><td><code>auto</code></td><td>Cât face 12 ori 12?</td><td class='num'>1</td><td><span class='muted'>niciun apel</span></td><td>12 ori 12 face 144.</td></tr><tr><td><code>auto</code></td><td>Ce conflict există între radiator și aer condiționat?</td><td class='num'>2</td><td><code>check_conflict({&quot;device_b&quot;: &quot;aer condiționat&quot;, &quot;device_a&quot;: &quot;radiator&quot;})</code></td><td>Nu există niciun conflict înregistrat în setul de date de test între radiator și aer condiționat.</td></tr><tr><td><code>required</code></td><td>Cât face 12 ori 12?</td><td class='num'>2</td><td><code>list_devices({})</code></td><td>12 ori 12 face 144.</td></tr><tr><td><code>required</code></td><td>Ce conflict există între radiator și aer condiționat?</td><td class='num'>2</td><td><code>check_conflict({&quot;device_a&quot;: &quot;radiator&quot;, &quot;device_b&quot;: &quot;aer_conditionat&quot;})</code></td><td>Conflictul dintre radiator și aerul condiționat este de nivel **RIDICAT**: reprezintă încălzire și răcire simultană, ceea ce duce la un consum inutil de energie.</td></tr><tr><td><code>none</code></td><td>Cât face 12 ori 12?</td><td class='num'>1</td><td><span class='muted'>niciun apel</span></td><td>12 ori 12 face 144.</td></tr><tr><td><code>none</code></td><td>Ce conflict există între radiator și aer condiționat?</td><td class='num'>1</td><td><span class='muted'>niciun apel</span></td><td>Momentan, nu există conflicte înregistrate între radiator și aerul condiționat.</td></tr></tbody></table></div>
+<h3>Răspuns</h3>
+<ul>
+<li><b><code>required</code> + „12 ori 12” (mock):</b> mock-ul ar fi răspuns fără instrument, dar <code>required</code> îl obligă să ceară ceva, așa că cere <code>list_devices()</code>, un apel inutil. Pasul 2 rulează din nou în <code>auto</code> (agentul aplică <code>tool_choice</code> doar la primul pas), deci răspunsul final vine imediat. Cu <code>required</code> la fiecare pas, bucla ar fi mers până la <code>MAX_STEPS</code>.</li>
+<li><b><code>none</code> + conflict (mock):</b> mock-ul nu are voie să ceară <code>check_conflict</code> și răspunde doar „(am răspuns fără instrumente, tool_choice=none)”. Informația despre conflict lipsește.</li>
+<li><b>Gemini acceptă toate trei valorile</b>, fără HTTP 400, deși documentația de compatibilitate OpenAI arată doar <code>auto</code> (secțiunea 1.3). Comportamentul respectă semantica:
+<ul>
+<li><code>required</code>: la „12 ori 12” a făcut un apel forțat <code>list_devices()</code>, apoi a răspuns corect „144” la pasul 2;</li>
+<li><code>none</code>: niciun apel, nici măcar la întrebarea despre conflict.</li>
+</ul></li>
+<li><b>Pericolul lui <code>none</code>:</b> fără instrument, Gemini a răspuns <i>„Momentan, nu există conflicte înregistrate între radiator și aerul condiționat.”</i>. Este <b>fals</b>: conflictul radiator / aer condiționat este RIDICAT. Modelul a inventat un răspuns în ciuda promptului de sistem („nu inventa date”).</li>
+<li><b>Observație neașteptată în <code>auto</code>:</b> Gemini a trimis <code>device_b: "aer condiționat"</code> (cu spațiu și diacritice) în loc de <code>aer_conditionat</code>. <code>check_conflict</code> nu validează numele și a răspuns „Niciun conflict înregistrat”, deci și răspunsul final a fost greșit (fals negativ). În rularea cu <code>required</code>, modelul a folosit numele corect și a primit RIDICAT. Pentru același input, modelul a ales o dată corect, o dată greșit. Soluții posibile: <code>check_conflict</code> ar trebui să întoarcă „dispozitiv necunoscut” pentru nume invalide, ca <code>estimate_energy</code>; schema ar putea folosi un <code>enum</code> cu numele valide.</li>
+<li>Am revenit la <code>TOOL_CHOICE = "auto"</code> (proiectul nu a fost modificat).</li>
+</ul>
+<details><summary>Transcripturi Gemini (auto / required / none)</summary><pre class="term">--- auto ---
+Tu: Agent: 12 ori 12 face 144. 
+
+Tu:   [instrument] check_conflict({&#x27;device_b&#x27;: &#x27;aer condiționat&#x27;, &#x27;device_a&#x27;: &#x27;radiator&#x27;}) -&gt; Niciun conflict înregistrat în setul de date de test.
+Agent: Nu există niciun conflict înregistrat în setul de date de test între radiator și aer condiționat.
+
+--- required ---
+Tu:   [instrument] list_devices({}) -&gt; [&quot;aer_conditionat&quot;,&quot;jaluzele&quot;,&quot;lampa_led&quot;,&quot;radiator&quot;,&quot;ventilatie&quot;]
+Agent: 12 ori 12 face 144. 
+
+Tu:   [instrument] check_conflict({&#x27;device_a&#x27;: &#x27;radiator&#x27;, &#x27;device_b&#x27;: &#x27;aer_conditionat&#x27;}) -&gt; RIDICAT - încălzire și răcire simultană, consum inutil.
+Agent: Conflictul dintre radiator și aerul condiționat este de nivel **RIDICAT**: reprezintă încălzire și răcire simultană, ceea ce duce la un consum inutil de energie.
+
+--- none ---
+Tu: Agent: 12 ori 12 face 144. 
+
+Tu: Agent: Momentan, nu există conflicte înregistrate între radiator și aerul condiționat.</pre></details>
+<details><summary>Transcripturi mock (auto / required / none)</summary><pre class="term">--- auto ---
+Tu: Agent: [mock] Nu am nevoie de instrumente pentru asta. 
+
+Tu:   [instrument] check_conflict({&#x27;device_a&#x27;: &#x27;radiator&#x27;, &#x27;device_b&#x27;: &#x27;aer_conditionat&#x27;}) -&gt; RIDICAT - încălzire și răcire simultană, consum inutil.
+Agent: [mock] Rezultatele instrumentelor:
+- RIDICAT - încălzire și răcire simultană, consum inutil.
+
+--- required ---
+Tu:   [instrument] list_devices({}) -&gt; [&quot;aer_conditionat&quot;,&quot;jaluzele&quot;,&quot;lampa_led&quot;,&quot;radiator&quot;,&quot;ventilatie&quot;]
+Agent: [mock] Rezultatele instrumentelor:
+- [&quot;aer_conditionat&quot;,&quot;jaluzele&quot;,&quot;lampa_led&quot;,&quot;radiator&quot;,&quot;ventilatie&quot;] 
+
+Tu:   [instrument] check_conflict({&#x27;device_a&#x27;: &#x27;radiator&#x27;, &#x27;device_b&#x27;: &#x27;aer_conditionat&#x27;}) -&gt; RIDICAT - încălzire și răcire simultană, consum inutil.
+Agent: [mock] Rezultatele instrumentelor:
+- RIDICAT - încălzire și răcire simultană, consum inutil.
+
+--- none ---
+Tu: Agent: [mock] (am răspuns fără instrumente, tool_choice=none) 
+
+Tu: Agent: [mock] (am răspuns fără instrumente, tool_choice=none)</pre></details>
+<details><summary>Log Gemini auto (logs/C5_gemini_auto-agent-20261022-212051.jsonl)</summary><pre class="log">{&quot;ts&quot;: &quot;2026-10-22T21:20:51.915&quot;, &quot;tip&quot;: &quot;reset&quot;}
+{&quot;ts&quot;: &quot;2026-10-22T21:20:53.564&quot;, &quot;tip&quot;: &quot;intrebare&quot;, &quot;text&quot;: &quot;Cât face 12 ori 12?&quot;, &quot;mesaje_taiate&quot;: 0}
+{&quot;ts&quot;: &quot;2026-10-22T21:20:57.878&quot;, &quot;tip&quot;: &quot;cerere_model&quot;, &quot;pas&quot;: 1, &quot;mesaje&quot;: 2, &quot;durata_ms&quot;: 4313, &quot;prompt_tokens&quot;: 624}
+{&quot;ts&quot;: &quot;2026-10-22T21:20:57.883&quot;, &quot;tip&quot;: &quot;raspuns&quot;, &quot;text&quot;: &quot;12 ori 12 face 144.&quot;, &quot;pas&quot;: 1}
+{&quot;ts&quot;: &quot;2026-10-22T21:20:57.898&quot;, &quot;tip&quot;: &quot;intrebare&quot;, &quot;text&quot;: &quot;Ce conflict există între radiator și aer condiționat?&quot;, &quot;mesaje_taiate&quot;: 0}
+{&quot;ts&quot;: &quot;2026-10-22T21:21:13.795&quot;, &quot;tip&quot;: &quot;cerere_model&quot;, &quot;pas&quot;: 1, &quot;mesaje&quot;: 4, &quot;durata_ms&quot;: 15893, &quot;prompt_tokens&quot;: 649}
+{&quot;ts&quot;: &quot;2026-10-22T21:21:13.800&quot;, &quot;tip&quot;: &quot;apel&quot;, &quot;pas&quot;: 1, &quot;nume&quot;: &quot;check_conflict&quot;, &quot;argumente&quot;: {&quot;device_b&quot;: &quot;aer condiționat&quot;, &quot;device_a&quot;: &quot;radiator&quot;}}
+{&quot;ts&quot;: &quot;2026-10-22T21:21:14.239&quot;, &quot;tip&quot;: &quot;rezultat&quot;, &quot;pas&quot;: 1, &quot;nume&quot;: &quot;check_conflict&quot;, &quot;eroare&quot;: false, &quot;text&quot;: &quot;Niciun conflict înregistrat în setul de date de test.&quot;, &quot;trunchiat&quot;: false}
+{&quot;ts&quot;: &quot;2026-10-22T21:21:26.065&quot;, &quot;tip&quot;: &quot;cerere_model&quot;, &quot;pas&quot;: 2, &quot;mesaje&quot;: 6, &quot;durata_ms&quot;: 11825, &quot;prompt_tokens&quot;: 707}
+{&quot;ts&quot;: &quot;2026-10-22T21:21:26.071&quot;, &quot;tip&quot;: &quot;raspuns&quot;, &quot;text&quot;: &quot;Nu există niciun conflict înregistrat în setul de date de test între radiator și aer condiționat.&quot;, &quot;pas&quot;: 2}</pre></details>
+<details><summary>Log Gemini none (logs/C5_gemini_none-agent-20261022-212156.jsonl)</summary><pre class="log">{&quot;ts&quot;: &quot;2026-10-22T21:21:56.801&quot;, &quot;tip&quot;: &quot;reset&quot;}
+{&quot;ts&quot;: &quot;2026-10-22T21:21:58.346&quot;, &quot;tip&quot;: &quot;intrebare&quot;, &quot;text&quot;: &quot;Cât face 12 ori 12?&quot;, &quot;mesaje_taiate&quot;: 0}
+{&quot;ts&quot;: &quot;2026-10-22T21:22:03.907&quot;, &quot;tip&quot;: &quot;cerere_model&quot;, &quot;pas&quot;: 1, &quot;mesaje&quot;: 2, &quot;durata_ms&quot;: 5561, &quot;prompt_tokens&quot;: 624}
+{&quot;ts&quot;: &quot;2026-10-22T21:22:03.909&quot;, &quot;tip&quot;: &quot;raspuns&quot;, &quot;text&quot;: &quot;12 ori 12 face 144.&quot;, &quot;pas&quot;: 1}
+{&quot;ts&quot;: &quot;2026-10-22T21:22:03.912&quot;, &quot;tip&quot;: &quot;intrebare&quot;, &quot;text&quot;: &quot;Ce conflict există între radiator și aer condiționat?&quot;, &quot;mesaje_taiate&quot;: 0}
+{&quot;ts&quot;: &quot;2026-10-22T21:22:05.560&quot;, &quot;tip&quot;: &quot;cerere_model&quot;, &quot;pas&quot;: 1, &quot;mesaje&quot;: 4, &quot;durata_ms&quot;: 1647, &quot;prompt_tokens&quot;: 649}
+{&quot;ts&quot;: &quot;2026-10-22T21:22:05.565&quot;, &quot;tip&quot;: &quot;raspuns&quot;, &quot;text&quot;: &quot;Momentan, nu există conflicte înregistrate între radiator și aerul condiționat.&quot;, &quot;pas&quot;: 1}</pre></details>
+</section>
+<section id="teste">
+<h2>Verificări automate</h2>
+<p class="muted">Fiecare configurație a rulat <code>python chat.py</code> (întrebări pe stdin) într-o copie a proiectului, cu <code>agent.py</code> modificat doar la constanta cerută. Logurile sunt copiate în <code>logs/C*-agent-….jsonl</code>.</p>
+<div class="table-wrap"><table><thead><tr><th>Ex.</th><th>Verificare</th><th>Rezultat</th></tr></thead><tbody><tr><td>C1</td><td>/istoric după fiecare întrebare: 5, 9, 9, 9 <span class=muted>([5, 9, 9, 9])</span></td><td class='pass'>✓ trecut</td></tr><tr><td>C1</td><td>mesaje_taiate: 0, 0, 4, 4 <span class=muted>([0, 0, 4, 4])</span></td><td class='pass'>✓ trecut</td></tr><tr><td>C3</td><td>rezultatul are trunchiat: true</td><td class='pass'>✓ trecut</td></tr><tr><td>C3</td><td>textul conține nota „[... trunchiat: N caractere omise]”</td><td class='pass'>✓ trecut</td></tr><tr><td>C3</td><td>cu valoarea implicită (1500) rezultatul e complet</td><td class='pass'>✓ trecut</td></tr><tr><td>C4</td><td>implicit: 2 apeluri executate, apoi bucla_detectata</td><td class='pass'>✓ trecut</td></tr><tr><td>C4</td><td>implicit: al 3-lea apel cerut NU a fost executat (3 cereri model, 2 rezultate)</td><td class='pass'>✓ trecut</td></tr><tr><td>C4</td><td>MAX_REPEAT=10, MAX_STEPS=4: 4 apeluri, apoi limita_pasi</td><td class='pass'>✓ trecut</td></tr><tr><td>C5</td><td>mock auto: „12 ori 12” fără instrument</td><td class='pass'>✓ trecut</td></tr><tr><td>C5</td><td>mock required: „12 ori 12” forțat să ceară list_devices</td><td class='pass'>✓ trecut</td></tr><tr><td>C5</td><td>mock none: întrebarea despre conflict fără check_conflict</td><td class='pass'>✓ trecut</td></tr><tr><td>C5</td><td>required se aplică doar la pasul 1: a doua cerere a dat răspuns final</td><td class='pass'>✓ trecut</td></tr><tr><td>C2</td><td>MAX_TURNS=6: „Și în 5 ore?” → estimate_energy(radiator, 5)</td><td class='pass'>✓ trecut</td></tr><tr><td>C2</td><td>MAX_TURNS=1: prima tură tăiată (mesaje_taiate = 4)</td><td class='pass'>✓ trecut</td></tr><tr><td>C2</td><td>MAX_TURNS=1: modelul nu mai apelează estimate_energy pentru radiator</td><td class='pass'>✓ trecut</td></tr><tr><td>C2</td><td>/istoric: 5, 9 (MAX_TURNS=6) și 5, 5 (MAX_TURNS=1)</td><td class='pass'>✓ trecut</td></tr><tr><td>C5</td><td>Gemini acceptă tool_choice=required (fără HTTP 400)</td><td class='pass'>✓ trecut</td></tr><tr><td>C5</td><td>Gemini acceptă tool_choice=none (fără HTTP 400)</td><td class='pass'>✓ trecut</td></tr><tr><td>C5</td><td>Gemini required: „12 ori 12” → un apel forțat, apoi 144 la pasul 2</td><td class='pass'>✓ trecut</td></tr><tr><td>C5</td><td>Gemini none: nicio cerere de instrument</td><td class='pass'>✓ trecut</td></tr></tbody></table></div>
+<h3>Cum se reproduce</h3>
+<pre class="term"># în agent.py schimbați constanta cerută, de ex.  MAX_TURNS = 2
+# în .env:  LLM_PROVIDER=mock   (sau gemini pentru C2 / C5)
+python chat.py
+python analyze_log.py
+# la final readuceți constantele: MAX_STEPS=6, MAX_REPEAT=2, MAX_TURNS=6, MAX_TOOL_CHARS=1500, TOOL_CHOICE=&quot;auto&quot;</pre>
+</section>
+</main>
+</body>
+</html>
