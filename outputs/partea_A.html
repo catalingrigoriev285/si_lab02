@@ -1,0 +1,483 @@
+<!doctype html>
+<html lang="ro">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Laborator 2 – Partea A</title>
+<style>
+:root {
+  --bg: #fbfaf8; --surface: #ffffff; --text: #1d1d1f; --muted: #6b6b70; --border: #e3e1dc;
+  --accent: #2f5fb3; --accent-soft: #e9effa; --code-bg: #f3f2ef; --term-bg: #1e1f24; --term-text: #e6e6e6;
+  --ok: #1f7a3d; --ok-soft: #e4f3e9; --bad: #b3261e; --bad-soft: #fbe9e7; --warn: #8a5a00; --warn-soft: #fdf3dc;
+  --hist: #5a4fb3; --hist-soft: #ecebfa;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #141517; --surface: #1c1d21; --text: #e8e8ea; --muted: #9a9aa2; --border: #2e3036;
+    --accent: #8ab0f0; --accent-soft: #1f2a3d; --code-bg: #25272c; --term-bg: #0e0f11; --term-text: #dcdcdc;
+    --ok: #6fd08f; --ok-soft: #173222; --bad: #f08b84; --bad-soft: #3a1d1b; --warn: #e8bf6a; --warn-soft: #33290f;
+    --hist: #b3abf5; --hist-soft: #26233f;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #141517; --surface: #1c1d21; --text: #e8e8ea; --muted: #9a9aa2; --border: #2e3036;
+  --accent: #8ab0f0; --accent-soft: #1f2a3d; --code-bg: #25272c; --term-bg: #0e0f11; --term-text: #dcdcdc;
+  --ok: #6fd08f; --ok-soft: #173222; --bad: #f08b84; --bad-soft: #3a1d1b; --warn: #e8bf6a; --warn-soft: #33290f;
+  --hist: #b3abf5; --hist-soft: #26233f;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--text);
+  font: 16px/1.6 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+main { max-width: 1040px; margin: 0 auto; padding: 32px 16px 80px; }
+header h1 { font-size: 1.9rem; margin: 0 0 4px; letter-spacing: -0.01em; }
+header .sub { color: var(--muted); margin: 0 0 16px; }
+nav { position: sticky; top: 0; z-index: 5; background: var(--bg); padding: 10px 0; margin-bottom: 8px;
+  border-bottom: 1px solid var(--border); display: flex; gap: 6px; flex-wrap: wrap; }
+nav a { text-decoration: none; color: var(--accent); background: var(--accent-soft); padding: 3px 12px;
+  border-radius: 999px; font-weight: 600; font-size: .9rem; }
+section { background: var(--surface); border: 1px solid var(--border); border-radius: 12px;
+  padding: 20px 22px; margin: 22px 0; }
+h2 { margin: 0 0 8px; font-size: 1.35rem; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+h3 { font-size: 1rem; margin: 20px 0 8px; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; }
+.ex { background: var(--accent); color: var(--surface); border-radius: 6px; padding: 0 8px; font-size: 1rem; }
+.opt { font-size: .75rem; font-weight: 600; color: var(--warn); background: var(--warn-soft);
+  padding: 1px 8px; border-radius: 999px; }
+.task { color: var(--muted); border-left: 3px solid var(--border); padding-left: 12px; margin: 6px 0 0; }
+code { font-family: ui-monospace, "Cascadia Code", Consolas, monospace; font-size: .86em;
+  background: var(--code-bg); padding: 1px 5px; border-radius: 4px; overflow-wrap: anywhere; }
+pre { font-family: ui-monospace, "Cascadia Code", Consolas, monospace; font-size: .8rem; line-height: 1.5;
+  padding: 12px 14px; border-radius: 8px; overflow-x: auto; margin: 8px 0; }
+pre.log { background: var(--code-bg); color: var(--text); white-space: pre; }
+pre.term { background: var(--term-bg); color: var(--term-text); white-space: pre-wrap; }
+.table-wrap { overflow-x: auto; margin: 8px 0; }
+table { border-collapse: collapse; width: 100%; font-size: .9rem; margin: 0; }
+th, td { border-bottom: 1px solid var(--border); padding: 7px 10px; text-align: left; vertical-align: top; }
+th { font-weight: 600; background: var(--code-bg); }
+td.num { text-align: center; white-space: nowrap; font-variant-numeric: tabular-nums; }
+td.flow { font-size: .78rem; color: var(--muted); }
+td.flow sub { font-size: .7em; }
+tr.total td { font-weight: 600; background: var(--code-bg); }
+td.pass { color: var(--ok); font-weight: 600; white-space: nowrap; }
+td.fail { color: var(--bad); font-weight: 600; white-space: nowrap; }
+.muted { color: var(--muted); font-size: .9em; }
+.tag { font-size: .72rem; font-weight: 700; padding: 1px 7px; border-radius: 999px; white-space: nowrap; }
+.tag.ok { color: var(--ok); background: var(--ok-soft); }
+.tag.bad { color: var(--bad); background: var(--bad-soft); }
+.tag.miss { color: var(--warn); background: var(--warn-soft); }
+.tag.hist { color: var(--hist); background: var(--hist-soft); }
+.callout { background: var(--accent-soft); border-radius: 8px; padding: 10px 14px; margin: 12px 0 4px; font-size: .93rem; }
+.callout.warn { background: var(--warn-soft); }
+ul { padding-left: 20px; }
+li { margin: 6px 0; }
+details { margin: 8px 0; border: 1px solid var(--border); border-radius: 8px; padding: 4px 12px; }
+details summary { cursor: pointer; font-weight: 600; font-size: .9rem; padding: 4px 0; color: var(--accent); }
+.meta { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 10px; margin: 14px 0; }
+.meta div { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 10px 14px; }
+.meta b { display: block; font-size: .75rem; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; }
+.score { font-size: 1.5rem; font-weight: 700; color: var(--ok); }
+</style>
+</head>
+<body>
+<main>
+<header>
+<h1>Laborator 2 – Partea A</h1>
+<p class="sub">Exercițiile 3.6: furnizorul mock și fișierul de log. Toate rezultatele sunt din rulări reale ale <code>chat.py</code>, pe 22.10.2026.</p>
+<div class="meta">
+<div><b>Furnizor A1–A4</b>mock (<code>mock-1</code>)</div>
+<div><b>Furnizor A5–A6</b><code>qwen3:1.7b</code> local (Ollama)</div>
+<div><b>Mediu</b>Python 3.14 · fastmcp 4.1.3 · openai 3.36.1</div>
+<div><b>Verificări automate</b><span class="score">28/28</span> trecute</div>
+</div>
+</header>
+<nav><a href="#a1">A1</a><a href="#a2">A2</a><a href="#a3">A3</a><a href="#a4">A4</a><a href="#a5">A5</a><a href="#a6">A6</a><a href="#teste">Teste</a></nav>
+
+<section id="a1">
+<h2><span class="ex">A1</span> Un apel simplu</h2>
+<p class="task">Cu mock: „Cât consumă radiatorul în 3 ore?”, „Care sunt dispozitivele? Vreau lista.”, „Dă-mi informații despre ventilație”. Câte cereri către model? Ce instrument, cu ce argumente? Cum se vede trecerea de la cererea de apel la răspunsul final?</p>
+<h3>Rezultat</h3>
+<div class="table-wrap"><table><thead><tr><th>#</th><th>Întrebare</th><th>Cereri model</th><th>Instrument (argumente)</th><th>Fluxul în log</th></tr></thead><tbody><tr><td>1</td><td>Cât consumă radiatorul în 3 ore?</td><td class='num'>2</td><td><code>estimate_energy({&quot;name&quot;: &quot;radiator&quot;, &quot;hours&quot;: 3.0})</code> <span class='muted'>pas 1</span></td><td class='flow'>intrebare → cerere_model<sub>1</sub> → apel<sub>1</sub> → rezultat<sub>1</sub> → cerere_model<sub>2</sub> → raspuns</td></tr><tr><td>2</td><td>Care sunt dispozitivele? Vreau lista.</td><td class='num'>2</td><td><code>list_devices({})</code> <span class='muted'>pas 1</span></td><td class='flow'>intrebare → cerere_model<sub>1</sub> → apel<sub>1</sub> → rezultat<sub>1</sub> → cerere_model<sub>2</sub> → raspuns</td></tr><tr><td>3</td><td>Dă-mi informații despre ventilație</td><td class='num'>2</td><td><code>get_device_info({&quot;name&quot;: &quot;ventilatie&quot;})</code> <span class='muted'>pas 1</span></td><td class='flow'>intrebare → cerere_model<sub>1</sub> → apel<sub>1</sub> → rezultat<sub>1</sub> → cerere_model<sub>2</sub> → raspuns</td></tr></tbody></table></div>
+<h3>Răspuns</h3>
+<ul>
+<li><b>Câte cereri către model:</b> câte <b>2</b> pentru fiecare întrebare (6 în total). Pasul 1: modelul primește întrebarea și răspunde cu o cerere de apel. Pasul 2: primește rezultatul instrumentului și formulează răspunsul final în text.</li>
+<li><b>Instrumentele și argumentele:</b> <code>estimate_energy(name="radiator", hours=3.0)</code> → 4,5 kWh (1500 W × 3 h); <code>list_devices()</code> fără argumente → cele 5 dispozitive; <code>get_device_info(name="ventilatie")</code>. Mock-ul a normalizat „ventilație” (cu diacritice) la numele canonic <code>ventilatie</code> și a transformat „3” în <code>3.0</code> (float).</li>
+<li><b>Trecerea în log:</b> <code>intrebare</code> → <code>cerere_model</code> (pas 1) → <code>apel</code> (pas 1) → <code>rezultat</code> (pas 1, <code>eroare: false</code>) → <code>cerere_model</code> (pas 2) → <code>raspuns</code> (pas 2). Câmpul <code>mesaje</code> crește cu 2 între pasul 1 și pasul 2 (2 → 4, 6 → 8, 10 → 12): în istoric au intrat mesajul <code>assistant</code> cu <code>tool_calls</code> și mesajul <code>tool</code> cu rezultatul. Răspunsul final apare la pasul în care modelul nu mai cere niciun instrument.</li>
+<li><b>Tokenii din prompt</b> cresc de la o întrebare la alta (97 → 173 → 224 → 295 → 349 → 437), pentru că tot istoricul se retrimite.</li>
+</ul>
+<details><summary>Transcriptul chat.py</summary><pre class="term">Tu:   [instrument] estimate_energy({&#x27;name&#x27;: &#x27;radiator&#x27;, &#x27;hours&#x27;: 3.0}) -&gt; {&quot;nume&quot;:&quot;radiator&quot;,&quot;ore&quot;:3.0,&quot;energie_kwh&quot;:4.5}
+Agent: [mock] Rezultatele instrumentelor:
+- {&quot;nume&quot;:&quot;radiator&quot;,&quot;ore&quot;:3.0,&quot;energie_kwh&quot;:4.5} 
+
+Tu:   [instrument] list_devices({}) -&gt; [&quot;aer_conditionat&quot;,&quot;jaluzele&quot;,&quot;lampa_led&quot;,&quot;radiator&quot;,&quot;ventilatie&quot;]
+Agent: [mock] Rezultatele instrumentelor:
+- [&quot;aer_conditionat&quot;,&quot;jaluzele&quot;,&quot;lampa_led&quot;,&quot;radiator&quot;,&quot;ventilatie&quot;] 
+
+Tu:   [instrument] get_device_info({&#x27;name&#x27;: &#x27;ventilatie&#x27;}) -&gt; {&quot;nume&quot;:&quot;ventilatie&quot;,&quot;categorie&quot;:&quot;ventilație&quot;,&quot;putere_w&quot;:120,&quot;note&quot;:&quot;Aduce aer proaspăt din exterior.&quot;}
+Agent: [mock] Rezultatele instrumentelor:
+- {&quot;nume&quot;:&quot;ventilatie&quot;,&quot;categorie&quot;:&quot;ventilație&quot;,&quot;putere_w&quot;:120,&quot;note&quot;:&quot;Aduce aer proaspăt din exterior.&quot;}</pre></details>
+<details><summary>Logul complet (logs\agent-20261022-193234.jsonl)</summary><pre class="log">{&quot;ts&quot;: &quot;2026-10-22T19:32:34.730&quot;, &quot;tip&quot;: &quot;reset&quot;}
+{&quot;ts&quot;: &quot;2026-10-22T19:32:36.490&quot;, &quot;tip&quot;: &quot;intrebare&quot;, &quot;text&quot;: &quot;Cât consumă radiatorul în 3 ore?&quot;, &quot;mesaje_taiate&quot;: 0}
+{&quot;ts&quot;: &quot;2026-10-22T19:32:36.494&quot;, &quot;tip&quot;: &quot;cerere_model&quot;, &quot;pas&quot;: 1, &quot;mesaje&quot;: 2, &quot;durata_ms&quot;: 4, &quot;prompt_tokens&quot;: 97}
+{&quot;ts&quot;: &quot;2026-10-22T19:32:36.499&quot;, &quot;tip&quot;: &quot;apel&quot;, &quot;pas&quot;: 1, &quot;nume&quot;: &quot;estimate_energy&quot;, &quot;argumente&quot;: {&quot;name&quot;: &quot;radiator&quot;, &quot;hours&quot;: 3.0}}
+{&quot;ts&quot;: &quot;2026-10-22T19:32:36.681&quot;, &quot;tip&quot;: &quot;rezultat&quot;, &quot;pas&quot;: 1, &quot;nume&quot;: &quot;estimate_energy&quot;, &quot;eroare&quot;: false, &quot;text&quot;: &quot;{\&quot;nume\&quot;:\&quot;radiator\&quot;,\&quot;ore\&quot;:3.0,\&quot;energie_kwh\&quot;:4.5}&quot;, &quot;trunchiat&quot;: false}
+{&quot;ts&quot;: &quot;2026-10-22T19:32:36.684&quot;, &quot;tip&quot;: &quot;cerere_model&quot;, &quot;pas&quot;: 2, &quot;mesaje&quot;: 4, &quot;durata_ms&quot;: 0, &quot;prompt_tokens&quot;: 173}
+{&quot;ts&quot;: &quot;2026-10-22T19:32:36.685&quot;, &quot;tip&quot;: &quot;raspuns&quot;, &quot;text&quot;: &quot;[mock] Rezultatele instrumentelor:\n- {\&quot;nume\&quot;:\&quot;radiator\&quot;,\&quot;ore\&quot;:3.0,\&quot;energie_kwh\&quot;:4.5}&quot;, &quot;pas&quot;: 2}
+{&quot;ts&quot;: &quot;2026-10-22T19:32:36.686&quot;, &quot;tip&quot;: &quot;intrebare&quot;, &quot;text&quot;: &quot;Care sunt dispozitivele? Vreau lista.&quot;, &quot;mesaje_taiate&quot;: 0}
+{&quot;ts&quot;: &quot;2026-10-22T19:32:36.688&quot;, &quot;tip&quot;: &quot;cerere_model&quot;, &quot;pas&quot;: 1, &quot;mesaje&quot;: 6, &quot;durata_ms&quot;: 0, &quot;prompt_tokens&quot;: 224}
+{&quot;ts&quot;: &quot;2026-10-22T19:32:36.689&quot;, &quot;tip&quot;: &quot;apel&quot;, &quot;pas&quot;: 1, &quot;nume&quot;: &quot;list_devices&quot;, &quot;argumente&quot;: {}}
+{&quot;ts&quot;: &quot;2026-10-22T19:32:36.705&quot;, &quot;tip&quot;: &quot;rezultat&quot;, &quot;pas&quot;: 1, &quot;nume&quot;: &quot;list_devices&quot;, &quot;eroare&quot;: false, &quot;text&quot;: &quot;[\&quot;aer_conditionat\&quot;,\&quot;jaluzele\&quot;,\&quot;lampa_led\&quot;,\&quot;radiator\&quot;,\&quot;ventilatie\&quot;]&quot;, &quot;trunchiat&quot;: false}
+{&quot;ts&quot;: &quot;2026-10-22T19:32:36.706&quot;, &quot;tip&quot;: &quot;cerere_model&quot;, &quot;pas&quot;: 2, &quot;mesaje&quot;: 8, &quot;durata_ms&quot;: 0, &quot;prompt_tokens&quot;: 295}
+{&quot;ts&quot;: &quot;2026-10-22T19:32:36.707&quot;, &quot;tip&quot;: &quot;raspuns&quot;, &quot;text&quot;: &quot;[mock] Rezultatele instrumentelor:\n- [\&quot;aer_conditionat\&quot;,\&quot;jaluzele\&quot;,\&quot;lampa_led\&quot;,\&quot;radiator\&quot;,\&quot;ventilatie\&quot;]&quot;, &quot;pas&quot;: 2}
+{&quot;ts&quot;: &quot;2026-10-22T19:32:36.709&quot;, &quot;tip&quot;: &quot;intrebare&quot;, &quot;text&quot;: &quot;Dă-mi informații despre ventilație&quot;, &quot;mesaje_taiate&quot;: 0}
+{&quot;ts&quot;: &quot;2026-10-22T19:32:36.710&quot;, &quot;tip&quot;: &quot;cerere_model&quot;, &quot;pas&quot;: 1, &quot;mesaje&quot;: 10, &quot;durata_ms&quot;: 0, &quot;prompt_tokens&quot;: 349}
+{&quot;ts&quot;: &quot;2026-10-22T19:32:36.711&quot;, &quot;tip&quot;: &quot;apel&quot;, &quot;pas&quot;: 1, &quot;nume&quot;: &quot;get_device_info&quot;, &quot;argumente&quot;: {&quot;name&quot;: &quot;ventilatie&quot;}}
+{&quot;ts&quot;: &quot;2026-10-22T19:32:36.720&quot;, &quot;tip&quot;: &quot;rezultat&quot;, &quot;pas&quot;: 1, &quot;nume&quot;: &quot;get_device_info&quot;, &quot;eroare&quot;: false, &quot;text&quot;: &quot;{\&quot;nume\&quot;:\&quot;ventilatie\&quot;,\&quot;categorie\&quot;:\&quot;ventilație\&quot;,\&quot;putere_w\&quot;:120,\&quot;note\&quot;:\&quot;Aduce aer proaspăt din exterior.\&quot;}&quot;, &quot;trunchiat&quot;: false}
+{&quot;ts&quot;: &quot;2026-10-22T19:32:36.722&quot;, &quot;tip&quot;: &quot;cerere_model&quot;, &quot;pas&quot;: 2, &quot;mesaje&quot;: 12, &quot;durata_ms&quot;: 0, &quot;prompt_tokens&quot;: 437}
+{&quot;ts&quot;: &quot;2026-10-22T19:32:36.724&quot;, &quot;tip&quot;: &quot;raspuns&quot;, &quot;text&quot;: &quot;[mock] Rezultatele instrumentelor:\n- {\&quot;nume\&quot;:\&quot;ventilatie\&quot;,\&quot;categorie\&quot;:\&quot;ventilație\&quot;,\&quot;putere_w\&quot;:120,\&quot;note\&quot;:\&quot;Aduce aer proaspăt din exterior.\&quot;}&quot;, &quot;pas&quot;: 2}</pre></details>
+<details><summary>python analyze_log.py</summary><pre class="term">Fișier: C:\Users\catalin\OneDrive\Documents\GitHub\si_lab02\logs\agent-20261022-193234.jsonl
+Evenimente pe tip: {&#x27;reset&#x27;: 1, &#x27;pornire&#x27;: 1, &#x27;intrebare&#x27;: 3, &#x27;cerere_model&#x27;: 6, &#x27;apel&#x27;: 3, &#x27;rezultat&#x27;: 3, &#x27;raspuns&#x27;: 3}
+Apeluri pe instrument: {&#x27;estimate_energy&#x27;: 1, &#x27;list_devices&#x27;: 1, &#x27;get_device_info&#x27;: 1}
+Apeluri cu eroare: - | refuzuri ale utilizatorului: 0
+Cereri către model: 6 | durata medie: 1 ms
+Tokeni în prompt: primul 97, ultimul 437, maxim 437</pre></details>
+</section>
+<section id="a2">
+<h2><span class="ex">A2</span> Mai multe apeluri într-un pas</h2>
+<p class="task">„Ce conflict există între radiator și aer condiționat și cât ar consuma amândouă în 2 ore?” Câte apeluri și în câți pași? Au același pas? Câte evenimente <code>cerere_model</code>? Corelați cu 1.2.</p>
+<h3>Rezultat</h3>
+<div class="table-wrap"><table><thead><tr><th>#</th><th>Întrebare</th><th>Cereri model</th><th>Instrument (argumente)</th><th>Fluxul în log</th></tr></thead><tbody><tr><td>1</td><td>Ce conflict există între radiator și aer condiționat și cât ar consuma amândouă în 2 ore?</td><td class='num'>2</td><td><code>check_conflict({&quot;device_a&quot;: &quot;radiator&quot;, &quot;device_b&quot;: &quot;aer_conditionat&quot;})</code> <span class='muted'>pas 1</span><br><code>estimate_energy({&quot;name&quot;: &quot;radiator&quot;, &quot;hours&quot;: 2.0})</code> <span class='muted'>pas 1</span><br><code>estimate_energy({&quot;name&quot;: &quot;aer_conditionat&quot;, &quot;hours&quot;: 2.0})</code> <span class='muted'>pas 1</span></td><td class='flow'>intrebare → cerere_model<sub>1</sub> → apel<sub>1</sub> → rezultat<sub>1</sub> → apel<sub>1</sub> → rezultat<sub>1</sub> → apel<sub>1</sub> → rezultat<sub>1</sub> → cerere_model<sub>2</sub> → raspuns</td></tr></tbody></table></div>
+<h3>Răspuns</h3>
+<ul>
+<li>Mock-ul a cerut <b>3 apeluri într-un singur pas</b>: <code>check_conflict(radiator, aer_conditionat)</code> → RIDICAT, <code>estimate_energy(radiator, 2.0)</code> → 3,0 kWh și <code>estimate_energy(aer_conditionat, 2.0)</code> → 4,0 kWh.</li>
+<li>În log, toate cele trei evenimente <code>apel</code> au <code>"pas": 1</code>. Apar doar <b>2 evenimente <code>cerere_model</code></b>: una care produce lista de 3 apeluri și una care primește toate cele 3 rezultate și dă răspunsul final.</li>
+<li>Corelare cu 1.2: <code>tool_calls</code> este o listă, deci un singur răspuns al modelului poate conține mai multe apeluri. Agentul le execută pe rând, adaugă câte un mesaj <code>tool</code> pentru fiecare (cu <code>tool_call_id</code>-ul lui) și trimite apoi totul într-o singură cerere nouă. De aceea a doua cerere are <code>mesaje: 6</code> = system + user + assistant(tool_calls) + 3 × tool. Cele trei apeluri sunt independente (niciunul nu folosește rezultatul altuia), așa că încap în același pas. Unul dependent (de ex. „află lista, apoi estimează”) ar fi necesitat un pas în plus.</li>
+</ul>
+<div class="callout"><b>Fragment de log pentru temă</b> (secțiunea 7: max. 10 linii, fără date personale). Ilustrează exercițiul A2:</div>
+<pre class="log">{&quot;ts&quot;: &quot;2026-10-22T19:32:42.717&quot;, &quot;tip&quot;: &quot;intrebare&quot;, &quot;text&quot;: &quot;Ce conflict există între radiator și aer condiționat și cât ar consuma amândouă în 2 ore?&quot;, &quot;mesaje_taiate&quot;: 0}
+{&quot;ts&quot;: &quot;2026-10-22T19:32:42.720&quot;, &quot;tip&quot;: &quot;cerere_model&quot;, &quot;pas&quot;: 1, &quot;mesaje&quot;: 2, &quot;durata_ms&quot;: 2, &quot;prompt_tokens&quot;: 112}
+{&quot;ts&quot;: &quot;2026-10-22T19:32:42.728&quot;, &quot;tip&quot;: &quot;apel&quot;, &quot;pas&quot;: 1, &quot;nume&quot;: &quot;check_conflict&quot;, &quot;argumente&quot;: {&quot;device_a&quot;: &quot;radiator&quot;, &quot;device_b&quot;: &quot;aer_conditionat&quot;}}
+{&quot;ts&quot;: &quot;2026-10-22T19:32:42.928&quot;, &quot;tip&quot;: &quot;rezultat&quot;, &quot;pas&quot;: 1, &quot;nume&quot;: &quot;check_conflict&quot;, &quot;eroare&quot;: false, &quot;text&quot;: &quot;RIDICAT - încălzire și răcire simultană, consum inutil.&quot;, &quot;trunchiat&quot;: false}
+{&quot;ts&quot;: &quot;2026-10-22T19:32:42.929&quot;, &quot;tip&quot;: &quot;apel&quot;, &quot;pas&quot;: 1, &quot;nume&quot;: &quot;estimate_energy&quot;, &quot;argumente&quot;: {&quot;name&quot;: &quot;radiator&quot;, &quot;hours&quot;: 2.0}}
+{&quot;ts&quot;: &quot;2026-10-22T19:32:42.954&quot;, &quot;tip&quot;: &quot;rezultat&quot;, &quot;pas&quot;: 1, &quot;nume&quot;: &quot;estimate_energy&quot;, &quot;eroare&quot;: false, &quot;text&quot;: &quot;{\&quot;nume\&quot;:\&quot;radiator\&quot;,\&quot;ore\&quot;:2.0,\&quot;energie_kwh\&quot;:3.0}&quot;, &quot;trunchiat&quot;: false}
+{&quot;ts&quot;: &quot;2026-10-22T19:32:42.960&quot;, &quot;tip&quot;: &quot;apel&quot;, &quot;pas&quot;: 1, &quot;nume&quot;: &quot;estimate_energy&quot;, &quot;argumente&quot;: {&quot;name&quot;: &quot;aer_conditionat&quot;, &quot;hours&quot;: 2.0}}
+{&quot;ts&quot;: &quot;2026-10-22T19:32:42.973&quot;, &quot;tip&quot;: &quot;rezultat&quot;, &quot;pas&quot;: 1, &quot;nume&quot;: &quot;estimate_energy&quot;, &quot;eroare&quot;: false, &quot;text&quot;: &quot;{\&quot;nume\&quot;:\&quot;aer_conditionat\&quot;,\&quot;ore\&quot;:2.0,\&quot;energie_kwh\&quot;:4.0}&quot;, &quot;trunchiat&quot;: false}
+{&quot;ts&quot;: &quot;2026-10-22T19:32:42.974&quot;, &quot;tip&quot;: &quot;cerere_model&quot;, &quot;pas&quot;: 2, &quot;mesaje&quot;: 6, &quot;durata_ms&quot;: 0, &quot;prompt_tokens&quot;: 322}
+{&quot;ts&quot;: &quot;2026-10-22T19:32:42.976&quot;, &quot;tip&quot;: &quot;raspuns&quot;, &quot;text&quot;: &quot;[mock] Rezultatele instrumentelor:\n- RIDICAT - încălzire și răcire simultană, consum inutil.\n- {\&quot;nume\&quot;:\&quot;radiator\&quot;,\&quot;ore\&quot;:2.0,\&quot;energie_kwh\&quot;:3.0}\n- {\&quot;nume\&quot;:\&quot;aer_conditionat\&quot;,\&quot;ore\&quot;:2.0,\&quot;energie_kwh\&quot;:4.0}&quot;, &quot;pas&quot;: 2}</pre>
+<details><summary>Transcriptul chat.py</summary><pre class="term">Tu:   [instrument] check_conflict({&#x27;device_a&#x27;: &#x27;radiator&#x27;, &#x27;device_b&#x27;: &#x27;aer_conditionat&#x27;}) -&gt; RIDICAT - încălzire și răcire simultană, consum inutil.
+  [instrument] estimate_energy({&#x27;name&#x27;: &#x27;radiator&#x27;, &#x27;hours&#x27;: 2.0}) -&gt; {&quot;nume&quot;:&quot;radiator&quot;,&quot;ore&quot;:2.0,&quot;energie_kwh&quot;:3.0}
+  [instrument] estimate_energy({&#x27;name&#x27;: &#x27;aer_conditionat&#x27;, &#x27;hours&#x27;: 2.0}) -&gt; {&quot;nume&quot;:&quot;aer_conditionat&quot;,&quot;ore&quot;:2.0,&quot;energie_kwh&quot;:4.0}
+Agent: [mock] Rezultatele instrumentelor:
+- RIDICAT - încălzire și răcire simultană, consum inutil.
+- {&quot;nume&quot;:&quot;radiator&quot;,&quot;ore&quot;:2.0,&quot;energie_kwh&quot;:3.0}
+- {&quot;nume&quot;:&quot;aer_conditionat&quot;,&quot;ore&quot;:2.0,&quot;energie_kwh&quot;:4.0}</pre></details>
+<details><summary>python analyze_log.py</summary><pre class="term">Fișier: C:\Users\catalin\OneDrive\Documents\GitHub\si_lab02\logs\agent-20261022-193240.jsonl
+Evenimente pe tip: {&#x27;reset&#x27;: 1, &#x27;pornire&#x27;: 1, &#x27;intrebare&#x27;: 1, &#x27;cerere_model&#x27;: 2, &#x27;apel&#x27;: 3, &#x27;rezultat&#x27;: 3, &#x27;raspuns&#x27;: 1}
+Apeluri pe instrument: {&#x27;check_conflict&#x27;: 1, &#x27;estimate_energy&#x27;: 2}
+Apeluri cu eroare: - | refuzuri ale utilizatorului: 0
+Cereri către model: 2 | durata medie: 1 ms
+Tokeni în prompt: primul 112, ultimul 322, maxim 322</pre></details>
+</section>
+<section id="a3">
+<h2><span class="ex">A3</span> Trei feluri de eroare</h2>
+<p class="task">(a) „Cât consumă frigiderul în 2 ore?”; (b) <code>apel: inexistent {}</code>; (c) <code>apel: estimate_energy {"name": "radiator", "hours": "abc"}</code>. Cine a produs eroarea și cum arată în log? Comparați (c) cu exercițiul 3 din Laboratorul 1.</p>
+<h3>Rezultat</h3>
+<div class="table-wrap"><table>
+<thead><tr><th>Caz</th><th>Cine a produs eroarea</th><th>Ajunge la server?</th><th><code>eroare</code> în log</th><th>Textul rezultatului</th></tr></thead>
+<tbody>
+<tr><td>(a) frigider</td><td><b>Instrumentul</b> (<code>estimate_energy</code>, prin <code>_necunoscut</code>)</td><td>da, funcția rulează</td><td class="num"><code>false</code></td><td><code>{&quot;eroare&quot;:&quot;Dispozitiv necunoscut: frigider&quot;,&quot;cunoscute&quot;:[&quot;aer_conditionat&quot;,&quot;jaluzele&quot;,&quot;lampa_led&quot;,&quot;radiator&quot;,&quot;ventilatie&quot;]}</code></td></tr>
+<tr><td>(b) inexistent</td><td><b>Agentul</b> (<code>call_tool</code>: numele lipsește din <code>self.flags</code>)</td><td>nu</td><td class="num"><code>true</code></td><td><code>Instrument necunoscut: inexistent. Disponibile: check_conflict, estimate_energy, get_building_state, get_device_info, list_devices, reset_building, set_device_state, set_thermostat.</code></td></tr>
+<tr><td>(c) hours="abc"</td><td><b>Serverul MCP</b> (validarea schemei, Pydantic/FastMCP)</td><td>da, dar funcția nu rulează</td><td class="num"><code>true</code></td><td><code>Eroare la apelul estimate_energy: 1 validation error for call[estimate_energy]
+hours
+  Input should be a valid number, unable to parse string as a number [type=float_parsing, input_value=&#x27;abc&#x27;, input_type=str]
+    For further information visit https://errors.pydantic.dev/2.14/v/float_parsing</code></td></tr>
+</tbody></table></div>
+<h3>Răspuns</h3>
+<ul>
+<li><b>(a)</b> Eroarea e produsă de <b>instrument</b>: funcția rulează și întoarce un dicționar obișnuit cu câmpurile <code>eroare</code> și <code>cunoscute</code>. Pentru MCP, apelul a reușit (<code>isError: false</code>), deci în log apare <code>eroare: false</code>. Problema se vede doar în text; modelul trebuie să-l citească și să se corecteze, de exemplu alegând un nume din <code>cunoscute</code>.</li>
+<li><b>(b)</b> Eroarea e produsă de <b>agent</b>: <code>inexistent</code> nu se află în lista primită prin <code>list_tools</code>, deci apelul nu ajunge la server. În log apare evenimentul <code>apel</code>, apoi direct <code>rezultat</code> cu <code>eroare: true</code> și lista instrumentelor valide. Nu există niciun eveniment <code>confirmare</code>.</li>
+<li><b>(c)</b> Eroarea e produsă de <b>serverul MCP</b>: FastMCP validează argumentele cu schema (<code>hours: float</code>) înainte să ruleze funcția. Pe stderr apare <code>WARNING Invalid arguments for tool 'estimate_energy': {'error_types': ['float_parsing']}</code>. Serverul întoarce <code>isError: true</code>; clientul FastMCP transformă asta într-o excepție, iar agentul o prinde (<code>except Exception</code>) și o trimite modelului ca text, cu <code>eroare: true</code> în log.</li>
+<li><b>Comparație cu exercițiul 3 din Laboratorul 1:</b> e același strat de protecție (validarea schemei pe server) și același <code>isError: true</code>. Diferențele sunt două. În Laboratorul 1, Inspector CLI a trimis <code>input_value=None</code> (eroare <code>float_type</code>); aici agentul trimite chiar șirul <code>'abc'</code>, deci eroarea este <code>float_parsing</code>, cu <code>input_value='abc'</code>. Apoi, în Laboratorul 1 eroarea a văzut-o un om în Inspector; aici ea ajunge la model ca mesaj <code>tool</code>, iar un model real poate reîncerca cu un număr. Agentul nu se oprește.</li>
+</ul>
+<details><summary>Transcriptul chat.py</summary><pre class="term">Tu:   [instrument] estimate_energy({&#x27;name&#x27;: &#x27;frigider&#x27;, &#x27;hours&#x27;: 2.0}) -&gt; {&quot;eroare&quot;:&quot;Dispozitiv necunoscut: frigider&quot;,&quot;cunoscute&quot;:[&quot;aer_conditionat&quot;,&quot;jaluzele&quot;,&quot;lampa_led&quot;,&quot;radiator&quot;,&quot;ventilatie&quot;]}
+Agent: [mock] Rezultatele instrumentelor:
+- {&quot;eroare&quot;:&quot;Dispozitiv necunoscut: frigider&quot;,&quot;cunoscute&quot;:[&quot;aer_conditionat&quot;,&quot;jaluzele&quot;,&quot;lampa_led&quot;,&quot;radiator&quot;,&quot;ventilatie&quot;]} 
+
+Tu:   [instrument] inexistent({}) -&gt; Instrument necunoscut: inexistent. Disponibile: check_conflict, estimate_energy, get_building_state, get_device_info, list_devices, reset_building, se
+Agent: [mock] Rezultatele instrumentelor:
+- Instrument necunoscut: inexistent. Disponibile: check_conflict, estimate_energy, get_building_state, get_device_info, list_devices, reset_building, set_device_state, set_thermostat. 
+
+Tu:   [instrument] estimate_energy({&#x27;name&#x27;: &#x27;radiator&#x27;, &#x27;hours&#x27;: &#x27;abc&#x27;}) -&gt; Eroare la apelul estimate_energy: 1 validation error for call[estimate_energy]
+hours
+  Input should be a valid number, unable to parse string as a num
+Agent: [mock] Rezultatele instrumentelor:
+- Eroare la apelul estimate_energy: 1 validation error for call[estimate_energy]
+hours
+  Input should be a valid number, unable to parse string as a number [type=float_parsing, input_value=&#x27;abc&#x27;, input_type=str]
+    For further information visit https://errors.pydantic.dev/2.14/v/float_parsing</pre></details>
+<details><summary>Logul complet (logs\agent-20261022-193247.jsonl)</summary><pre class="log">{&quot;ts&quot;: &quot;2026-10-22T19:32:47.437&quot;, &quot;tip&quot;: &quot;reset&quot;}
+{&quot;ts&quot;: &quot;2026-10-22T19:32:49.064&quot;, &quot;tip&quot;: &quot;intrebare&quot;, &quot;text&quot;: &quot;Cât consumă frigiderul în 2 ore?&quot;, &quot;mesaje_taiate&quot;: 0}
+{&quot;ts&quot;: &quot;2026-10-22T19:32:49.071&quot;, &quot;tip&quot;: &quot;cerere_model&quot;, &quot;pas&quot;: 1, &quot;mesaje&quot;: 2, &quot;durata_ms&quot;: 6, &quot;prompt_tokens&quot;: 97}
+{&quot;ts&quot;: &quot;2026-10-22T19:32:49.087&quot;, &quot;tip&quot;: &quot;apel&quot;, &quot;pas&quot;: 1, &quot;nume&quot;: &quot;estimate_energy&quot;, &quot;argumente&quot;: {&quot;name&quot;: &quot;frigider&quot;, &quot;hours&quot;: 2.0}}
+{&quot;ts&quot;: &quot;2026-10-22T19:32:49.318&quot;, &quot;tip&quot;: &quot;rezultat&quot;, &quot;pas&quot;: 1, &quot;nume&quot;: &quot;estimate_energy&quot;, &quot;eroare&quot;: false, &quot;text&quot;: &quot;{\&quot;eroare\&quot;:\&quot;Dispozitiv necunoscut: frigider\&quot;,\&quot;cunoscute\&quot;:[\&quot;aer_conditionat\&quot;,\&quot;jaluzele\&quot;,\&quot;lampa_led\&quot;,\&quot;radiator\&quot;,\&quot;ventilatie\&quot;]}&quot;, &quot;trunchiat&quot;: false}
+{&quot;ts&quot;: &quot;2026-10-22T19:32:49.319&quot;, &quot;tip&quot;: &quot;cerere_model&quot;, &quot;pas&quot;: 2, &quot;mesaje&quot;: 4, &quot;durata_ms&quot;: 0, &quot;prompt_tokens&quot;: 194}
+{&quot;ts&quot;: &quot;2026-10-22T19:32:49.320&quot;, &quot;tip&quot;: &quot;raspuns&quot;, &quot;text&quot;: &quot;[mock] Rezultatele instrumentelor:\n- {\&quot;eroare\&quot;:\&quot;Dispozitiv necunoscut: frigider\&quot;,\&quot;cunoscute\&quot;:[\&quot;aer_conditionat\&quot;,\&quot;jaluzele\&quot;,\&quot;lampa_led\&quot;,\&quot;radiator\&quot;,\&quot;ventilatie\&quot;]}&quot;, &quot;pas&quot;: 2}
+{&quot;ts&quot;: &quot;2026-10-22T19:32:49.321&quot;, &quot;tip&quot;: &quot;intrebare&quot;, &quot;text&quot;: &quot;apel: inexistent {}&quot;, &quot;mesaje_taiate&quot;: 0}
+{&quot;ts&quot;: &quot;2026-10-22T19:32:49.324&quot;, &quot;tip&quot;: &quot;cerere_model&quot;, &quot;pas&quot;: 1, &quot;mesaje&quot;: 6, &quot;durata_ms&quot;: 0, &quot;prompt_tokens&quot;: 261}
+{&quot;ts&quot;: &quot;2026-10-22T19:32:49.325&quot;, &quot;tip&quot;: &quot;apel&quot;, &quot;pas&quot;: 1, &quot;nume&quot;: &quot;inexistent&quot;, &quot;argumente&quot;: {}}
+{&quot;ts&quot;: &quot;2026-10-22T19:32:49.326&quot;, &quot;tip&quot;: &quot;rezultat&quot;, &quot;pas&quot;: 1, &quot;nume&quot;: &quot;inexistent&quot;, &quot;eroare&quot;: true, &quot;text&quot;: &quot;Instrument necunoscut: inexistent. Disponibile: check_conflict, estimate_energy, get_building_state, get_device_info, list_devices, reset_building, set_device_state, set_thermostat.&quot;, &quot;trunchiat&quot;: false}
+{&quot;ts&quot;: &quot;2026-10-22T19:32:49.328&quot;, &quot;tip&quot;: &quot;cerere_model&quot;, &quot;pas&quot;: 2, &quot;mesaje&quot;: 8, &quot;durata_ms&quot;: 0, &quot;prompt_tokens&quot;: 358}
+{&quot;ts&quot;: &quot;2026-10-22T19:32:49.329&quot;, &quot;tip&quot;: &quot;raspuns&quot;, &quot;text&quot;: &quot;[mock] Rezultatele instrumentelor:\n- Instrument necunoscut: inexistent. Disponibile: check_conflict, estimate_energy, get_building_state, get_device_info, list_devices, reset_building, set_device_state, set_thermostat.&quot;, &quot;pas&quot;: 2}
+{&quot;ts&quot;: &quot;2026-10-22T19:32:49.330&quot;, &quot;tip&quot;: &quot;intrebare&quot;, &quot;text&quot;: &quot;apel: estimate_energy {\&quot;name\&quot;: \&quot;radiator\&quot;, \&quot;hours\&quot;: \&quot;abc\&quot;}&quot;, &quot;mesaje_taiate&quot;: 0}
+{&quot;ts&quot;: &quot;2026-10-22T19:32:49.331&quot;, &quot;tip&quot;: &quot;cerere_model&quot;, &quot;pas&quot;: 1, &quot;mesaje&quot;: 10, &quot;durata_ms&quot;: 0, &quot;prompt_tokens&quot;: 447}
+{&quot;ts&quot;: &quot;2026-10-22T19:32:49.332&quot;, &quot;tip&quot;: &quot;apel&quot;, &quot;pas&quot;: 1, &quot;nume&quot;: &quot;estimate_energy&quot;, &quot;argumente&quot;: {&quot;name&quot;: &quot;radiator&quot;, &quot;hours&quot;: &quot;abc&quot;}}
+{&quot;ts&quot;: &quot;2026-10-22T19:32:49.337&quot;, &quot;tip&quot;: &quot;rezultat&quot;, &quot;pas&quot;: 1, &quot;nume&quot;: &quot;estimate_energy&quot;, &quot;eroare&quot;: true, &quot;text&quot;: &quot;Eroare la apelul estimate_energy: 1 validation error for call[estimate_energy]\nhours\n  Input should be a valid number, unable to parse string as a number [type=float_parsing, input_value=&#x27;abc&#x27;, input_type=str]\n    For further information visit https://errors.pydantic.dev/2.14/v/float_parsing&quot;, &quot;trunchiat&quot;: false}
+{&quot;ts&quot;: &quot;2026-10-22T19:32:49.339&quot;, &quot;tip&quot;: &quot;cerere_model&quot;, &quot;pas&quot;: 2, &quot;mesaje&quot;: 12, &quot;durata_ms&quot;: 1, &quot;prompt_tokens&quot;: 584}
+{&quot;ts&quot;: &quot;2026-10-22T19:32:49.340&quot;, &quot;tip&quot;: &quot;raspuns&quot;, &quot;text&quot;: &quot;[mock] Rezultatele instrumentelor:\n- Eroare la apelul estimate_energy: 1 validation error for call[estimate_energy]\nhours\n  Input should be a valid number, unable to parse string as a number [type=float_parsing, input_value=&#x27;abc&#x27;, input_type=str]\n    For further information visit https://errors.pydantic.dev/2.14/v/float_parsing&quot;, &quot;pas&quot;: 2}</pre></details>
+<details><summary>stderr al serverului MCP</summary><pre class="term">[10/22/26 19:32:48] INFO     Starting MCP server               transport.py:241
+                             &#x27;smart-building-demo&#x27; with                        
+                             transport &#x27;stdio&#x27;                                 
+[10/22/26 19:32:49] WARNING  Invalid arguments for tool          server.py:1501
+                             &#x27;estimate_energy&#x27;: {&#x27;error_count&#x27;:                
+                             1, &#x27;error_types&#x27;:                                 
+                             [&#x27;float_parsing&#x27;]}</pre></details>
+<details><summary>python analyze_log.py</summary><pre class="term">Fișier: C:\Users\catalin\OneDrive\Documents\GitHub\si_lab02\logs\agent-20261022-193247.jsonl
+Evenimente pe tip: {&#x27;reset&#x27;: 1, &#x27;pornire&#x27;: 1, &#x27;intrebare&#x27;: 3, &#x27;cerere_model&#x27;: 6, &#x27;apel&#x27;: 3, &#x27;rezultat&#x27;: 3, &#x27;raspuns&#x27;: 3}
+Apeluri pe instrument: {&#x27;estimate_energy&#x27;: 2, &#x27;inexistent&#x27;: 1}
+Apeluri cu eroare: {&#x27;inexistent&#x27;: 1, &#x27;estimate_energy&#x27;: 1} | refuzuri ale utilizatorului: 0
+Cereri către model: 6 | durata medie: 1 ms
+Tokeni în prompt: primul 97, ultimul 584, maxim 584</pre></details>
+</section>
+<section id="a4">
+<h2><span class="ex">A4</span> Jucați voi rolul modelului <span class="opt">facultativ</span></h2>
+<p class="task">O singură întrebare în sintaxa <code>apel:</code> care cere două instrumente în același pas. Ce arată exercițiul despre ce face, de fapt, un model care „folosește un instrument”?</p>
+<h3>Ce am scris</h3>
+<pre class="term">apel: get_device_info {&quot;name&quot;: &quot;ventilatie&quot;} ; check_conflict {&quot;device_a&quot;: &quot;ventilatie&quot;, &quot;device_b&quot;: &quot;aer_conditionat&quot;}</pre>
+<h3>Rezultat</h3>
+<div class="table-wrap"><table><thead><tr><th>#</th><th>Întrebare</th><th>Cereri model</th><th>Instrument (argumente)</th><th>Fluxul în log</th></tr></thead><tbody><tr><td>1</td><td>apel: get_device_info {&quot;name&quot;: &quot;ventilatie&quot;} ; check_conflict {&quot;device_a&quot;: &quot;ventilatie&quot;, &quot;device_b&quot;: &quot;aer_conditionat&quot;}</td><td class='num'>2</td><td><code>get_device_info({&quot;name&quot;: &quot;ventilatie&quot;})</code> <span class='muted'>pas 1</span><br><code>check_conflict({&quot;device_a&quot;: &quot;ventilatie&quot;, &quot;device_b&quot;: &quot;aer_conditionat&quot;})</code> <span class='muted'>pas 1</span></td><td class='flow'>intrebare → cerere_model<sub>1</sub> → apel<sub>1</sub> → rezultat<sub>1</sub> → apel<sub>1</sub> → rezultat<sub>1</sub> → cerere_model<sub>2</sub> → raspuns</td></tr></tbody></table></div>
+<h3>Răspuns</h3>
+<ul>
+<li>Ambele apeluri au <code>pas: 1</code> și sunt doar 2 cereri către model, exact ca la A2. Agentul nu poate deosebi un apel scris de mine de unul generat de un LLM.</li>
+<li><b>Concluzia:</b> un model care „folosește un instrument” nu execută nimic. El doar <b>produce text structurat</b>: un nume și un șir JSON cu argumente. Tot restul face agentul: parsează JSON-ul (<code>json.loads</code>), verifică dacă instrumentul există, cere confirmare, apelează serverul MCP, pune rezultatul în istoric și retrimite totul. Oricine poate emite acel format „folosește instrumente”: un LLM, un mock sau un om.</li>
+<li>Consecința practică: cererea de apel este <b>intrare nesigură</b> (poate fi greșită sau manipulată), deci verificările și confirmarea trebuie să fie în agent și pe server, nu în „bunul-simț” al modelului.</li>
+</ul>
+<details><summary>Transcriptul chat.py</summary><pre class="term">Tu:   [instrument] get_device_info({&#x27;name&#x27;: &#x27;ventilatie&#x27;}) -&gt; {&quot;nume&quot;:&quot;ventilatie&quot;,&quot;categorie&quot;:&quot;ventilație&quot;,&quot;putere_w&quot;:120,&quot;note&quot;:&quot;Aduce aer proaspăt din exterior.&quot;}
+  [instrument] check_conflict({&#x27;device_a&#x27;: &#x27;ventilatie&#x27;, &#x27;device_b&#x27;: &#x27;aer_conditionat&#x27;}) -&gt; MEDIU - aerul exterior scade eficiența climatizării.
+Agent: [mock] Rezultatele instrumentelor:
+- {&quot;nume&quot;:&quot;ventilatie&quot;,&quot;categorie&quot;:&quot;ventilație&quot;,&quot;putere_w&quot;:120,&quot;note&quot;:&quot;Aduce aer proaspăt din exterior.&quot;}
+- MEDIU - aerul exterior scade eficiența climatizării.</pre></details>
+<details><summary>Logul complet (logs\agent-20261022-193253.jsonl)</summary><pre class="log">{&quot;ts&quot;: &quot;2026-10-22T19:32:53.985&quot;, &quot;tip&quot;: &quot;reset&quot;}
+{&quot;ts&quot;: &quot;2026-10-22T19:32:55.754&quot;, &quot;tip&quot;: &quot;intrebare&quot;, &quot;text&quot;: &quot;apel: get_device_info {\&quot;name\&quot;: \&quot;ventilatie\&quot;} ; check_conflict {\&quot;device_a\&quot;: \&quot;ventilatie\&quot;, \&quot;device_b\&quot;: \&quot;aer_conditionat\&quot;}&quot;, &quot;mesaje_taiate&quot;: 0}
+{&quot;ts&quot;: &quot;2026-10-22T19:32:55.756&quot;, &quot;tip&quot;: &quot;cerere_model&quot;, &quot;pas&quot;: 1, &quot;mesaje&quot;: 2, &quot;durata_ms&quot;: 0, &quot;prompt_tokens&quot;: 122}
+{&quot;ts&quot;: &quot;2026-10-22T19:32:55.762&quot;, &quot;tip&quot;: &quot;apel&quot;, &quot;pas&quot;: 1, &quot;nume&quot;: &quot;get_device_info&quot;, &quot;argumente&quot;: {&quot;name&quot;: &quot;ventilatie&quot;}}
+{&quot;ts&quot;: &quot;2026-10-22T19:32:56.140&quot;, &quot;tip&quot;: &quot;rezultat&quot;, &quot;pas&quot;: 1, &quot;nume&quot;: &quot;get_device_info&quot;, &quot;eroare&quot;: false, &quot;text&quot;: &quot;{\&quot;nume\&quot;:\&quot;ventilatie\&quot;,\&quot;categorie\&quot;:\&quot;ventilație\&quot;,\&quot;putere_w\&quot;:120,\&quot;note\&quot;:\&quot;Aduce aer proaspăt din exterior.\&quot;}&quot;, &quot;trunchiat&quot;: false}
+{&quot;ts&quot;: &quot;2026-10-22T19:32:56.146&quot;, &quot;tip&quot;: &quot;apel&quot;, &quot;pas&quot;: 1, &quot;nume&quot;: &quot;check_conflict&quot;, &quot;argumente&quot;: {&quot;device_a&quot;: &quot;ventilatie&quot;, &quot;device_b&quot;: &quot;aer_conditionat&quot;}}
+{&quot;ts&quot;: &quot;2026-10-22T19:32:56.176&quot;, &quot;tip&quot;: &quot;rezultat&quot;, &quot;pas&quot;: 1, &quot;nume&quot;: &quot;check_conflict&quot;, &quot;eroare&quot;: false, &quot;text&quot;: &quot;MEDIU - aerul exterior scade eficiența climatizării.&quot;, &quot;trunchiat&quot;: false}
+{&quot;ts&quot;: &quot;2026-10-22T19:32:56.179&quot;, &quot;tip&quot;: &quot;cerere_model&quot;, &quot;pas&quot;: 2, &quot;mesaje&quot;: 5, &quot;durata_ms&quot;: 0, &quot;prompt_tokens&quot;: 278}
+{&quot;ts&quot;: &quot;2026-10-22T19:32:56.182&quot;, &quot;tip&quot;: &quot;raspuns&quot;, &quot;text&quot;: &quot;[mock] Rezultatele instrumentelor:\n- {\&quot;nume\&quot;:\&quot;ventilatie\&quot;,\&quot;categorie\&quot;:\&quot;ventilație\&quot;,\&quot;putere_w\&quot;:120,\&quot;note\&quot;:\&quot;Aduce aer proaspăt din exterior.\&quot;}\n- MEDIU - aerul exterior scade eficiența climatizării.&quot;, &quot;pas&quot;: 2}</pre></details>
+</section>
+<section id="a5">
+<h2><span class="ex">A5</span> Același agent, un model adevărat <span class="opt">model real</span></h2>
+<p class="task">Aceleași întrebări de la A1 și A2 cu un model real; comparați cu mock-ul (cereri, argumente, durată, tokeni, răspunsul final).</p>
+<div class="callout warn"><b>Model folosit:</b> <code>qwen3:1.7b</code> local, prin Ollama (<code>LLM_PROVIDER=ollama</code>), în loc de Gemini. Este un model mic (2B parametri, Q4_K_M), deci rezultatele lui nu reprezintă un model cloud mare. Toate cele 4 întrebări au fost puse într-o singură sesiune.</div>
+<h3>Comparație pe întrebare</h3>
+<div class="table-wrap"><table>
+<thead><tr><th rowspan="2">Întrebare</th><th colspan="2">mock</th><th colspan="2">qwen3:1.7b (Ollama)</th></tr>
+<tr><th>Cereri</th><th>Apeluri</th><th>Cereri</th><th>Apeluri</th></tr></thead>
+<tbody><tr><td>Cât consumă radiatorul în 3 ore?</td><td class='num'>2</td><td><code>estimate_energy({&quot;name&quot;: &quot;radiator&quot;, &quot;hours&quot;: 3.0})</code></td><td class='num'>2</td><td><code>list_devices({})</code></td></tr><tr><td>Care sunt dispozitivele? Vreau lista.</td><td class='num'>2</td><td><code>list_devices({})</code></td><td class='num'>1</td><td><span class='muted'>niciun apel</span></td></tr><tr><td>Dă-mi informații despre ventilație</td><td class='num'>2</td><td><code>get_device_info({&quot;name&quot;: &quot;ventilatie&quot;})</code></td><td class='num'>2</td><td><code>get_device_info({&quot;name&quot;: &quot;ventilatie&quot;})</code></td></tr><tr><td>Ce conflict există între radiator și aer condiționat și cât ar consuma amândouă în 2 ore?</td><td class='num'>2</td><td><code>check_conflict({&quot;device_a&quot;: &quot;radiator&quot;, &quot;device_b&quot;: &quot;aer_conditionat&quot;})</code><br><code>estimate_energy({&quot;name&quot;: &quot;radiator&quot;, &quot;hours&quot;: 2.0})</code><br><code>estimate_energy({&quot;name&quot;: &quot;aer_conditionat&quot;, &quot;hours&quot;: 2.0})</code></td><td class='num'>2</td><td><code>check_conflict({&quot;device_a&quot;: &quot;radiator&quot;, &quot;device_b&quot;: &quot;aer_conditionat&quot;})</code></td></tr></tbody></table></div>
+<h3>Comparație globală (<code>analyze_log.py</code>)</h3>
+<div class="table-wrap"><table>
+<thead><tr><th></th><th>mock (A1 + A2)</th><th>qwen3:1.7b</th></tr></thead>
+<tbody>
+<tr><td>Cereri către model</td><td class="num">8</td><td class="num">7</td></tr>
+<tr><td>Apeluri de instrumente</td><td class="num">6</td><td class="num">3</td></tr>
+<tr><td>Durata medie a unei cereri</td><td class="num">≈ 1 ms</td><td class="num">3429 ms</td></tr>
+<tr><td>Tokeni în prompt (primul → ultimul)</td><td class="num">97 → 437 <span class="muted">(estimare)</span></td><td class="num">720 → 1179</td></tr>
+</tbody></table></div>
+<h3>Răspuns</h3>
+<ul>
+<li><b>Numărul de cereri:</b> 7 la qwen față de 8 la mock. La „Vreau lista” qwen nu a mai apelat <code>list_devices</code>: a refolosit lista primită la întrebarea anterioară, care era deja în istoric (1 cerere în loc de 2). Mock-ul nu ține cont de istoric.</li>
+<li><b>Argumentele alese:</b> la radiator, qwen a apelat <code>list_devices</code> în loc de <code>estimate_energy</code>, apoi a răspuns că „nu poate determina dacă radiatorul este în funcționare”. A înțeles greșit întrebarea și <b>nu a calculat</b> 4,5 kWh. La ventilație, argumentul a fost corect (<code>"ventilatie"</code>, fără diacritice). La întrebarea A2 a făcut <b>un singur apel</b> (<code>check_conflict</code>), nu trei.</li>
+<li><b>Halucinație în răspunsul final (A2):</b> fără <code>estimate_energy</code>, qwen a inventat consumul: „Radiator: 120 W… 0,24 kWh; Aer condiționat: 120 W… 0,24 kWh”. A copiat puterea ventilației din istoric. Valorile corecte sunt 3,0 kWh (1500 W) și 4,0 kWh (2000 W), adică exact ce a dat mock-ul. Promptul de sistem („nu inventa date”) nu a fost suficient pentru un model atât de mic.</li>
+<li><b>Durata:</b> ~3,4 s pe cerere, față de ~1 ms la mock. Prima cerere a fost cea mai lentă (6146 ms), pentru că a inclus încărcarea modelului în memorie.</li>
+<li><b>Tokenii:</b> qwen pornește de la 720 de tokeni, față de 97 estimați de mock. Diferența vine din <b>lista celor 8 instrumente</b> (nume, descrieri, scheme), pe care un model real o primește și o numără la fiecare cerere. Estimarea mock-ului (<code>len(json) // 4</code>) se face doar pe mesaje. Creșterea pe parcursul conversației se vede în ambele cazuri.</li>
+<li><b>Răspunsul final:</b> mock-ul doar listează rezultatele brute (<code>[mock] Rezultatele instrumentelor: …</code>). qwen formulează în română, cu formatare Markdown, dar face greșeli de limbă („Potest”, „ar consume”) și, mai grav, de conținut (vezi mai sus). Mock-ul este fiabil și sec; modelul real e fluent, dar nu e de încredere.</li>
+</ul>
+<details><summary>Transcriptul chat.py (qwen3:1.7b)</summary><pre class="term">Tu:   [instrument] list_devices({}) -&gt; [&quot;aer_conditionat&quot;,&quot;jaluzele&quot;,&quot;lampa_led&quot;,&quot;radiator&quot;,&quot;ventilatie&quot;]
+Agent: Nu pot determina dacă radiatorul este în funcționare, deoarece nu am acces la starea actuală a dispozitivelor. Potest să estimez energia consumată dacă aș cunoaște dacă radiatorul este pornit, dar pentru a face asta, trebuie să verificați dacă el este activ. 
+
+Tu: Agent: Dispozitivele în clădire sunt:  
+1. Aer conditionat  
+2. Jaluzele  
+3. Lampa LED  
+4. Radiator  
+5. Ventilatie  
+
+Dacă ai nevoie de informații suplimentare despre un dispozitiv, spune-mi. 
+
+Tu:   [instrument] get_device_info({&#x27;name&#x27;: &#x27;ventilatie&#x27;}) -&gt; {&quot;nume&quot;:&quot;ventilatie&quot;,&quot;categorie&quot;:&quot;ventilație&quot;,&quot;putere_w&quot;:120,&quot;note&quot;:&quot;Aduce aer proaspăt din exterior.&quot;}
+Agent: Dispozitivul **ventilatie** este de categorie **ventilație**, consumă **120 W** și este utilizat pentru a importa aer proaspăt din exterior. 
+
+Tu:   [instrument] check_conflict({&#x27;device_a&#x27;: &#x27;radiator&#x27;, &#x27;device_b&#x27;: &#x27;aer_conditionat&#x27;}) -&gt; RIDICAT - încălzire și răcire simultană, consum inutil.
+Agent: Conflictul între radiator și aer condiționat este de tip **RIDICAT** (încălzire și răcire simultană, consum inutil).  
+- **Radiator**: 120 W (în 2 ore ar consume **0.24 kWh**).  
+- **Aer condiționat**: 120 W (în 2 ore ar consume **0.24 kWh**).  
+*Observație: Datorită conflictului, nu se pot începe ambii dispozitive în același timp.*</pre></details>
+<details><summary>Logul complet (logs\agent-20261022-193845.jsonl)</summary><pre class="log">{&quot;ts&quot;: &quot;2026-10-22T19:38:45.721&quot;, &quot;tip&quot;: &quot;reset&quot;}
+{&quot;ts&quot;: &quot;2026-10-22T19:38:47.517&quot;, &quot;tip&quot;: &quot;intrebare&quot;, &quot;text&quot;: &quot;Cât consumă radiatorul în 3 ore?&quot;, &quot;mesaje_taiate&quot;: 0}
+{&quot;ts&quot;: &quot;2026-10-22T19:38:53.663&quot;, &quot;tip&quot;: &quot;cerere_model&quot;, &quot;pas&quot;: 1, &quot;mesaje&quot;: 2, &quot;durata_ms&quot;: 6146, &quot;prompt_tokens&quot;: 720}
+{&quot;ts&quot;: &quot;2026-10-22T19:38:53.663&quot;, &quot;tip&quot;: &quot;apel&quot;, &quot;pas&quot;: 1, &quot;nume&quot;: &quot;list_devices&quot;, &quot;argumente&quot;: {}}
+{&quot;ts&quot;: &quot;2026-10-22T19:38:53.740&quot;, &quot;tip&quot;: &quot;rezultat&quot;, &quot;pas&quot;: 1, &quot;nume&quot;: &quot;list_devices&quot;, &quot;eroare&quot;: false, &quot;text&quot;: &quot;[\&quot;aer_conditionat\&quot;,\&quot;jaluzele\&quot;,\&quot;lampa_led\&quot;,\&quot;radiator\&quot;,\&quot;ventilatie\&quot;]&quot;, &quot;trunchiat&quot;: false}
+{&quot;ts&quot;: &quot;2026-10-22T19:38:57.023&quot;, &quot;tip&quot;: &quot;cerere_model&quot;, &quot;pas&quot;: 2, &quot;mesaje&quot;: 4, &quot;durata_ms&quot;: 3283, &quot;prompt_tokens&quot;: 770}
+{&quot;ts&quot;: &quot;2026-10-22T19:38:57.025&quot;, &quot;tip&quot;: &quot;raspuns&quot;, &quot;text&quot;: &quot;Nu pot determina dacă radiatorul este în funcționare, deoarece nu am acces la starea actuală a dispozitivelor. Potest să estimez energia consumată dacă aș cunoaște dacă radiatorul este pornit, dar pentru a face asta, trebuie să verificați dacă el este activ.&quot;, &quot;pas&quot;: 2}
+{&quot;ts&quot;: &quot;2026-10-22T19:38:57.027&quot;, &quot;tip&quot;: &quot;intrebare&quot;, &quot;text&quot;: &quot;Care sunt dispozitivele? Vreau lista.&quot;, &quot;mesaje_taiate&quot;: 0}
+{&quot;ts&quot;: &quot;2026-10-22T19:38:59.302&quot;, &quot;tip&quot;: &quot;cerere_model&quot;, &quot;pas&quot;: 1, &quot;mesaje&quot;: 6, &quot;durata_ms&quot;: 2272, &quot;prompt_tokens&quot;: 870}
+{&quot;ts&quot;: &quot;2026-10-22T19:38:59.302&quot;, &quot;tip&quot;: &quot;raspuns&quot;, &quot;text&quot;: &quot;Dispozitivele în clădire sunt:  \n1. Aer conditionat  \n2. Jaluzele  \n3. Lampa LED  \n4. Radiator  \n5. Ventilatie  \n\nDacă ai nevoie de informații suplimentare despre un dispozitiv, spune-mi.&quot;, &quot;pas&quot;: 1}
+{&quot;ts&quot;: &quot;2026-10-22T19:38:59.303&quot;, &quot;tip&quot;: &quot;intrebare&quot;, &quot;text&quot;: &quot;Dă-mi informații despre ventilație&quot;, &quot;mesaje_taiate&quot;: 0}
+{&quot;ts&quot;: &quot;2026-10-22T19:39:02.415&quot;, &quot;tip&quot;: &quot;cerere_model&quot;, &quot;pas&quot;: 1, &quot;mesaje&quot;: 8, &quot;durata_ms&quot;: 3111, &quot;prompt_tokens&quot;: 963}
+{&quot;ts&quot;: &quot;2026-10-22T19:39:02.415&quot;, &quot;tip&quot;: &quot;apel&quot;, &quot;pas&quot;: 1, &quot;nume&quot;: &quot;get_device_info&quot;, &quot;argumente&quot;: {&quot;name&quot;: &quot;ventilatie&quot;}}
+{&quot;ts&quot;: &quot;2026-10-22T19:39:02.420&quot;, &quot;tip&quot;: &quot;rezultat&quot;, &quot;pas&quot;: 1, &quot;nume&quot;: &quot;get_device_info&quot;, &quot;eroare&quot;: false, &quot;text&quot;: &quot;{\&quot;nume\&quot;:\&quot;ventilatie\&quot;,\&quot;categorie\&quot;:\&quot;ventilație\&quot;,\&quot;putere_w\&quot;:120,\&quot;note\&quot;:\&quot;Aduce aer proaspăt din exterior.\&quot;}&quot;, &quot;trunchiat&quot;: false}
+{&quot;ts&quot;: &quot;2026-10-22T19:39:04.831&quot;, &quot;tip&quot;: &quot;cerere_model&quot;, &quot;pas&quot;: 2, &quot;mesaje&quot;: 10, &quot;durata_ms&quot;: 2411, &quot;prompt_tokens&quot;: 1033}
+{&quot;ts&quot;: &quot;2026-10-22T19:39:04.833&quot;, &quot;tip&quot;: &quot;raspuns&quot;, &quot;text&quot;: &quot;Dispozitivul **ventilatie** este de categorie **ventilație**, consumă **120 W** și este utilizat pentru a importa aer proaspăt din exterior.&quot;, &quot;pas&quot;: 2}
+{&quot;ts&quot;: &quot;2026-10-22T19:39:04.835&quot;, &quot;tip&quot;: &quot;intrebare&quot;, &quot;text&quot;: &quot;Ce conflict există între radiator și aer condiționat și cât ar consuma amândouă în 2 ore?&quot;, &quot;mesaje_taiate&quot;: 0}
+{&quot;ts&quot;: &quot;2026-10-22T19:39:07.130&quot;, &quot;tip&quot;: &quot;cerere_model&quot;, &quot;pas&quot;: 1, &quot;mesaje&quot;: 12, &quot;durata_ms&quot;: 2294, &quot;prompt_tokens&quot;: 1115}
+{&quot;ts&quot;: &quot;2026-10-22T19:39:07.131&quot;, &quot;tip&quot;: &quot;apel&quot;, &quot;pas&quot;: 1, &quot;nume&quot;: &quot;check_conflict&quot;, &quot;argumente&quot;: {&quot;device_a&quot;: &quot;radiator&quot;, &quot;device_b&quot;: &quot;aer_conditionat&quot;}}
+{&quot;ts&quot;: &quot;2026-10-22T19:39:07.143&quot;, &quot;tip&quot;: &quot;rezultat&quot;, &quot;pas&quot;: 1, &quot;nume&quot;: &quot;check_conflict&quot;, &quot;eroare&quot;: false, &quot;text&quot;: &quot;RIDICAT - încălzire și răcire simultană, consum inutil.&quot;, &quot;trunchiat&quot;: false}
+{&quot;ts&quot;: &quot;2026-10-22T19:39:11.630&quot;, &quot;tip&quot;: &quot;cerere_model&quot;, &quot;pas&quot;: 2, &quot;mesaje&quot;: 14, &quot;durata_ms&quot;: 4486, &quot;prompt_tokens&quot;: 1179}
+{&quot;ts&quot;: &quot;2026-10-22T19:39:11.631&quot;, &quot;tip&quot;: &quot;raspuns&quot;, &quot;text&quot;: &quot;Conflictul între radiator și aer condiționat este de tip **RIDICAT** (încălzire și răcire simultană, consum inutil).  \n- **Radiator**: 120 W (în 2 ore ar consume **0.24 kWh**).  \n- **Aer condiționat**: 120 W (în 2 ore ar consume **0.24 kWh**).  \n*Observație: Datorită conflictului, nu se pot începe ambii dispozitive în același timp.*&quot;, &quot;pas&quot;: 2}</pre></details>
+<details><summary>python analyze_log.py (qwen3:1.7b)</summary><pre class="term">Fișier: C:\Users\catalin\OneDrive\Documents\GitHub\si_lab02\logs\agent-20261022-193845.jsonl
+Evenimente pe tip: {&#x27;reset&#x27;: 1, &#x27;pornire&#x27;: 1, &#x27;intrebare&#x27;: 4, &#x27;cerere_model&#x27;: 7, &#x27;apel&#x27;: 3, &#x27;rezultat&#x27;: 3, &#x27;raspuns&#x27;: 4}
+Apeluri pe instrument: {&#x27;list_devices&#x27;: 1, &#x27;get_device_info&#x27;: 1, &#x27;check_conflict&#x27;: 1}
+Apeluri cu eroare: - | refuzuri ale utilizatorului: 0
+Cereri către model: 7 | durata medie: 3429 ms
+Tokeni în prompt: primul 720, ultimul 1179, maxim 1179</pre></details>
+</section>
+<section id="a6">
+<h2><span class="ex">A6</span> Descrierea contează <span class="opt">model real, facultativ</span></h2>
+<p class="task">Docstring-ul lui <code>estimate_energy</code> devine <code>&quot;&quot;&quot;Face calcule.&quot;&quot;&quot;</code>, iar <code>hours</code> devine <code>h</code>. „Cât consumă ventilația în 4 ore?” de trei ori; numărați apelurile corecte, greșite și lipsă. Apoi readuceți codul la forma inițială și repetați.</p>
+<div class="callout"><b>Cum am rulat:</b> nu am modificat <code>server.py</code> din proiect. Am rulat agentul într-o <b>copie</b> a proiectului (în folderul temporar), cu <code>server.py</code> modificat pentru varianta „proastă” și nemodificat pentru varianta „bună”. Model: <code>qwen3:1.7b</code> (Ollama). Am făcut două rulări pentru fiecare variantă. În prima, cele 3 întrebări au fost puse în aceeași conversație; a doua și a treia au fost influențate de istoric. În a doua am dat <code>/reset</code> între încercări, deci încercările sunt independente. Logurile rulării a doua sunt copiate în <code>logs/A6-prost-…jsonl</code> și <code>logs/A6-bun-…jsonl</code>.</div>
+<h3>Rezultat</h3>
+
+<div class="table-wrap"><table>
+<thead><tr><th>Încercare</th><th>Descriere proastă<br><span class="muted">„Face calcule.”, parametru <code>h</code></span></th>
+<th>Descriere bună<br><span class="muted">docstring original, parametru <code>hours</code></span></th></tr></thead>
+<tbody>
+<tr><td>Rularea 1, încercarea 1 <span class="muted">(conversație nouă)</span></td>
+<td><span class="tag ok">corect</span> <code>list_devices()</code> apoi <code>estimate_energy(name="ventilatie", h=4)</code> → 0,48 kWh (3 pași)</td>
+<td><span class="tag bad">greșit</span> <code>estimate_energy(name="ventilația", hours=4)</code> → „Dispozitiv necunoscut”</td></tr>
+<tr><td>Rularea 1, încercarea 2 <span class="muted">(același istoric)</span></td>
+<td><span class="tag hist">din istoric</span> fără apel, repetă 0,48 kWh</td>
+<td><span class="tag hist">din istoric</span> fără apel, repetă eroarea</td></tr>
+<tr><td>Rularea 1, încercarea 3 <span class="muted">(același istoric)</span></td>
+<td><span class="tag hist">din istoric</span> fără apel, repetă 0,48 kWh</td>
+<td><span class="tag ok">corect</span> <code>estimate_energy(name="ventilatie", hours=4)</code>: a corectat numele din lista <code>cunoscute</code> primită anterior</td></tr>
+<tr><td>Rularea 2, încercarea 1 <span class="muted">(după /reset)</span></td>
+<td><span class="tag miss">lipsă</span> „Vă rog să specificați numele dispozitivului”</td>
+<td><span class="tag miss">lipsă</span> „Nu există o funcție disponibilă…”</td></tr>
+<tr><td>Rularea 2, încercarea 2 <span class="muted">(după /reset)</span></td>
+<td><span class="tag miss">lipsă</span> răspuns gol</td>
+<td><span class="tag bad">greșit</span> <code>estimate_energy(name="ventilația", hours=4)</code> → eroare; apoi sugerează <code>aer_conditionat</code>(!)</td></tr>
+<tr><td>Rularea 2, încercarea 3 <span class="muted">(după /reset)</span></td>
+<td><span class="tag miss">lipsă</span> „Nu se poate determina… fără specificarea unui dispozitiv”</td>
+<td><span class="tag miss">lipsă</span> „Nu există o funcție specifică…”</td></tr>
+<tr class="total"><td>Total (4 încercări independente)</td><td>1 corect · 0 greșite · 3 lipsă</td><td>0 corecte · 2 greșite · 2 lipsă</td></tr>
+</tbody></table></div>
+
+<h3>Răspuns (impresie, nu statistică)</h3>
+<ul>
+<li>Cu qwen3:1.7b, <b>nu se vede un avantaj clar al descrierii bune</b>. Varianta proastă a avut 1 apel corect și 3 lipsă; cea bună a avut 0 corecte (fără ajutorul istoricului), 2 greșite și 2 lipsă. Zgomotul unui model de 2B și cele câteva încercări domină efectul descrierii. Așa cum spune enunțul, e o impresie.</li>
+<li><b>Schema (numele parametrului) a fost respectată mereu:</b> cu <code>h</code>, modelul a trimis <code>h=4</code>; cu <code>hours</code>, a trimis <code>hours=4</code>. Nu a apărut niciun apel cu parametru greșit, pentru că numele vine din schemă, nu din descriere.</li>
+<li>Cu descrierea proastă, în singurul apel reușit modelul a apelat întâi <code>list_devices</code> ca să afle numele valide (un pas în plus). Descrierea nu-i spunea nimic, așa că a explorat.</li>
+<li>Cu descrierea bună, modelul a ales instrumentul direct, dar a trimis <code>name="ventilația"</code> (cu diacritice), pe care serverul nu îl recunoaște. Descrierea originală nu spune ce valori sunt acceptate pentru <code>name</code>. O descriere mai bună ar fi: „name: unul dintre numele returnate de list_devices, de ex. ventilatie”. Ca alternativă, serverul ar putea normaliza diacriticele.</li>
+<li>Când a primit eroarea cu lista <code>cunoscute</code> în istoric, modelul s-a corectat la încercarea următoare (Rularea 1, încercarea 3). Asta confirmă alegerea de a întoarce „dispozitiv necunoscut” ca dată, nu ca excepție.</li>
+<li>Cost: descrierea bună adaugă ~25 de tokeni la fiecare cerere (697 → 722 în prompt). Fiecare cuvânt din descriere se plătește la fiecare cerere.</li>
+<li>Pentru o concluzie fermă ar trebui un model mai mare (de ex. Gemini) și zeci de încercări pe variantă.</li>
+</ul>
+<details><summary>Transcript: descriere proastă, cu /reset</summary><pre class="term">Tu: Agent: Nu am dat în mod explicit un device specific pentru ventilație. Vă rog să specificați numele dispozitivului de ventilație pentru a evaluate consumul. 
+
+Tu: (conversație nouă; starea clădirii din server nu s-a schimbat)
+Tu: Agent:  
+
+Tu: (conversație nouă; starea clădirii din server nu s-a schimbat)
+Tu: Agent: Nu se poate determina consumul de energie al ventilației fără specificarea unui dispozitiv cu care se va calcula. Dacă ai un dispozitiv specific, pot face o estimare. Asa de a face, trebuie să îți informezi cu numele dispozitivului.</pre></details>
+<details><summary>Transcript: descriere bună, cu /reset</summary><pre class="term">Tu: Agent: Nu există o funcție disponibilă pentru a estima consumul de ventilație. În mod înregistrat, este necesar să se specificeze un dispozitiv (ex: &quot;ventilație&quot;) și să se utilizeze funcția `estimate_energy` pentru a calcula consumul. Dacă ai un dispozitiv specific, pot să-l solicitez. 
+
+Tu: (conversație nouă; starea clădirii din server nu s-a schimbat)
+Tu:   [instrument] estimate_energy({&#x27;hours&#x27;: 4, &#x27;name&#x27;: &#x27;ventilația&#x27;}) -&gt; {&quot;eroare&quot;:&quot;Dispozitiv necunoscut: ventilația&quot;,&quot;cunoscute&quot;:[&quot;aer_conditionat&quot;,&quot;jaluzele&quot;,&quot;lampa_led&quot;,&quot;radiator&quot;,&quot;ventilatie&quot;]}
+Agent: Dispozitivul &quot;ventilatie&quot; nu este cunoscut în clădire. Înlocuind, puteți estimă consumul ventilării (dacă este un aer condiționat) folosind numele corect: &quot;aer_conditionat&quot;. Dacă vă îndemnează, pot să vedem estimarea pentru acest dispozitiv. 
+
+Tu: (conversație nouă; starea clădirii din server nu s-a schimbat)
+Tu: Agent: Nu există o funcție specifică pentru estimarea consumului de ventilație. Înlocul așa, trebuie să specifici un dispozitiv (ex: &quot;ventilație&quot; sau nume specific) pentru a calcula consumul.</pre></details>
+<details><summary>Log: descriere proastă, fără /reset</summary><pre class="log">{&quot;ts&quot;: &quot;2026-10-22T19:39:15.887&quot;, &quot;tip&quot;: &quot;reset&quot;}
+{&quot;ts&quot;: &quot;2026-10-22T19:39:17.456&quot;, &quot;tip&quot;: &quot;intrebare&quot;, &quot;text&quot;: &quot;Cât consumă ventilația în 4 ore?&quot;, &quot;mesaje_taiate&quot;: 0}
+{&quot;ts&quot;: &quot;2026-10-22T19:39:25.288&quot;, &quot;tip&quot;: &quot;cerere_model&quot;, &quot;pas&quot;: 1, &quot;mesaje&quot;: 2, &quot;durata_ms&quot;: 7832, &quot;prompt_tokens&quot;: 697}
+{&quot;ts&quot;: &quot;2026-10-22T19:39:25.289&quot;, &quot;tip&quot;: &quot;apel&quot;, &quot;pas&quot;: 1, &quot;nume&quot;: &quot;list_devices&quot;, &quot;argumente&quot;: {}}
+{&quot;ts&quot;: &quot;2026-10-22T19:39:25.351&quot;, &quot;tip&quot;: &quot;rezultat&quot;, &quot;pas&quot;: 1, &quot;nume&quot;: &quot;list_devices&quot;, &quot;eroare&quot;: false, &quot;text&quot;: &quot;[\&quot;aer_conditionat\&quot;,\&quot;jaluzele\&quot;,\&quot;lampa_led\&quot;,\&quot;radiator\&quot;,\&quot;ventilatie\&quot;]&quot;, &quot;trunchiat&quot;: false}
+{&quot;ts&quot;: &quot;2026-10-22T19:39:26.973&quot;, &quot;tip&quot;: &quot;cerere_model&quot;, &quot;pas&quot;: 2, &quot;mesaje&quot;: 4, &quot;durata_ms&quot;: 1622, &quot;prompt_tokens&quot;: 747}
+{&quot;ts&quot;: &quot;2026-10-22T19:39:26.974&quot;, &quot;tip&quot;: &quot;apel&quot;, &quot;pas&quot;: 2, &quot;nume&quot;: &quot;estimate_energy&quot;, &quot;argumente&quot;: {&quot;name&quot;: &quot;ventilatie&quot;, &quot;h&quot;: 4}}
+{&quot;ts&quot;: &quot;2026-10-22T19:39:26.978&quot;, &quot;tip&quot;: &quot;rezultat&quot;, &quot;pas&quot;: 2, &quot;nume&quot;: &quot;estimate_energy&quot;, &quot;eroare&quot;: false, &quot;text&quot;: &quot;{\&quot;nume\&quot;:\&quot;ventilatie\&quot;,\&quot;ore\&quot;:4.0,\&quot;energie_kwh\&quot;:0.48}&quot;, &quot;trunchiat&quot;: false}
+{&quot;ts&quot;: &quot;2026-10-22T19:39:29.138&quot;, &quot;tip&quot;: &quot;cerere_model&quot;, &quot;pas&quot;: 3, &quot;mesaje&quot;: 6, &quot;durata_ms&quot;: 2159, &quot;prompt_tokens&quot;: 808}
+{&quot;ts&quot;: &quot;2026-10-22T19:39:29.139&quot;, &quot;tip&quot;: &quot;raspuns&quot;, &quot;text&quot;: &quot;Ventilatația consumă 0,48 kWh în 4 ore (0,12 kWh/hora). Valorile sunt estimate și pot varia în funcție de condiții reale.&quot;, &quot;pas&quot;: 3}
+{&quot;ts&quot;: &quot;2026-10-22T19:39:29.141&quot;, &quot;tip&quot;: &quot;intrebare&quot;, &quot;text&quot;: &quot;Cât consumă ventilația în 4 ore?&quot;, &quot;mesaje_taiate&quot;: 0}
+{&quot;ts&quot;: &quot;2026-10-22T19:39:31.233&quot;, &quot;tip&quot;: &quot;cerere_model&quot;, &quot;pas&quot;: 1, &quot;mesaje&quot;: 8, &quot;durata_ms&quot;: 2092, &quot;prompt_tokens&quot;: 876}
+{&quot;ts&quot;: &quot;2026-10-22T19:39:31.235&quot;, &quot;tip&quot;: &quot;raspuns&quot;, &quot;text&quot;: &quot;Ventilatația consumă 0,48 kWh în 4 ore (0,12 kWh/hora). Valorile sunt estimate și pot varia în funcție de condiții reale.&quot;, &quot;pas&quot;: 1}
+{&quot;ts&quot;: &quot;2026-10-22T19:39:31.236&quot;, &quot;tip&quot;: &quot;intrebare&quot;, &quot;text&quot;: &quot;Cât consumă ventilația în 4 ore?&quot;, &quot;mesaje_taiate&quot;: 0}
+{&quot;ts&quot;: &quot;2026-10-22T19:39:34.224&quot;, &quot;tip&quot;: &quot;cerere_model&quot;, &quot;pas&quot;: 1, &quot;mesaje&quot;: 10, &quot;durata_ms&quot;: 2988, &quot;prompt_tokens&quot;: 944}
+{&quot;ts&quot;: &quot;2026-10-22T19:39:34.226&quot;, &quot;tip&quot;: &quot;raspuns&quot;, &quot;text&quot;: &quot;Ventilatația consumă 0,48 kWh în 4 ore (0,12 kWh/hora). Valorile sunt estimate și pot varia în funcție de condiții reale.&quot;, &quot;pas&quot;: 1}</pre></details>
+<details><summary>Log: descriere bună, fără /reset</summary><pre class="log">{&quot;ts&quot;: &quot;2026-10-22T19:39:38.277&quot;, &quot;tip&quot;: &quot;reset&quot;}
+{&quot;ts&quot;: &quot;2026-10-22T19:39:39.819&quot;, &quot;tip&quot;: &quot;intrebare&quot;, &quot;text&quot;: &quot;Cât consumă ventilația în 4 ore?&quot;, &quot;mesaje_taiate&quot;: 0}
+{&quot;ts&quot;: &quot;2026-10-22T19:39:47.164&quot;, &quot;tip&quot;: &quot;cerere_model&quot;, &quot;pas&quot;: 1, &quot;mesaje&quot;: 2, &quot;durata_ms&quot;: 7345, &quot;prompt_tokens&quot;: 722}
+{&quot;ts&quot;: &quot;2026-10-22T19:39:47.166&quot;, &quot;tip&quot;: &quot;apel&quot;, &quot;pas&quot;: 1, &quot;nume&quot;: &quot;estimate_energy&quot;, &quot;argumente&quot;: {&quot;hours&quot;: 4, &quot;name&quot;: &quot;ventilația&quot;}}
+{&quot;ts&quot;: &quot;2026-10-22T19:39:47.232&quot;, &quot;tip&quot;: &quot;rezultat&quot;, &quot;pas&quot;: 1, &quot;nume&quot;: &quot;estimate_energy&quot;, &quot;eroare&quot;: false, &quot;text&quot;: &quot;{\&quot;eroare\&quot;:\&quot;Dispozitiv necunoscut: ventilația\&quot;,\&quot;cunoscute\&quot;:[\&quot;aer_conditionat\&quot;,\&quot;jaluzele\&quot;,\&quot;lampa_led\&quot;,\&quot;radiator\&quot;,\&quot;ventilatie\&quot;]}&quot;, &quot;trunchiat&quot;: false}
+{&quot;ts&quot;: &quot;2026-10-22T19:39:50.445&quot;, &quot;tip&quot;: &quot;cerere_model&quot;, &quot;pas&quot;: 2, &quot;mesaje&quot;: 4, &quot;durata_ms&quot;: 3213, &quot;prompt_tokens&quot;: 804}
+{&quot;ts&quot;: &quot;2026-10-22T19:39:50.445&quot;, &quot;tip&quot;: &quot;raspuns&quot;, &quot;text&quot;: &quot;Dispozitivul \&quot;ventilația\&quot; nu este cunoscut în clădire. Este posibil să există o eroare de identificare sau un tip de dispozitiv necunoscut. Dispozitivele cunoscute incluză: aer_conditionat, jaluzele, lampa_led, radiator, ventilatie. Pe baza instrumentelor disponibile, nu se poate estimeaza consumul energiei pentru acest dispozitiv.&quot;, &quot;pas&quot;: 2}
+{&quot;ts&quot;: &quot;2026-10-22T19:39:50.446&quot;, &quot;tip&quot;: &quot;intrebare&quot;, &quot;text&quot;: &quot;Cât consumă ventilația în 4 ore?&quot;, &quot;mesaje_taiate&quot;: 0}
+{&quot;ts&quot;: &quot;2026-10-22T19:39:53.630&quot;, &quot;tip&quot;: &quot;cerere_model&quot;, &quot;pas&quot;: 1, &quot;mesaje&quot;: 6, &quot;durata_ms&quot;: 3185, &quot;prompt_tokens&quot;: 932}
+{&quot;ts&quot;: &quot;2026-10-22T19:39:53.632&quot;, &quot;tip&quot;: &quot;raspuns&quot;, &quot;text&quot;: &quot;Dispozitivul \&quot;ventilația\&quot; nu este cunoscut în clădire. Este posibil să existe o eroare de identificare sau un tip de dispozitiv necunoscut. Dispozitivele cunoscute incluză: aer_conditionat, jaluzele, lampa_led, radiator, ventilatie. Pe baza instrumentelor disponibile, nu se poate estimeaza consumul energiei pentru acest dispozitiv.&quot;, &quot;pas&quot;: 1}
+{&quot;ts&quot;: &quot;2026-10-22T19:39:53.632&quot;, &quot;tip&quot;: &quot;intrebare&quot;, &quot;text&quot;: &quot;Cât consumă ventilația în 4 ore?&quot;, &quot;mesaje_taiate&quot;: 0}
+{&quot;ts&quot;: &quot;2026-10-22T19:39:57.210&quot;, &quot;tip&quot;: &quot;cerere_model&quot;, &quot;pas&quot;: 1, &quot;mesaje&quot;: 8, &quot;durata_ms&quot;: 3577, &quot;prompt_tokens&quot;: 1059}
+{&quot;ts&quot;: &quot;2026-10-22T19:39:57.212&quot;, &quot;tip&quot;: &quot;apel&quot;, &quot;pas&quot;: 1, &quot;nume&quot;: &quot;estimate_energy&quot;, &quot;argumente&quot;: {&quot;hours&quot;: 4, &quot;name&quot;: &quot;ventilatie&quot;}}
+{&quot;ts&quot;: &quot;2026-10-22T19:39:57.220&quot;, &quot;tip&quot;: &quot;rezultat&quot;, &quot;pas&quot;: 1, &quot;nume&quot;: &quot;estimate_energy&quot;, &quot;eroare&quot;: false, &quot;text&quot;: &quot;{\&quot;nume\&quot;:\&quot;ventilatie\&quot;,\&quot;ore\&quot;:4.0,\&quot;energie_kwh\&quot;:0.48}&quot;, &quot;trunchiat&quot;: false}
+{&quot;ts&quot;: &quot;2026-10-22T19:39:59.703&quot;, &quot;tip&quot;: &quot;cerere_model&quot;, &quot;pas&quot;: 2, &quot;mesaje&quot;: 10, &quot;durata_ms&quot;: 2482, &quot;prompt_tokens&quot;: 1120}
+{&quot;ts&quot;: &quot;2026-10-22T19:39:59.703&quot;, &quot;tip&quot;: &quot;raspuns&quot;, &quot;text&quot;: &quot;Consumul ventilatie în 4 ore este de 0,48 kWh.&quot;, &quot;pas&quot;: 2}</pre></details>
+<details><summary>Log: descriere proastă, cu /reset</summary><pre class="log">{&quot;ts&quot;: &quot;2026-10-22T19:40:16.273&quot;, &quot;tip&quot;: &quot;reset&quot;}
+{&quot;ts&quot;: &quot;2026-10-22T19:40:17.898&quot;, &quot;tip&quot;: &quot;intrebare&quot;, &quot;text&quot;: &quot;Cât consumă ventilația în 4 ore?&quot;, &quot;mesaje_taiate&quot;: 0}
+{&quot;ts&quot;: &quot;2026-10-22T19:40:50.828&quot;, &quot;tip&quot;: &quot;cerere_model&quot;, &quot;pas&quot;: 1, &quot;mesaje&quot;: 2, &quot;durata_ms&quot;: 32929, &quot;prompt_tokens&quot;: 697}
+{&quot;ts&quot;: &quot;2026-10-22T19:40:50.828&quot;, &quot;tip&quot;: &quot;raspuns&quot;, &quot;text&quot;: &quot;Nu am dat în mod explicit un device specific pentru ventilație. Vă rog să specificați numele dispozitivului de ventilație pentru a evaluate consumul.&quot;, &quot;pas&quot;: 1}
+{&quot;ts&quot;: &quot;2026-10-22T19:40:50.836&quot;, &quot;tip&quot;: &quot;reset&quot;}
+{&quot;ts&quot;: &quot;2026-10-22T19:40:50.836&quot;, &quot;tip&quot;: &quot;intrebare&quot;, &quot;text&quot;: &quot;Cât consumă ventilația în 4 ore?&quot;, &quot;mesaje_taiate&quot;: 0}
+{&quot;ts&quot;: &quot;2026-10-22T19:40:52.475&quot;, &quot;tip&quot;: &quot;cerere_model&quot;, &quot;pas&quot;: 1, &quot;mesaje&quot;: 2, &quot;durata_ms&quot;: 1639, &quot;prompt_tokens&quot;: 697}
+{&quot;ts&quot;: &quot;2026-10-22T19:40:52.477&quot;, &quot;tip&quot;: &quot;raspuns&quot;, &quot;text&quot;: &quot;&quot;, &quot;pas&quot;: 1}
+{&quot;ts&quot;: &quot;2026-10-22T19:40:52.478&quot;, &quot;tip&quot;: &quot;reset&quot;}
+{&quot;ts&quot;: &quot;2026-10-22T19:40:52.480&quot;, &quot;tip&quot;: &quot;intrebare&quot;, &quot;text&quot;: &quot;Cât consumă ventilația în 4 ore?&quot;, &quot;mesaje_taiate&quot;: 0}
+{&quot;ts&quot;: &quot;2026-10-22T19:40:54.199&quot;, &quot;tip&quot;: &quot;cerere_model&quot;, &quot;pas&quot;: 1, &quot;mesaje&quot;: 2, &quot;durata_ms&quot;: 1718, &quot;prompt_tokens&quot;: 697}
+{&quot;ts&quot;: &quot;2026-10-22T19:40:54.200&quot;, &quot;tip&quot;: &quot;raspuns&quot;, &quot;text&quot;: &quot;Nu se poate determina consumul de energie al ventilației fără specificarea unui dispozitiv cu care se va calcula. Dacă ai un dispozitiv specific, pot face o estimare. Asa de a face, trebuie să îți informezi cu numele dispozitivului.&quot;, &quot;pas&quot;: 1}</pre></details>
+<details><summary>Log: descriere bună, cu /reset</summary><pre class="log">{&quot;ts&quot;: &quot;2026-10-22T19:40:58.721&quot;, &quot;tip&quot;: &quot;reset&quot;}
+{&quot;ts&quot;: &quot;2026-10-22T19:41:00.249&quot;, &quot;tip&quot;: &quot;intrebare&quot;, &quot;text&quot;: &quot;Cât consumă ventilația în 4 ore?&quot;, &quot;mesaje_taiate&quot;: 0}
+{&quot;ts&quot;: &quot;2026-10-22T19:41:05.112&quot;, &quot;tip&quot;: &quot;cerere_model&quot;, &quot;pas&quot;: 1, &quot;mesaje&quot;: 2, &quot;durata_ms&quot;: 4862, &quot;prompt_tokens&quot;: 722}
+{&quot;ts&quot;: &quot;2026-10-22T19:41:05.112&quot;, &quot;tip&quot;: &quot;raspuns&quot;, &quot;text&quot;: &quot;Nu există o funcție disponibilă pentru a estima consumul de ventilație. În mod înregistrat, este necesar să se specificeze un dispozitiv (ex: \&quot;ventilație\&quot;) și să se utilizeze funcția `estimate_energy` pentru a calcula consumul. Dacă ai un dispozitiv specific, pot să-l solicitez.&quot;, &quot;pas&quot;: 1}
+{&quot;ts&quot;: &quot;2026-10-22T19:41:05.113&quot;, &quot;tip&quot;: &quot;reset&quot;}
+{&quot;ts&quot;: &quot;2026-10-22T19:41:05.113&quot;, &quot;tip&quot;: &quot;intrebare&quot;, &quot;text&quot;: &quot;Cât consumă ventilația în 4 ore?&quot;, &quot;mesaje_taiate&quot;: 0}
+{&quot;ts&quot;: &quot;2026-10-22T19:41:06.882&quot;, &quot;tip&quot;: &quot;cerere_model&quot;, &quot;pas&quot;: 1, &quot;mesaje&quot;: 2, &quot;durata_ms&quot;: 1769, &quot;prompt_tokens&quot;: 722}
+{&quot;ts&quot;: &quot;2026-10-22T19:41:06.885&quot;, &quot;tip&quot;: &quot;apel&quot;, &quot;pas&quot;: 1, &quot;nume&quot;: &quot;estimate_energy&quot;, &quot;argumente&quot;: {&quot;hours&quot;: 4, &quot;name&quot;: &quot;ventilația&quot;}}
+{&quot;ts&quot;: &quot;2026-10-22T19:41:06.952&quot;, &quot;tip&quot;: &quot;rezultat&quot;, &quot;pas&quot;: 1, &quot;nume&quot;: &quot;estimate_energy&quot;, &quot;eroare&quot;: false, &quot;text&quot;: &quot;{\&quot;eroare\&quot;:\&quot;Dispozitiv necunoscut: ventilația\&quot;,\&quot;cunoscute\&quot;:[\&quot;aer_conditionat\&quot;,\&quot;jaluzele\&quot;,\&quot;lampa_led\&quot;,\&quot;radiator\&quot;,\&quot;ventilatie\&quot;]}&quot;, &quot;trunchiat&quot;: false}
+{&quot;ts&quot;: &quot;2026-10-22T19:41:10.478&quot;, &quot;tip&quot;: &quot;cerere_model&quot;, &quot;pas&quot;: 2, &quot;mesaje&quot;: 4, &quot;durata_ms&quot;: 3525, &quot;prompt_tokens&quot;: 804}
+{&quot;ts&quot;: &quot;2026-10-22T19:41:10.478&quot;, &quot;tip&quot;: &quot;raspuns&quot;, &quot;text&quot;: &quot;Dispozitivul \&quot;ventilatie\&quot; nu este cunoscut în clădire. Înlocuind, puteți estimă consumul ventilării (dacă este un aer condiționat) folosind numele corect: \&quot;aer_conditionat\&quot;. Dacă vă îndemnează, pot să vedem estimarea pentru acest dispozitiv.&quot;, &quot;pas&quot;: 2}
+{&quot;ts&quot;: &quot;2026-10-22T19:41:10.479&quot;, &quot;tip&quot;: &quot;reset&quot;}
+{&quot;ts&quot;: &quot;2026-10-22T19:41:10.479&quot;, &quot;tip&quot;: &quot;intrebare&quot;, &quot;text&quot;: &quot;Cât consumă ventilația în 4 ore?&quot;, &quot;mesaje_taiate&quot;: 0}
+{&quot;ts&quot;: &quot;2026-10-22T19:41:12.525&quot;, &quot;tip&quot;: &quot;cerere_model&quot;, &quot;pas&quot;: 1, &quot;mesaje&quot;: 2, &quot;durata_ms&quot;: 2046, &quot;prompt_tokens&quot;: 722}
+{&quot;ts&quot;: &quot;2026-10-22T19:41:12.527&quot;, &quot;tip&quot;: &quot;raspuns&quot;, &quot;text&quot;: &quot;Nu există o funcție specifică pentru estimarea consumului de ventilație. Înlocul așa, trebuie să specifici un dispozitiv (ex: \&quot;ventilație\&quot; sau nume specific) pentru a calcula consumul.&quot;, &quot;pas&quot;: 1}</pre></details>
+</section>
+<section id="teste">
+<h2>Verificări automate</h2>
+<p class="muted">Fiecare exercițiu a fost rulat ca sesiune separată <code>python chat.py</code>, cu întrebările trimise pe stdin. Logul JSONL rezultat a fost verificat automat cu aserțiunile de mai jos.</p>
+<div class="table-wrap"><table><thead><tr><th>Ex.</th><th>Verificare</th><th>Rezultat</th></tr></thead><tbody><tr><td>A1</td><td>„Cât consumă radiatorul în 3 ore?” → 2 cereri către model <span class=muted>(2 cereri)</span></td><td class='pass'>✓ trecut</td></tr><tr><td>A1</td><td>„Cât consumă radiatorul în 3 ore?” → un apel estimate_energy({&quot;name&quot;: &quot;radiator&quot;, &quot;hours&quot;: 3.0}) <span class=muted>(estimate_energy({&quot;name&quot;: &quot;radiator&quot;, &quot;hours&quot;: 3.0}))</span></td><td class='pass'>✓ trecut</td></tr><tr><td>A1</td><td>„Care sunt dispozitivele? Vreau lista.” → 2 cereri către model <span class=muted>(2 cereri)</span></td><td class='pass'>✓ trecut</td></tr><tr><td>A1</td><td>„Care sunt dispozitivele? Vreau lista.” → un apel list_devices({}) <span class=muted>(list_devices({}))</span></td><td class='pass'>✓ trecut</td></tr><tr><td>A1</td><td>„Dă-mi informații despre ventilație” → 2 cereri către model <span class=muted>(2 cereri)</span></td><td class='pass'>✓ trecut</td></tr><tr><td>A1</td><td>„Dă-mi informații despre ventilație” → un apel get_device_info({&quot;name&quot;: &quot;ventilatie&quot;}) <span class=muted>(get_device_info({&quot;name&quot;: &quot;ventilatie&quot;}))</span></td><td class='pass'>✓ trecut</td></tr><tr><td>A2</td><td>3 apeluri cerute (check_conflict + 2× estimate_energy) <span class=muted>(check_conflict, estimate_energy, estimate_energy)</span></td><td class='pass'>✓ trecut</td></tr><tr><td>A2</td><td>toate apelurile au același pas (pas = 1) <span class=muted>(pași: [1])</span></td><td class='pass'>✓ trecut</td></tr><tr><td>A2</td><td>exact 2 evenimente cerere_model</td><td class='pass'>✓ trecut</td></tr><tr><td>A2</td><td>a doua cerere conține 6 mesaje (system, user, assistant+tool_calls, 3× tool) <span class=muted>(mesaje = 6)</span></td><td class='pass'>✓ trecut</td></tr><tr><td>A3</td><td>(a) frigider: eroare ca dată de la instrument, eroare=false</td><td class='pass'>✓ trecut</td></tr><tr><td>A3</td><td>(b) inexistent: oprit de agent, eroare=true</td><td class='pass'>✓ trecut</td></tr><tr><td>A3</td><td>(c) hours=&quot;abc&quot;: validare în serverul MCP, eroare=true</td><td class='pass'>✓ trecut</td></tr><tr><td>A3</td><td>(c) serverul a raportat argumente invalide (stderr)</td><td class='pass'>✓ trecut</td></tr><tr><td>A4</td><td>2 apeluri în același pas</td><td class='pass'>✓ trecut</td></tr><tr><td>A4</td><td>2 cereri către model (cererea + răspunsul final)</td><td class='pass'>✓ trecut</td></tr><tr><td>A5</td><td>sesiunea cu qwen3:1.7b a răspuns la toate cele 4 întrebări (fără erori HTTP)</td><td class='pass'>✓ trecut</td></tr><tr><td>A5</td><td>furnizorul raportează tokeni reali (prompt_tokens prezent)</td><td class='pass'>✓ trecut</td></tr><tr><td>A5</td><td>A2 cu model real: estimate_energy NU a fost apelat (diferență față de mock) <span class=muted>(observație, nu eroare a agentului)</span></td><td class='pass'>✓ trecut</td></tr><tr><td>A6</td><td>descriere prostă: 3 încercări independente (3× reset + 3 întrebări)</td><td class='pass'>✓ trecut</td></tr><tr><td>A6</td><td>descriere bună: 3 încercări independente (3× reset + 3 întrebări)</td><td class='pass'>✓ trecut</td></tr><tr><td>toate</td><td>A1: chat.py s-a încheiat cu cod 0</td><td class='pass'>✓ trecut</td></tr><tr><td>toate</td><td>A2: chat.py s-a încheiat cu cod 0</td><td class='pass'>✓ trecut</td></tr><tr><td>toate</td><td>A3: chat.py s-a încheiat cu cod 0</td><td class='pass'>✓ trecut</td></tr><tr><td>toate</td><td>A4: chat.py s-a încheiat cu cod 0</td><td class='pass'>✓ trecut</td></tr><tr><td>toate</td><td>A5: chat.py s-a încheiat cu cod 0</td><td class='pass'>✓ trecut</td></tr><tr><td>toate</td><td>A6_prost: chat.py s-a încheiat cu cod 0</td><td class='pass'>✓ trecut</td></tr><tr><td>toate</td><td>A6_bun: chat.py s-a încheiat cu cod 0</td><td class='pass'>✓ trecut</td></tr></tbody></table></div>
+<h3>Cum se reproduce</h3>
+<pre class="term"># A1–A4 (mock): în .env  LLM_PROVIDER=mock
+python chat.py
+python analyze_log.py
+
+# A5–A6 (model local): ollama pull qwen3:1.7b ; în .env  LLM_PROVIDER=ollama
+python chat.py</pre>
+</section>
+</main>
+</body>
+</html>
