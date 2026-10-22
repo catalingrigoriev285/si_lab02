@@ -1,15 +1,22 @@
-"""Chatbot în linia de comandă. Rulare: python chat.py"""
+"""Chatbot în linia de comandă, cu confirmare pentru instrumentele cu efecte. Rulare: python chat.py"""
 import asyncio
 
 from openai import APIConnectionError, APIStatusError
 
 from agent import Agent
 
+def cere_acord(nume: str, args: dict, distructiv: bool) -> bool:
+    """Întreabă utilizatorul dacă agentul are voie să ruleze un instrument cu efecte."""
+    eticheta = " [DISTRUCTIV]" if distructiv else ""
+    raspuns = input(f"  ? Agentul vrea să ruleze {nume}({args}){eticheta}. Permiteți? [d/N] ")
+    return raspuns.strip().lower() in ("d", "da", "y", "yes")
+
 async def main():
-    async with Agent() as agent:
+    async with Agent(confirm=cere_acord) as agent:
         print(f"Furnizor: {agent.provider} | model: {agent.model}")
         print("Instrumente:", ", ".join(t["function"]["name"] for t in agent.tools))
-        print("Comenzi: /reset (conversație nouă), /iesire\n")
+        print(f"Fișier de log: {agent.log.path}")
+        print("Comenzi: /reset (conversație nouă), /istoric, /iesire\n")
         while True:
             try:
                 text = input("Tu: ").strip()
@@ -19,7 +26,10 @@ async def main():
                 break
             if text == "/reset":
                 agent.reset()
-                print("(conversație nouă)")
+                print("(conversație nouă; starea clădirii din server nu s-a schimbat)")
+                continue
+            if text == "/istoric":
+                print(f"(istoric: {len(agent.messages)} mesaje)")
                 continue
             if not text:
                 continue
