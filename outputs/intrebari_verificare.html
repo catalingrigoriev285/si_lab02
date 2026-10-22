@@ -1,0 +1,320 @@
+<!doctype html>
+<html lang="ro">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Laborator 2 – Întrebări de verificare</title>
+<style>
+:root {
+  --bg: #fbfaf8; --surface: #ffffff; --text: #1d1d1f; --muted: #6b6b70; --border: #e3e1dc;
+  --accent: #2f5fb3; --accent-soft: #e9effa; --code-bg: #f3f2ef; --term-bg: #1e1f24; --term-text: #e6e6e6;
+  --ok: #1f7a3d; --ok-soft: #e4f3e9; --bad: #b3261e; --bad-soft: #fbe9e7; --warn: #8a5a00; --warn-soft: #fdf3dc;
+  --hist: #5a4fb3; --hist-soft: #ecebfa;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #141517; --surface: #1c1d21; --text: #e8e8ea; --muted: #9a9aa2; --border: #2e3036;
+    --accent: #8ab0f0; --accent-soft: #1f2a3d; --code-bg: #25272c; --term-bg: #0e0f11; --term-text: #dcdcdc;
+    --ok: #6fd08f; --ok-soft: #173222; --bad: #f08b84; --bad-soft: #3a1d1b; --warn: #e8bf6a; --warn-soft: #33290f;
+    --hist: #b3abf5; --hist-soft: #26233f;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #141517; --surface: #1c1d21; --text: #e8e8ea; --muted: #9a9aa2; --border: #2e3036;
+  --accent: #8ab0f0; --accent-soft: #1f2a3d; --code-bg: #25272c; --term-bg: #0e0f11; --term-text: #dcdcdc;
+  --ok: #6fd08f; --ok-soft: #173222; --bad: #f08b84; --bad-soft: #3a1d1b; --warn: #e8bf6a; --warn-soft: #33290f;
+  --hist: #b3abf5; --hist-soft: #26233f;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--text);
+  font: 16px/1.6 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+main { max-width: 1040px; margin: 0 auto; padding: 32px 16px 80px; }
+header h1 { font-size: 1.9rem; margin: 0 0 4px; letter-spacing: -0.01em; }
+header .sub { color: var(--muted); margin: 0 0 16px; }
+nav { position: sticky; top: 0; z-index: 5; background: var(--bg); padding: 10px 0; margin-bottom: 8px;
+  border-bottom: 1px solid var(--border); display: flex; gap: 6px; flex-wrap: wrap; }
+nav a { text-decoration: none; color: var(--accent); background: var(--accent-soft); padding: 3px 12px;
+  border-radius: 999px; font-weight: 600; font-size: .9rem; }
+section { background: var(--surface); border: 1px solid var(--border); border-radius: 12px;
+  padding: 20px 22px; margin: 22px 0; }
+h2 { margin: 0 0 8px; font-size: 1.35rem; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+h3 { font-size: 1rem; margin: 20px 0 8px; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; }
+.ex { background: var(--accent); color: var(--surface); border-radius: 6px; padding: 0 8px; font-size: 1rem; }
+.opt { font-size: .75rem; font-weight: 600; color: var(--warn); background: var(--warn-soft);
+  padding: 1px 8px; border-radius: 999px; }
+.task { color: var(--muted); border-left: 3px solid var(--border); padding-left: 12px; margin: 6px 0 0; }
+code { font-family: ui-monospace, "Cascadia Code", Consolas, monospace; font-size: .86em;
+  background: var(--code-bg); padding: 1px 5px; border-radius: 4px; overflow-wrap: anywhere; }
+pre { font-family: ui-monospace, "Cascadia Code", Consolas, monospace; font-size: .8rem; line-height: 1.5;
+  padding: 12px 14px; border-radius: 8px; overflow-x: auto; margin: 8px 0; }
+pre.log { background: var(--code-bg); color: var(--text); white-space: pre; }
+pre.term { background: var(--term-bg); color: var(--term-text); white-space: pre-wrap; }
+.table-wrap { overflow-x: auto; margin: 8px 0; }
+table { border-collapse: collapse; width: 100%; font-size: .9rem; margin: 0; }
+th, td { border-bottom: 1px solid var(--border); padding: 7px 10px; text-align: left; vertical-align: top; }
+th { font-weight: 600; background: var(--code-bg); }
+td.num { text-align: center; white-space: nowrap; font-variant-numeric: tabular-nums; }
+td.flow { font-size: .78rem; color: var(--muted); }
+td.flow sub { font-size: .7em; }
+tr.total td { font-weight: 600; background: var(--code-bg); }
+td.pass { color: var(--ok); font-weight: 600; white-space: nowrap; }
+td.fail { color: var(--bad); font-weight: 600; white-space: nowrap; }
+.muted { color: var(--muted); font-size: .9em; }
+.tag { font-size: .72rem; font-weight: 700; padding: 1px 7px; border-radius: 999px; white-space: nowrap; }
+.tag.ok { color: var(--ok); background: var(--ok-soft); }
+.tag.bad { color: var(--bad); background: var(--bad-soft); }
+.tag.miss { color: var(--warn); background: var(--warn-soft); }
+.tag.hist { color: var(--hist); background: var(--hist-soft); }
+.callout { background: var(--accent-soft); border-radius: 8px; padding: 10px 14px; margin: 12px 0 4px; font-size: .93rem; }
+.callout.warn { background: var(--warn-soft); }
+ul { padding-left: 20px; }
+li { margin: 6px 0; }
+details { margin: 8px 0; border: 1px solid var(--border); border-radius: 8px; padding: 4px 12px; }
+details summary { cursor: pointer; font-weight: 600; font-size: .9rem; padding: 4px 0; color: var(--accent); }
+.meta { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 10px; margin: 14px 0; }
+.meta div { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 10px 14px; }
+.meta b { display: block; font-size: .75rem; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; }
+.score { font-size: 1.5rem; font-weight: 700; color: var(--ok); }
+
+.q { font-size: 1.05rem; font-weight: 600; margin: 4px 0 0; }
+.tl { font-weight: 700; }
+td.ok200 { color: var(--ok); font-weight: 700; text-align: center; }
+td.err400 { color: var(--bad); font-weight: 700; text-align: center; }
+</style>
+</head>
+<body>
+<main>
+<header>
+<h1>Laborator 2 – Întrebări de verificare</h1>
+<p class="sub">Secțiunea 6: răspunsuri la cele 9 întrebări, fiecare susținută de un experiment rulat pe codul laboratorului (22.10.2026).</p>
+<div class="meta">
+<div><b>Local</b>mock + <code>server.py</code> + server MCP de test (Q1, Q4–Q7, Q9)</div>
+<div><b>Model real</b><code>gemini-3.5-flash-lite</code> (Q2, Q3, Q8)</div>
+<div><b>Cod modificat</b>niciunul în proiect (copii și subclase în folderul temporar)</div>
+<div><b>Verificări automate</b><span class="score">33/33</span> trecute</div>
+</div>
+</header>
+<nav><a href="#q1">1</a><a href="#q2">2</a><a href="#q3">3</a><a href="#q4">4</a><a href="#q5">5</a><a href="#q6">6</a><a href="#q7">7</a><a href="#q8">8</a><a href="#q9">9</a><a href="#teste">Teste</a></nav>
+
+<section id="q1">
+<h2><span class="ex">1</span> De ce <code>arguments</code> este un șir de caractere?</h2>
+<p class="q">De ce <code>arguments</code> este un șir de caractere și ce se poate întâmpla cu el înainte de <code>json.loads</code>?</p>
+<h3>Răspuns</h3>
+<ul>
+<li>Un model de limbaj produce <b>text</b>, token cu token. Argumentele unui apel sunt și ele text generat, care doar <i>ar trebui</i> să fie JSON. API-ul OpenAI le transmite ca șir (<code>"arguments": "{\"name\": …}"</code>), nu ca obiect deja parsat, tocmai pentru că nu garantează că sunt valide. Parsarea și verificarea cad în sarcina agentului.</li>
+<li><b>Ce poate merge prost:</b> virgulă în plus, ghilimele simple (stil Python), JSON tăiat la jumătate când se atinge limita de tokeni, text în jurul JSON-ului („Sigur! {…}”). Chiar dacă se parsează, valoarea poate fi greșită ca tip (<code>"hours": "trei"</code>) sau ca formă (listă în loc de obiect), ori pot lipsi câmpuri obligatorii.</li>
+<li>De aceea <code>call_tool</code> pune <code>json.loads</code> într-un <code>try</code> și trimite eroarea înapoi modelului ca rezultat (<code>eroare: true</code>), ca să se poată corecta. Tot ce trece de <code>json.loads</code> e verificat apoi de server, cu schema.</li>
+</ul>
+<h3>Experiment</h3>
+<p class="muted">Am trimis direct în <code>Agent.call_tool</code> opt variante de <code>arguments</code> pentru <code>estimate_energy</code> (mock + serverul real).</p>
+<div class="table-wrap"><table><thead><tr><th>Caz</th><th><code>arguments</code></th><th>Cine oprește</th><th>Eveniment <code>apel</code> în log</th><th>Ce primește modelul</th></tr></thead><tbody><tr><td>JSON valid</td><td><code>{&quot;name&quot;: &quot;radiator&quot;, &quot;hours&quot;: 3}</code></td><td>—</td><td class='num'>✓</td><td><code>{&quot;nume&quot;:&quot;radiator&quot;,&quot;ore&quot;:3.0,&quot;energie_kwh&quot;:4.5}</code></td></tr><tr><td>virgulă în plus</td><td><code>{&quot;name&quot;: &quot;radiator&quot;, &quot;hours&quot;: 3,}</code></td><td>agent (<code>json.loads</code>)</td><td class='num'><span class=muted>lipsește</span></td><td><code>Eroare: argumentele nu sunt JSON valid (Illegal trailing comma before end of object: line 1 column 32 (char 31)).</code></td></tr><tr><td>ghilimele simple (stil Python)</td><td><code>{&#x27;name&#x27;: &#x27;radiator&#x27;, &#x27;hours&#x27;: 3}</code></td><td>agent (<code>json.loads</code>)</td><td class='num'><span class=muted>lipsește</span></td><td><code>Eroare: argumentele nu sunt JSON valid (Expecting property name enclosed in double quotes: line 1 column 2 (char 1)).</code></td></tr><tr><td>tăiat la jumătate (limită de tokeni)</td><td><code>{&quot;name&quot;: &quot;radiator&quot;, &quot;hours&quot;: 3</code></td><td>agent (<code>json.loads</code>)</td><td class='num'><span class=muted>lipsește</span></td><td><code>Eroare: argumentele nu sunt JSON valid (Expecting &#x27;,&#x27; delimiter: line 1 column 32 (char 31)).</code></td></tr><tr><td>text în jurul JSON-ului</td><td><code>Sigur! {&quot;name&quot;: &quot;radiator&quot;, &quot;hours&quot;: 3}</code></td><td>agent (<code>json.loads</code>)</td><td class='num'><span class=muted>lipsește</span></td><td><code>Eroare: argumentele nu sunt JSON valid (Expecting value: line 1 column 1 (char 0)).</code></td></tr><tr><td>JSON valid, tip greșit</td><td><code>{&quot;name&quot;: &quot;radiator&quot;, &quot;hours&quot;: &quot;trei&quot;}</code></td><td>server MCP (schemă)</td><td class='num'>✓</td><td><code>Eroare la apelul estimate_energy: 1 validation error for call[estimate_energy]
+hours
+  Input should be a valid number, unable to parse strin…</code></td></tr><tr><td>JSON valid, dar nu obiect</td><td><code>[&quot;radiator&quot;, 3]</code></td><td>server MCP (schemă)</td><td class='num'>✓</td><td><code>Eroare la apelul estimate_energy: 1 validation error for CallToolRequestParams
+arguments
+  Input should be a valid dictionary [type=dict_typ…</code></td></tr><tr><td>șir gol</td><td><code>(gol)</code></td><td>server MCP (schemă)</td><td class='num'>✓</td><td><code>Eroare la apelul estimate_energy: 2 validation errors for call[estimate_energy]
+name
+  Missing required argument [type=missing_argument, inp…</code></td></tr></tbody></table></div>
+<p><b>Ce arată:</b> 4 din 8 șiruri nu trec de <code>json.loads</code>; agentul le prinde și nu contactează serverul. Celelalte 3 sunt JSON valid, dar greșit, și le respinge serverul prin schemă. Nicio excepție nu a oprit agentul. <b>Observație:</b> când JSON-ul e invalid, <code>call_tool</code> iese <i>înainte</i> de <code>log.write("apel", …)</code>. În log rămâne doar <code>rezultat</code> cu <code>argumente: {}</code>, iar șirul original trimis de model se pierde. Pentru depanare ar fi util ca șirul brut să fie scris și el în log.</p>
+</section>
+<section id="q2">
+<h2><span class="ex">2</span> Rolul lui <code>tool_call_id</code></h2>
+<p class="q">Ce rol are <code>tool_call_id</code> și ce se întâmplă dacă lipsește un mesaj <code>tool</code> pentru un apel cerut?</p>
+<h3>Răspuns</h3>
+<ul>
+<li><code>tool_call_id</code> leagă fiecare rezultat (mesaj <code>tool</code>) de cererea de apel care l-a produs (<code>tool_calls[i].id</code> din mesajul <code>assistant</code>). E necesar pentru că un singur pas poate conține mai multe apeluri, chiar ale aceluiași instrument (de ex. două <code>estimate_energy</code>). Fără id, modelul nu ar ști care rezultat aparține cărui apel.</li>
+<li>Protocolul cere ca <b>fiecare</b> apel cerut să primească exact un mesaj <code>tool</code> cu id-ul lui, înainte de mesajul următor. Dacă lipsește, cererea e invalidă. Specificația OpenAI o respinge cu HTTP 400, iar agentul nostru adaugă întotdeauna câte un rezultat, inclusiv pentru erori și refuzuri.</li>
+<li>Experimentul arată că Gemini e <b>mai tolerant decât specificația</b> în unele cazuri. Atunci nu dă eroare, dar răspunsul devine incomplet în tăcere, ceea ce e mai periculos.</li>
+</ul>
+<h3>Experiment (Gemini, <code>gemini-3.5-flash-lite</code>)</h3>
+<p class="muted">Am cerut întâi lui Gemini mesaje <code>assistant</code> reale cu <code>tool_calls</code> (inclusiv semnătura <code>extra_content.google.thought_signature</code>), apoi am trimis variante ale istoricului.</p>
+<div class="table-wrap"><table><thead><tr><th>Scenariu</th><th>Roluri trimise</th><th>HTTP</th><th>Rezultat</th></tr></thead><tbody><tr><td>secvență corectă: assistant(tool_calls) → tool cu același id</td><td class='muted'>system → user → assistant → tool</td><td class='ok200'>200</td><td>Radiatorul consumă 4,5 kWh în 3 ore.</td></tr><tr><td>lipsește mesajul tool; urmează direct răspunsul cerut</td><td class='muted'>system → user → assistant</td><td class='err400'>400</td><td>Requests ending with a model turn are not supported.&#x27;, &#x27;status&#x27;: &#x27;INVALID_ARGUMENT&#x27;}}]</td></tr><tr><td>lipsește mesajul tool; urmează altă întrebare</td><td class='muted'>system → user → assistant → user</td><td class='ok200'>200</td><td>cere: estimate_energy({&quot;hours&quot;:5,&quot;name&quot;:&quot;radiator&quot;})</td></tr><tr><td>tool_call_id greșit (call_999)</td><td class='muted'>system → user → assistant → tool</td><td class='err400'>400</td><td>* GenerateContentRequest.contents[2].parts[0].function_response.name: Name cannot be empty.\n&#x27;, &#x27;status&#x27;: &#x27;INVALID_ARGUMENT&#x27;}}]</td></tr><tr><td>mesaj tool fără tool_call_id</td><td class='muted'>system → user → assistant → tool</td><td class='err400'>400</td><td>Request contains an invalid argument.&#x27;, &#x27;status&#x27;: &#x27;INVALID_ARGUMENT&#x27;}}]</td></tr><tr><td>2 apeluri cerute, toate mesajele tool</td><td class='muted'>system → user → assistant → tool → tool</td><td class='ok200'>200</td><td>Radiatorul consumă 4,5 kWh, iar lampa LED consumă 0,03 kWh în 3 ore.</td></tr><tr><td>2 apeluri cerute, doar primul mesaj tool</td><td class='muted'>system → user → assistant → tool</td><td class='ok200'>200</td><td>Radiatorul consumă 4,5 kWh în 3 ore.</td></tr><tr><td>rezultatele în ordine inversă (id-uri corecte)</td><td class='muted'>system → user → assistant → tool → tool</td><td class='ok200'>200</td><td>Radiatorul consumă 4,5 kWh, iar lampa LED consumă 0,03 kWh în 3 ore.</td></tr></tbody></table></div>
+<p><b>Ce arată:</b></p>
+<ul>
+<li>Perechea se face <b>după id, nu după poziție</b>: rezultatele în ordine inversă au dat răspunsul corect.</li>
+<li>Un id greșit sau lipsă dă <b>HTTP 400</b>. Mesajul de eroare (<i>„function_response.name: Name cannot be empty”</i>) arată că Gemini folosește id-ul ca să afle <i>numele</i> funcției căreia îi aparține rezultatul.</li>
+<li>Un mesaj <code>tool</code> lipsă la finalul cererii dă tot 400 (<i>„Requests ending with a model turn are not supported”</i>).</li>
+<li>Gemini acceptă însă un mesaj <code>tool</code> lipsă dacă urmează altă întrebare, iar la două apeluri cu un singur rezultat a răspuns <i>„Radiatorul consumă 4,5 kWh în 3 ore.”</i>. Lampa a dispărut fără nicio eroare.</li>
+</ul>
+<div class="callout warn"><b>Constatare suplimentară:</b> la prima încercare am scris apelurile de mână, fără semnătură. Gemini a răspuns cu 400 chiar și la secvența corectă: <i>„Function call is missing a thought_signature in functionCall parts”</i>. Modelele Gemini 3 cer ca mesajul <code>assistant</code> să fie retrimis <b>exact</b> cum a venit. Agentul face asta prin <code>c.model_dump()</code>, care păstrează și <code>extra_content</code>. Istoricul nu trebuie reconstruit sau „curățat” manual.</div>
+<details><summary>Încercarea 1: apeluri scrise de mână, fără semnătură</summary><pre class="log">400  secvență corectă (assistant tool_calls → tool cu același id)  →  [{&#x27;error&#x27;: {&#x27;code&#x27;: 400, &#x27;message&#x27;: &#x27;Function call is missing a thought_signature in functionCall parts. This is required for tools to work correctly,…
+200  lipsește mesajul tool (apoi altă întrebare)
+400  două apeluri cerute, un singur mesaj tool  →  [{&#x27;error&#x27;: {&#x27;code&#x27;: 400, &#x27;message&#x27;: &#x27;Function call is missing a thought_signature in functionCall parts. This is required for tools to work correctly,…
+400  două apeluri, ambele mesaje tool  →  [{&#x27;error&#x27;: {&#x27;code&#x27;: 400, &#x27;message&#x27;: &#x27;Function call is missing a thought_signature in functionCall parts. This is required for tools to work correctly,…
+400  tool_call_id greșit (call_999)  →  [{&#x27;error&#x27;: {&#x27;code&#x27;: 400, &#x27;message&#x27;: &#x27;* GenerateContentRequest.contents[2].parts[0].function_response.name: Name cannot be empty.\n&#x27;, &#x27;status&#x27;: &#x27;INVALI…
+400  mesaj tool fără tool_call_id  →  [{&#x27;error&#x27;: {&#x27;code&#x27;: 400, &#x27;message&#x27;: &#x27;Request contains an invalid argument.&#x27;, &#x27;status&#x27;: &#x27;INVALID_ARGUMENT&#x27;}}]
+400  tăiere în mijlocul turei: tool fără assistant-ul cu tool_calls  →  [{&#x27;error&#x27;: {&#x27;code&#x27;: 400, &#x27;message&#x27;: &#x27;* GenerateContentRequest.contents[0].parts[0].function_response.name: Name cannot be empty.\n&#x27;, &#x27;status&#x27;: &#x27;INVALI…
+200  tăiere la granița turei (trim_history)</pre></details>
+</section>
+<section id="q3">
+<h2><span class="ex">3</span> De ce <code>tool_choice</code> doar la primul pas?</h2>
+<p class="q">De ce aplicăm <code>tool_choice</code> doar la primul pas al unei întrebări?</p>
+<h3>Răspuns</h3>
+<ul>
+<li>Răspunsul final al agentului este un mesaj <b>fără</b> <code>tool_calls</code>. Cu <code>tool_choice="required"</code>, modelul e <i>obligat</i> să ceară un instrument. Dacă obligația s-ar aplica la fiecare pas, modelul n-ar putea niciodată să răspundă în text: după ce primește rezultatul, ar fi forțat să ceară încă un instrument, apoi altul, până la <code>MAX_STEPS</code>.</li>
+<li>Aplicat doar la pasul 1, <code>required</code> înseamnă „consultă cel puțin o dată datele, nu răspunde din memorie”. De la pasul 2, modelul revine la <code>auto</code> și poate încheia.</li>
+<li>Analog, <code>none</code> la fiecare pas ar face inutil orice apel deja început. Aplicat doar la pasul 1, înseamnă „răspunde direct, fără instrumente”.</li>
+</ul>
+<h3>Experiment (Gemini): <code>required</code> aplicat la fiecare pas</h3>
+<p class="muted">Într-o copie a proiectului am schimbat linia din <code>Agent.ask</code>: <code>extra = {&quot;tool_choice&quot;: TOOL_CHOICE} if pas == 1 and TOOL_CHOICE != &quot;auto&quot; else {}</code> → fără condiția <code>pas == 1</code>, cu <code>TOOL_CHOICE = "required"</code>. Întrebare: „Cât consumă radiatorul în 3 ore?”.</p>
+<div class="table-wrap"><table><thead><tr><th>Pas</th><th>Apel cerut (obligatoriu)</th><th>Rezultat</th></tr></thead><tbody><tr><td class='num'>1</td><td><code>estimate_energy({&quot;name&quot;: &quot;radiator&quot;, &quot;hours&quot;: 3})</code></td><td><code>{&quot;nume&quot;:&quot;radiator&quot;,&quot;ore&quot;:3.0,&quot;energie_kwh&quot;:4.5}</code></td></tr><tr><td class='num'>2</td><td><code>get_device_info({&quot;name&quot;: &quot;radiator&quot;})</code></td><td><code>{&quot;nume&quot;:&quot;radiator&quot;,&quot;categorie&quot;:&quot;încălzire&quot;,&quot;putere_w&quot;:1500,&quot;note&quot;:&quot;Controlat de termostatul camerei.&quot;}</code></td></tr><tr><td class='num'>3</td><td><code>list_devices({})</code></td><td><code>[&quot;aer_conditionat&quot;,&quot;jaluzele&quot;,&quot;lampa_led&quot;,&quot;radiator&quot;,&quot;ventilatie&quot;]</code></td></tr><tr><td class='num'>4</td><td><code>get_device_info({&quot;name&quot;: &quot;Radiator&quot;})</code></td><td><code>{&quot;nume&quot;:&quot;radiator&quot;,&quot;categorie&quot;:&quot;încălzire&quot;,&quot;putere_w&quot;:1500,&quot;note&quot;:&quot;Controlat de termostatul camerei.&quot;}</code></td></tr><tr><td class='num'>5</td><td><code>estimate_energy({&quot;hours&quot;: 3, &quot;name&quot;: &quot;Radiator&quot;})</code></td><td><code>{&quot;nume&quot;:&quot;radiator&quot;,&quot;ore&quot;:3.0,&quot;energie_kwh&quot;:4.5}</code></td></tr><tr><td class='num'>6</td><td><code>get_device_info({&quot;name&quot;: &quot;radiator&quot;})</code></td><td><code>{&quot;nume&quot;:&quot;radiator&quot;,&quot;categorie&quot;:&quot;încălzire&quot;,&quot;putere_w&quot;:1500,&quot;note&quot;:&quot;Controlat de termostatul camerei.&quot;}</code></td></tr></tbody></table></div>
+<p><b>Ce arată:</b> răspunsul corect (4,5 kWh) era disponibil <b>după primul pas</b>, dar modelul nu l-a putut spune. A fost forțat să ceară mereu altceva: <code>get_device_info</code>, <code>list_devices</code>, aceleași apeluri cu <code>"Radiator"</code> scris cu majusculă. Agentul s-a oprit la <code>limita_pasi</code> (6 cereri, 6 apeluri inutile, ~624→922 tokeni), cu mesajul <i>„(Am atins limita de pași a agentului.)”</i>. Prin comparație, cu agentul original și <code>required</code> (Partea C, C5), Gemini a dat răspunsul la pasul 2. Variațiile de argumente (<code>radiator</code> / <code>Radiator</code>) au ocolit și <code>MAX_REPEAT</code>.</p>
+<details><summary>Transcript și analyze_log.py</summary><pre class="term">/reset (conversație nouă), /istoric, /iesire
+
+Tu:   [instrument] estimate_energy({&#x27;name&#x27;: &#x27;radiator&#x27;, &#x27;hours&#x27;: 3}) -&gt; {&quot;nume&quot;:&quot;radiator&quot;,&quot;ore&quot;:3.0,&quot;energie_kwh&quot;:4.5}
+  [instrument] get_device_info({&#x27;name&#x27;: &#x27;radiator&#x27;}) -&gt; {&quot;nume&quot;:&quot;radiator&quot;,&quot;categorie&quot;:&quot;încălzire&quot;,&quot;putere_w&quot;:1500,&quot;note&quot;:&quot;Controlat de termostatul camerei.&quot;}
+  [instrument] list_devices({}) -&gt; [&quot;aer_conditionat&quot;,&quot;jaluzele&quot;,&quot;lampa_led&quot;,&quot;radiator&quot;,&quot;ventilatie&quot;]
+  [instrument] get_device_info({&#x27;name&#x27;: &#x27;Radiator&#x27;}) -&gt; {&quot;nume&quot;:&quot;radiator&quot;,&quot;categorie&quot;:&quot;încălzire&quot;,&quot;putere_w&quot;:1500,&quot;note&quot;:&quot;Controlat de termostatul camerei.&quot;}
+  [instrument] estimate_energy({&#x27;hours&#x27;: 3, &#x27;name&#x27;: &#x27;Radiator&#x27;}) -&gt; {&quot;nume&quot;:&quot;radiator&quot;,&quot;ore&quot;:3.0,&quot;energie_kwh&quot;:4.5}
+  [instrument] get_device_info({&#x27;name&#x27;: &#x27;radiator&#x27;}) -&gt; {&quot;nume&quot;:&quot;radiator&quot;,&quot;categorie&quot;:&quot;încălzire&quot;,&quot;putere_w&quot;:1500,&quot;note&quot;:&quot;Controlat de termostatul camerei.&quot;}
+Agent: (Am atins limita de pași a agentului.) 
+
+Tu:
+
+Fișier: C:\Users\catalin\AppData\Local\Temp\claude\c--Users-catalin-OneDrive-Documents-GitHub-si-lab02\59b88388-f828-4cc2-a384-d58f13d5d6d9\scratchpad\q6\cfg_q3\logs\agent-20261022-224119.jsonl
+Evenimente pe tip: {&#x27;reset&#x27;: 1, &#x27;pornire&#x27;: 1, &#x27;intrebare&#x27;: 1, &#x27;cerere_model&#x27;: 6, &#x27;apel&#x27;: 6, &#x27;rezultat&#x27;: 6, &#x27;limita_pasi&#x27;: 1, &#x27;raspuns&#x27;: 1}
+Apeluri pe instrument: {&#x27;estimate_energy&#x27;: 2, &#x27;get_device_info&#x27;: 3, &#x27;list_devices&#x27;: 1}
+Apeluri cu eroare: - | refuzuri ale utilizatorului: 0
+Cereri către model: 6 | durata medie: 3466 ms
+Tokeni în prompt: primul 624, ultimul 922, maxim 922</pre></details>
+</section>
+<section id="q4">
+<h2><span class="ex">4</span> Starea clădirii vs. memoria conversației</h2>
+<p class="q">Unde stă starea clădirii și unde stă memoria conversației? Ce șterge <code>/reset</code> și ce nu?</p>
+<h3>Răspuns</h3>
+<ul>
+<li><b>Starea clădirii</b> (dispozitive pornite, termostat) stă în <b>procesul serverului MCP</b>, în variabilele globale <code>PORNITE</code> și <code>TERMOSTAT</code> din <code>server.py</code>. Trăiește cât trăiește procesul, care e pornit de agent ca proces copil prin stdio.</li>
+<li><b>Memoria conversației</b> stă în <b>agent</b>, în lista <code>agent.messages</code>, retrimisă integral modelului la fiecare cerere. <b>Modelul</b> nu reține nimic între cereri.</li>
+<li><b><code>/reset</code></b> apelează <code>agent.reset()</code>, care înlocuiește <code>messages</code> cu doar mesajul <code>system</code>. Conversația se șterge. Starea clădirii <b>nu</b> se schimbă, pentru că serverul nu e contactat. Starea se pierde doar la oprirea serverului (repornirea agentului) sau prin <code>reset_building</code>.</li>
+</ul>
+<h3>Experiment (mock)</h3>
+<div class="table-wrap"><table><thead><tr><th>Acțiune</th><th>Mesaje în <code>agent.messages</code></th><th>Rezultat</th></tr></thead><tbody><tr><td>Pornește radiatorul</td><td class='num'>5</td><td><code>{&quot;ok&quot;:true,&quot;nume&quot;:&quot;radiator&quot;,&quot;pornit&quot;:true}</code></td></tr><tr><td>Pornește lampa</td><td class='num'>9</td><td><code>{&quot;ok&quot;:true,&quot;nume&quot;:&quot;lampa_led&quot;,&quot;pornit&quot;:true}</code></td></tr><tr><td>/reset</td><td class='num'>1</td><td><code>(conversație nouă)</code></td></tr><tr><td>Ce este pornit acum?</td><td class='num'>5</td><td><code>{&quot;pornite&quot;:[&quot;lampa_led&quot;,&quot;radiator&quot;],&quot;termostat_c&quot;:21.0}</code></td></tr><tr><td>[agent repornit] Ce este pornit acum?</td><td class='num'>5</td><td><code>{&quot;pornite&quot;:[],&quot;termostat_c&quot;:21.0}</code></td></tr></tbody></table></div>
+<p><b>Ce arată:</b> după <code>/reset</code> istoricul are un singur mesaj, dar radiatorul și lampa sunt tot pornite. Abia un agent nou, deci un proces nou de server, găsește starea goală. Vezi și B5 din Partea B.</p>
+</section>
+<section id="q5">
+<h2><span class="ex">5</span> Refuzul implicit</h2>
+<p class="q">Ce înseamnă „refuz implicit” în politica agentului și de ce nu ne bazăm doar pe adnotările serverului?</p>
+<h3>Răspuns</h3>
+<ul>
+<li><b>Refuz implicit (default-deny):</b> orice instrument este considerat periculos până dovedește contrariul. Agentul rulează fără confirmare <b>doar</b> instrumentele care declară explicit <code>readOnlyHint: true</code>. Lipsa adnotărilor înseamnă „poate modifica și poate distruge” (<code>tool_flags</code>: <code>read_only=False</code>, <code>destructive=True</code>). Fără funcție de confirmare (<code>Agent(confirm=None)</code>), instrumentele cu efecte sunt refuzate automat.</li>
+<li>Așa, un autor de server care <b>uită</b> adnotările nu produce un instrument executat fără control. Greșeala duce spre siguranță.</li>
+<li><b>De ce nu doar adnotările:</b> sunt <i>indicii</i> declarate de server, nu garanții. Agentul nu are cum să verifice ce face funcția. Un server greșit sau rău intenționat poate declara <code>readOnlyHint: true</code> pe un instrument care modifică sau șterge. Specificația MCP spune explicit că un client trebuie să le considere nesigure dacă serverul nu e de încredere. De aceea mai există straturile de pe server (schema, regulile de domeniu) și, eventual, liste de servere de încredere.</li>
+</ul>
+<h3>Experiment: server de test cu adnotări corecte, lipsă și mincinoase</h3>
+<p class="muted">Am scris un server MCP cu trei instrumente și l-am conectat la același <code>Agent</code> (mock).</p>
+<div class="table-wrap"><table><thead><tr><th>Instrument</th><th>Adnotări declarate</th><th><code>read_only</code></th><th><code>destructive</code></th></tr></thead><tbody><tr><td><code>citeste_stare</code></td><td><code>{&quot;read_only_hint&quot;: true}</code></td><td class='num'>true</td><td class='num'>false</td></tr><tr><td><code>fara_adnotari</code></td><td><code>lipsă</code></td><td class='num'>false</td><td class='num'>true</td></tr><tr><td><code>mincinos</code></td><td><code>{&quot;read_only_hint&quot;: true}</code></td><td class='num'>true</td><td class='num'>false</td></tr></tbody></table></div>
+<div class="table-wrap"><table><thead><tr><th colspan="3"><code>Agent(confirm=None)</code>: fără funcție de confirmare</th></tr><tr><th>Apel</th><th>Confirmare cerută</th><th>Rezultat</th></tr></thead><tbody><tr><td><code>citeste_stare</code></td><td class='num'>nu</td><td><code>{&quot;modificari&quot;:0}</code></td></tr><tr><td><code>fara_adnotari</code></td><td class='num'>nu</td><td><code>Utilizatorul a refuzat acest apel; nu a fost executat.</code></td></tr><tr><td><code>mincinos</code></td><td class='num'>nu</td><td><code>{&quot;ok&quot;:true,&quot;modificari&quot;:100}</code></td></tr><tr><td><code>citeste_stare</code></td><td class='num'>nu</td><td><code>{&quot;modificari&quot;:100}</code></td></tr></tbody></table></div>
+<div class="table-wrap"><table><thead><tr><th colspan="3">Utilizatorul aprobă tot ce i se cere</th></tr><tr><th>Apel</th><th>Confirmare cerută</th><th>Rezultat</th></tr></thead><tbody><tr><td><code>citeste_stare</code></td><td class='num'>nu</td><td><code>{&quot;modificari&quot;:0}</code></td></tr><tr><td><code>fara_adnotari</code></td><td class='num'>da</td><td><code>{&quot;ok&quot;:true,&quot;modificari&quot;:1}</code></td></tr><tr><td><code>mincinos</code></td><td class='num'>nu</td><td><code>{&quot;ok&quot;:true,&quot;modificari&quot;:101}</code></td></tr><tr><td><code>citeste_stare</code></td><td class='num'>nu</td><td><code>{&quot;modificari&quot;:101}</code></td></tr></tbody></table></div>
+<p><b>Ce arată:</b> instrumentul <b>fără adnotări</b> e tratat ca distructiv: refuzat automat fără funcție de confirmare și cu confirmare cerută când există una. Refuzul implicit funcționează. Instrumentul <b>mincinos</b> (<code>readOnlyHint: true</code>, dar <code>modificari += 100</code>) a rulat în ambele scenarii <b>fără să întrebe pe nimeni</b> și a modificat starea. Asta e exact limita adnotărilor.</p>
+</section>
+<section id="q6">
+<h2><span class="ex">6</span> Cele trei straturi de protecție</h2>
+<p class="q">Care sunt cele trei straturi de protecție pentru un apel cu efecte și ce oprește fiecare?</p>
+<h3>Răspuns</h3>
+<div class="table-wrap"><table><thead><tr><th>Strat</th><th>Unde</th><th>Ce oprește</th><th>Exemplu</th></tr></thead><tbody>
+<tr><td class="tl">1. Schema</td><td>serverul MCP, înainte de a rula funcția (FastMCP + Pydantic)</td><td>argumente de tip greșit, lipsă sau în afara domeniului declarat (<code>Field(ge=10, le=30)</code>)</td><td><code>set_thermostat(temp_c=50)</code></td></tr>
+<tr><td class="tl">2. Regula de domeniu</td><td>în corpul instrumentului</td><td>acțiuni valide ca formă, dar fără sens în contextul curent al clădirii</td><td>pornirea aerului condiționat cu radiatorul pornit</td></tr>
+<tr><td class="tl">3. Omul</td><td>agentul, înainte de apel (<code>confirm</code>)</td><td>orice altceva: intenție greșită, ordin interpretat prea larg, prompt injection</td><td>„nu am cerut să resetezi clădirea”</td></tr>
+</tbody></table></div>
+<h3>Experiment (mock): câte un apel oprit de fiecare strat</h3>
+<div class="table-wrap"><table><thead><tr><th>Apel</th><th>Răspuns om</th><th>Oprit de</th><th>Rezultat</th></tr></thead><tbody><tr><td><code>set_thermostat {&quot;temp_c&quot;: 50}</code></td><td class='num'><span class="tag ok">d</span></td><td><b>Schema</b></td><td><code>Eroare la apelul set_thermostat: 1 validation error for call[set_thermostat]
+temp_c
+  Input should be less than or equal to 30 [ty…</code></td></tr><tr><td><code>set_device_state {&quot;name&quot;: &quot;radiator&quot;, &quot;on&quot;: true}</code></td><td class='num'><span class="tag ok">d</span></td><td><span class=muted>trece de toate</span></td><td><code>{&quot;ok&quot;:true,&quot;nume&quot;:&quot;radiator&quot;,&quot;pornit&quot;:true}</code></td></tr><tr><td><code>set_device_state {&quot;name&quot;: &quot;aer_conditionat&quot;, &quot;on&quot;: true}</code></td><td class='num'><span class="tag ok">d</span></td><td><b>Regula de domeniu</b></td><td><code>{&quot;ok&quot;:false,&quot;motiv&quot;:&quot;Conflict cu radiator, care este pornit: RIDICAT - încălzire și răcire simultană, consum inutil.&quot;}</code></td></tr><tr><td><code>reset_building {}</code></td><td class='num'><span class="tag bad">n</span></td><td><b>Omul</b></td><td><code>Utilizatorul a refuzat acest apel; nu a fost executat.</code></td></tr><tr><td><code>get_building_state {}</code></td><td class='num'>—</td><td><span class=muted>trece de toate</span></td><td><code>{&quot;pornite&quot;:[&quot;radiator&quot;],&quot;termostat_c&quot;:21.0}</code></td></tr></tbody></table></div>
+<p><b>Ce arată:</b> straturile sunt independente și niciunul nu-l înlocuiește pe altul. Omul a aprobat <code>set_thermostat(50)</code> și <code>aer_conditionat</code>, dar schema, respectiv regula de domeniu, le-au oprit. <code>reset_building</code> era perfect valid pentru server, dar omul l-a refuzat. Starea finală: doar radiatorul pornit.</p>
+</section>
+<section id="q7">
+<h2><span class="ex">7</span> JSONL față de JSON</h2>
+<p class="q">Dați trei avantaje ale JSONL față de un document JSON obișnuit, pentru un fișier de log.</p>
+<h3>Răspuns</h3>
+<ol>
+<li><b>Adăugare ieftină și sigură:</b> un eveniment nou e o linie scrisă la sfârșit (<code>open(..., "a")</code>). Un document JSON (o listă) ar trebui citit, modificat și rescris complet la fiecare eveniment, ceea ce e lent și riscant.</li>
+<li><b>Robustețe la erori:</b> o linie stricată (scriere întreruptă la o oprire bruscă, eroare de disc) afectează doar acea linie, iar restul se citește normal. Un document JSON neterminat (lipsește <code>]</code> final) nu mai poate fi parsat deloc.</li>
+<li><b>Prelucrare în flux, linie cu linie:</b> se poate citi pe măsură ce se scrie (<code>Get-Content -Tail</code>, <code>tail -f</code>), filtra cu <code>grep</code> / <code>Select-String</code> și procesa fișiere mari fără să fie încărcate integral în memorie. Fișierele se pot și concatena direct.</li>
+</ol>
+<h3>Experiment</h3>
+<p class="muted">Am luat logul de la C1 (C1-agent-20261022-211919.jsonl), am inserat o linie coruptă la mijloc și am tăiat ultima linie la jumătate, simulând o oprire bruscă. Apoi am salvat același conținut ca document JSON (listă) tăiat la fel.</p>
+<div class="table-wrap"><table><thead><tr><th></th><th>JSONL</th><th>JSON (document)</th></tr></thead><tbody>
+<tr><td>Citire după corupere</td><td class="pass">funcționează: 2 linii ignorate, restul raportat</td><td class="fail">JSONDecodeError: Unterminated string starting at: line 185 column 11 (char 3678) → 0 evenimente recuperate</td></tr>
+<tr><td>Cost adăugare eveniment</td><td class="num">50 octeți (o linie)</td><td class="num">4157 octeți (tot fișierul rescris)</td></tr>
+<tr><td>Căutare <code>"tip": "apel"</code></td><td>4 linii găsite direct cu <code>grep</code>, fiecare un eveniment complet</td><td>cu <code>indent</code>, un eveniment se întinde pe mai multe linii; <code>grep</code> dă fragmente</td></tr>
+</tbody></table></div>
+<details><summary>python analyze_log.py pe JSONL-ul stricat</summary><pre class="term">Fișier: C:\Users\catalin\AppData\Local\Temp\claude\c--Users-catalin-OneDrive-Documents-GitHub-si-lab02\59b88388-f828-4cc2-a384-d58f13d5d6d9\scratchpad\q6\q7\agent-stricat.jsonl
+Evenimente pe tip: {&#x27;reset&#x27;: 1, &#x27;pornire&#x27;: 1, &#x27;intrebare&#x27;: 4, &#x27;cerere_model&#x27;: 8, &#x27;apel&#x27;: 4, &#x27;rezultat&#x27;: 4, &#x27;raspuns&#x27;: 4}
+Apeluri pe instrument: {&#x27;estimate_energy&#x27;: 2, &#x27;list_devices&#x27;: 1, &#x27;get_building_state&#x27;: 1}
+Apeluri cu eroare: - | refuzuri ale utilizatorului: 0
+Cereri către model: 8 | durata medie: 1 ms
+Tokeni în prompt: primul 97, ultimul 284, maxim 298
+Atenție: 2 linii nu au putut fi citite.</pre></details>
+</section>
+<section id="q8">
+<h2><span class="ex">8</span> De ce tăiem la granița dintre ture?</h2>
+<p class="q">De ce tăiem istoricul la granița dintre ture?</p>
+<h3>Răspuns</h3>
+<ul>
+<li>O tură (de la un mesaj <code>user</code> până la următorul) conține perechi care trebuie să rămână întregi: mesajul <code>assistant</code> cu <code>tool_calls</code> și mesajele <code>tool</code> cu rezultatele, legate prin <code>tool_call_id</code> (întrebarea 2). O tăiere la un număr fix de mesaje poate rupe perechea. Rămâne un <code>tool</code> fără cererea lui sau o cerere fără rezultat, iar furnizorul respinge întreaga cerere cu <b>HTTP 400</b>. Agentul s-ar bloca exact când conversația devine lungă.</li>
+<li>Tăierea la începutul unei ture păstrează automat toate perechile. O tură întreagă e mereu consistentă, iar <code>trim_history</code> caută indicii mesajelor <code>user</code> și taie doar acolo.</li>
+<li>În plus, o tură întreagă păstrează și <b>sensul</b>. Chiar când o tăiere naivă e validă formal, modelul poate vedea un răspuns sau un apel fără întrebarea la care se referă.</li>
+</ul>
+<h3>Experiment 1 (local): <code>trim_history</code> vs. tăiere naivă</h3>
+<p class="muted">Istoric de 4 ture (system + 16 mesaje), verificat automat: fiecare <code>tool</code> are cererea lui și fiecare cerere are rezultatul ei.</p>
+<div class="table-wrap"><table><thead><tr><th>Metodă</th><th>Roluri păstrate</th><th>Verificare</th></tr></thead><tbody><tr><td><code>trim_history(max_turns=1)</code></td><td class='muted'>system → user → assistant → tool → assistant</td><td class='pass'>consistent</td></tr><tr><td><code>trim_history(max_turns=2)</code></td><td class='muted'>system → user → assistant → tool → assistant → user → assistant → tool → assistant</td><td class='pass'>consistent</td></tr><tr><td><code>trim_history(max_turns=3)</code></td><td class='muted'>system → user → assistant → tool → assistant → user → assistant → tool → assistant → user → assistant → tool → assistant</td><td class='pass'>consistent</td></tr><tr><td><code>naiv: system + ultimele 6 mesaje</code></td><td class='muted'>system → tool → assistant → user → assistant → tool → assistant</td><td class='fail'>mesajul 1: tool c3 fără cererea lui</td></tr><tr><td><code>naiv: system + ultimele 7 mesaje</code></td><td class='muted'>system → assistant → tool → assistant → user → assistant → tool → assistant</td><td class='pass'>consistent</td></tr><tr><td><code>naiv: system + ultimele 9 mesaje</code></td><td class='muted'>system → assistant → user → assistant → tool → assistant → user → assistant → tool → assistant</td><td class='pass'>consistent</td></tr></tbody></table></div>
+<h3>Experiment 2 (Gemini): ce face furnizorul cu un istoric tăiat greșit</h3>
+<div class="table-wrap"><table><thead><tr><th>Scenariu</th><th>Roluri trimise</th><th>HTTP</th><th>Rezultat</th></tr></thead><tbody><tr><td>tăiere în mijlocul turei: tool fără assistant-ul cu tool_calls</td><td class='muted'>system → tool → assistant → user</td><td class='err400'>400</td><td>* GenerateContentRequest.contents[0].parts[0].function_response.name: Name cannot be empty.\n&#x27;, &#x27;status&#x27;: &#x27;INVALID_ARGUMENT&#x27;}}]</td></tr><tr><td>tăiere în mijlocul turei: assistant(tool_calls) fără user-ul lui</td><td class='muted'>system → assistant → tool → assistant → user</td><td class='ok200'>200</td><td>cere: estimate_energy({&quot;hours&quot;:5,&quot;name&quot;:&quot;radiator&quot;})</td></tr><tr><td>tăiere la granița turei (ca trim_history)</td><td class='muted'>system → user → assistant → tool → assistant → user</td><td class='ok200'>200</td><td>cere: estimate_energy({&quot;hours&quot;:5,&quot;name&quot;:&quot;radiator&quot;})</td></tr></tbody></table></div>
+<p><b>Ce arată:</b> un mesaj <code>tool</code> orfan dă <b>HTTP 400</b> la Gemini. Tăierea la graniță merge, iar modelul înțelege „Și în 5 ore?” (cere <code>estimate_energy(radiator, 5)</code>). Tăierea naivă la „ultimele 7 mesaje” e consistentă formal, dar păstrează un apel <code>tool_calls</code> fără întrebarea care l-a cerut.</p>
+</section>
+<section id="q9">
+<h2><span class="ex">9</span> <code>MAX_STEPS</code> vs. <code>MAX_REPEAT</code></h2>
+<p class="q">Care este diferența dintre <code>MAX_STEPS</code> și <code>MAX_REPEAT</code>? Dați un exemplu de situație în care se declanșează doar unul dintre ele.</p>
+<h3>Răspuns</h3>
+<ul>
+<li><b><code>MAX_REPEAT</code></b> (implicit 2) limitează de câte ori poate fi cerut <b>același apel</b>, adică același nume și același șir de argumente, în cadrul unei întrebări. Prinde rapid modelul blocat care repetă identic aceeași cerere. Agentul se oprește <b>fără</b> să mai execute apelul în plus (<code>bucla_detectata</code>).</li>
+<li><b><code>MAX_STEPS</code></b> (implicit 6) limitează <b>numărul total de pași</b> (cereri către model) pentru o întrebare, oricare ar fi apelurile. Prinde buclele în care apelurile diferă puțin de fiecare dată, pe care <code>MAX_REPEAT</code> nu le vede (<code>limita_pasi</code>).</li>
+<li><b>Doar <code>MAX_REPEAT</code>:</b> modelul cere de 3 ori <code>list_devices()</code>, identic. Se oprește la pasul 3, mult înainte de pasul 6.</li>
+<li><b>Doar <code>MAX_STEPS</code>:</b> modelul cere <code>estimate_energy(radiator, 1)</code>, apoi <code>(radiator, 2)</code>, <code>(radiator, 3)</code> … Niciun apel nu se repetă, deci <code>MAX_REPEAT</code> nu se declanșează niciodată, iar bucla se oprește la pasul 6. Același lucru s-a întâmplat real cu Gemini la întrebarea 3 (<code>radiator</code> / <code>Radiator</code>) și în C4.</li>
+</ul>
+<h3>Experiment</h3>
+<div class="table-wrap"><table><thead><tr><th>„Model”</th><th>Apeluri executate</th><th>Eveniment de oprire</th><th>Pas</th></tr></thead><tbody>
+<tr><td>mock, „bucla” (același <code>list_devices()</code>)</td><td class="num">2</td><td><code>bucla_detectata</code></td><td class="num">3</td></tr>
+<tr><td>„model” scriptat: <code>estimate_energy</code> cu <code>hours</code> = 1, 2, 3, 4, 5, 6</td><td class="num">6</td><td><code>limita_pasi</code></td><td class="num">6</td></tr>
+</tbody></table></div>
+<p class="muted">„Modelul” scriptat e un client fals (în locul lui <code>agent.llm</code>) care cere la fiecare pas <code>estimate_energy</code> cu alt număr de ore. Agentul real, fără nicio modificare, s-a oprit doar la <code>MAX_STEPS</code>.</p>
+<details><summary>Evenimentele din log (ambele cazuri)</summary><pre class="log">{&quot;tip&quot;: &quot;intrebare&quot;, &quot;text&quot;: &quot;bucla&quot;, &quot;mesaje_taiate&quot;: 0}
+{&quot;tip&quot;: &quot;cerere_model&quot;, &quot;pas&quot;: 1, &quot;mesaje&quot;: 2, &quot;durata_ms&quot;: 0, &quot;prompt_tokens&quot;: 91}
+{&quot;tip&quot;: &quot;apel&quot;, &quot;pas&quot;: 1, &quot;nume&quot;: &quot;list_devices&quot;, &quot;argumente&quot;: {}}
+{&quot;tip&quot;: &quot;rezultat&quot;, &quot;pas&quot;: 1, &quot;nume&quot;: &quot;list_devices&quot;, &quot;eroare&quot;: false, &quot;text&quot;: &quot;[\&quot;aer_conditionat\&quot;,\&quot;jaluzele\&quot;,\&quot;lampa_led\&quot;,\&quot;radiator\&quot;,\&quot;ventilatie\&quot;]&quot;, &quot;trunchiat&quot;: false}
+{&quot;tip&quot;: &quot;cerere_model&quot;, &quot;pas&quot;: 2, &quot;mesaje&quot;: 4, &quot;durata_ms&quot;: 0, &quot;prompt_tokens&quot;: 162}
+{&quot;tip&quot;: &quot;apel&quot;, &quot;pas&quot;: 2, &quot;nume&quot;: &quot;list_devices&quot;, &quot;argumente&quot;: {}}
+{&quot;tip&quot;: &quot;rezultat&quot;, &quot;pas&quot;: 2, &quot;nume&quot;: &quot;list_devices&quot;, &quot;eroare&quot;: false, &quot;text&quot;: &quot;[\&quot;aer_conditionat\&quot;,\&quot;jaluzele\&quot;,\&quot;lampa_led\&quot;,\&quot;radiator\&quot;,\&quot;ventilatie\&quot;]&quot;, &quot;trunchiat&quot;: false}
+{&quot;tip&quot;: &quot;cerere_model&quot;, &quot;pas&quot;: 3, &quot;mesaje&quot;: 6, &quot;durata_ms&quot;: 0, &quot;prompt_tokens&quot;: 234}
+{&quot;tip&quot;: &quot;bucla_detectata&quot;, &quot;pas&quot;: 3, &quot;apeluri&quot;: [&quot;list_devices&quot;]}
+{&quot;tip&quot;: &quot;raspuns&quot;, &quot;text&quot;: &quot;(M-am oprit: modelul cere în mod repetat același apel.)&quot;, &quot;pas&quot;: 3}
+
+{&quot;tip&quot;: &quot;intrebare&quot;, &quot;text&quot;: &quot;Cât consumă radiatorul?&quot;, &quot;mesaje_taiate&quot;: 0}
+{&quot;tip&quot;: &quot;cerere_model&quot;, &quot;pas&quot;: 1, &quot;mesaje&quot;: 2, &quot;durata_ms&quot;: 1, &quot;prompt_tokens&quot;: null}
+{&quot;tip&quot;: &quot;apel&quot;, &quot;pas&quot;: 1, &quot;nume&quot;: &quot;estimate_energy&quot;, &quot;argumente&quot;: {&quot;name&quot;: &quot;radiator&quot;, &quot;hours&quot;: 1}}
+{&quot;tip&quot;: &quot;rezultat&quot;, &quot;pas&quot;: 1, &quot;nume&quot;: &quot;estimate_energy&quot;, &quot;eroare&quot;: false, &quot;text&quot;: &quot;{\&quot;nume\&quot;:\&quot;radiator\&quot;,\&quot;ore\&quot;:1.0,\&quot;energie_kwh\&quot;:1.5}&quot;, &quot;trunchiat&quot;: false}
+{&quot;tip&quot;: &quot;cerere_model&quot;, &quot;pas&quot;: 2, &quot;mesaje&quot;: 4, &quot;durata_ms&quot;: 0, &quot;prompt_tokens&quot;: null}
+{&quot;tip&quot;: &quot;apel&quot;, &quot;pas&quot;: 2, &quot;nume&quot;: &quot;estimate_energy&quot;, &quot;argumente&quot;: {&quot;name&quot;: &quot;radiator&quot;, &quot;hours&quot;: 2}}
+{&quot;tip&quot;: &quot;rezultat&quot;, &quot;pas&quot;: 2, &quot;nume&quot;: &quot;estimate_energy&quot;, &quot;eroare&quot;: false, &quot;text&quot;: &quot;{\&quot;nume\&quot;:\&quot;radiator\&quot;,\&quot;ore\&quot;:2.0,\&quot;energie_kwh\&quot;:3.0}&quot;, &quot;trunchiat&quot;: false}
+{&quot;tip&quot;: &quot;cerere_model&quot;, &quot;pas&quot;: 3, &quot;mesaje&quot;: 6, &quot;durata_ms&quot;: 2, &quot;prompt_tokens&quot;: null}
+{&quot;tip&quot;: &quot;apel&quot;, &quot;pas&quot;: 3, &quot;nume&quot;: &quot;estimate_energy&quot;, &quot;argumente&quot;: {&quot;name&quot;: &quot;radiator&quot;, &quot;hours&quot;: 3}}
+{&quot;tip&quot;: &quot;rezultat&quot;, &quot;pas&quot;: 3, &quot;nume&quot;: &quot;estimate_energy&quot;, &quot;eroare&quot;: false, &quot;text&quot;: &quot;{\&quot;nume\&quot;:\&quot;radiator\&quot;,\&quot;ore\&quot;:3.0,\&quot;energie_kwh\&quot;:4.5}&quot;, &quot;trunchiat&quot;: false}
+{&quot;tip&quot;: &quot;cerere_model&quot;, &quot;pas&quot;: 4, &quot;mesaje&quot;: 8, &quot;durata_ms&quot;: 0, &quot;prompt_tokens&quot;: null}
+{&quot;tip&quot;: &quot;apel&quot;, &quot;pas&quot;: 4, &quot;nume&quot;: &quot;estimate_energy&quot;, &quot;argumente&quot;: {&quot;name&quot;: &quot;radiator&quot;, &quot;hours&quot;: 4}}
+{&quot;tip&quot;: &quot;rezultat&quot;, &quot;pas&quot;: 4, &quot;nume&quot;: &quot;estimate_energy&quot;, &quot;eroare&quot;: false, &quot;text&quot;: &quot;{\&quot;nume\&quot;:\&quot;radiator\&quot;,\&quot;ore\&quot;:4.0,\&quot;energie_kwh\&quot;:6.0}&quot;, &quot;trunchiat&quot;: false}
+{&quot;tip&quot;: &quot;cerere_model&quot;, &quot;pas&quot;: 5, &quot;mesaje&quot;: 10, &quot;durata_ms&quot;: 0, &quot;prompt_tokens&quot;: null}
+{&quot;tip&quot;: &quot;apel&quot;, &quot;pas&quot;: 5, &quot;nume&quot;: &quot;estimate_energy&quot;, &quot;argumente&quot;: {&quot;name&quot;: &quot;radiator&quot;, &quot;hours&quot;: 5}}
+{&quot;tip&quot;: &quot;rezultat&quot;, &quot;pas&quot;: 5, &quot;nume&quot;: &quot;estimate_energy&quot;, &quot;eroare&quot;: false, &quot;text&quot;: &quot;{\&quot;nume\&quot;:\&quot;radiator\&quot;,\&quot;ore\&quot;:5.0,\&quot;energie_kwh\&quot;:7.5}&quot;, &quot;trunchiat&quot;: false}
+{&quot;tip&quot;: &quot;cerere_model&quot;, &quot;pas&quot;: 6, &quot;mesaje&quot;: 12, &quot;durata_ms&quot;: 0, &quot;prompt_tokens&quot;: null}
+{&quot;tip&quot;: &quot;apel&quot;, &quot;pas&quot;: 6, &quot;nume&quot;: &quot;estimate_energy&quot;, &quot;argumente&quot;: {&quot;name&quot;: &quot;radiator&quot;, &quot;hours&quot;: 6}}
+{&quot;tip&quot;: &quot;rezultat&quot;, &quot;pas&quot;: 6, &quot;nume&quot;: &quot;estimate_energy&quot;, &quot;eroare&quot;: false, &quot;text&quot;: &quot;{\&quot;nume\&quot;:\&quot;radiator\&quot;,\&quot;ore\&quot;:6.0,\&quot;energie_kwh\&quot;:9.0}&quot;, &quot;trunchiat&quot;: false}
+{&quot;tip&quot;: &quot;limita_pasi&quot;, &quot;pasi&quot;: 6}
+{&quot;tip&quot;: &quot;raspuns&quot;, &quot;text&quot;: &quot;(Am atins limita de pași a agentului.)&quot;}</pre></details>
+</section>
+<section id="teste">
+<h2>Verificări automate</h2>
+<p class="muted">Aserțiuni pe rezultatele experimentelor de mai sus.</p>
+<div class="table-wrap"><table><thead><tr><th>Într.</th><th>Verificare</th><th>Rezultat</th></tr></thead><tbody><tr><td class='num'>1</td><td>4 șiruri care nu sunt JSON valid → eroare a agentului, fără apel la server</td><td class='pass'>✓ trecut</td></tr><tr><td class='num'>1</td><td>JSON valid → rezultat corect (4,5 kWh)</td><td class='pass'>✓ trecut</td></tr><tr><td class='num'>1</td><td>JSON valid dar greșit (tip / listă / gol) → respins de serverul MCP</td><td class='pass'>✓ trecut</td></tr><tr><td class='num'>1</td><td>nicio excepție nu a scăpat din call_tool</td><td class='pass'>✓ trecut</td></tr><tr><td class='num'>2</td><td>secvență corectă → 200</td><td class='pass'>✓ trecut</td></tr><tr><td class='num'>2</td><td>tool_call_id greșit → 400</td><td class='pass'>✓ trecut</td></tr><tr><td class='num'>2</td><td>mesaj tool fără tool_call_id → 400</td><td class='pass'>✓ trecut</td></tr><tr><td class='num'>2</td><td>rezultate în ordine inversă, id-uri corecte → 200 (perechea e după id, nu după poziție)</td><td class='pass'>✓ trecut</td></tr><tr><td class='num'>2</td><td>lipsește tool, cererea se termină cu assistant → 400</td><td class='pass'>✓ trecut</td></tr><tr><td class='num'>2</td><td>Gemini: 2 apeluri, un singur rezultat → 200, dar răspunsul omite lampa</td><td class='pass'>✓ trecut</td></tr><tr><td class='num'>2</td><td>apel scris de mână, fără thought_signature → 400 la Gemini</td><td class='pass'>✓ trecut</td></tr><tr><td class='num'>3</td><td>required la fiecare pas: 6 cereri, 6 apeluri, apoi limita_pasi</td><td class='pass'>✓ trecut</td></tr><tr><td class='num'>3</td><td>modelul nu a putut da niciun răspuns în text</td><td class='pass'>✓ trecut</td></tr><tr><td class='num'>3</td><td>răspunsul corect (4,5 kWh) era disponibil deja după pasul 1</td><td class='pass'>✓ trecut</td></tr><tr><td class='num'>4</td><td>/reset: istoricul scade la 1 mesaj</td><td class='pass'>✓ trecut</td></tr><tr><td class='num'>4</td><td>după /reset, radiatorul și lampa sunt tot pornite</td><td class='pass'>✓ trecut</td></tr><tr><td class='num'>4</td><td>agent repornit (server nou) → starea goală</td><td class='pass'>✓ trecut</td></tr><tr><td class='num'>5</td><td>fără adnotări → tratat ca modificator distructiv</td><td class='pass'>✓ trecut</td></tr><tr><td class='num'>5</td><td>Agent(confirm=None): fara_adnotari refuzat automat</td><td class='pass'>✓ trecut</td></tr><tr><td class='num'>5</td><td>mincinos (readOnlyHint fals) rulează FĂRĂ confirmare și modifică starea</td><td class='pass'>✓ trecut</td></tr><tr><td class='num'>6</td><td>schema: set_thermostat(50) respins (validare)</td><td class='pass'>✓ trecut</td></tr><tr><td class='num'>6</td><td>regula de domeniu: aer_conditionat refuzat (ok=false)</td><td class='pass'>✓ trecut</td></tr><tr><td class='num'>6</td><td>omul: reset_building refuzat (aprobat=false)</td><td class='pass'>✓ trecut</td></tr><tr><td class='num'>6</td><td>starea finală: doar radiatorul pornit, 21 °C</td><td class='pass'>✓ trecut</td></tr><tr><td class='num'>7</td><td>analyze_log.py citește JSONL-ul cu 2 linii stricate și raportează restul</td><td class='pass'>✓ trecut</td></tr><tr><td class='num'>7</td><td>același conținut ca document JSON, tăiat la final → json.loads eșuează complet</td><td class='pass'>✓ trecut</td></tr><tr><td class='num'>7</td><td>adăugarea unui eveniment: JSONL scrie o linie, JSON rescrie tot fișierul</td><td class='pass'>✓ trecut</td></tr><tr><td class='num'>8</td><td>trim_history(1, 2, 3) → istoric consistent</td><td class='pass'>✓ trecut</td></tr><tr><td class='num'>8</td><td>tăiere naivă (ultimele 6 mesaje) → mesaj tool orfan</td><td class='pass'>✓ trecut</td></tr><tr><td class='num'>8</td><td>Gemini: tool orfan → HTTP 400</td><td class='pass'>✓ trecut</td></tr><tr><td class='num'>8</td><td>Gemini: tăiere la granița turei → 200</td><td class='pass'>✓ trecut</td></tr><tr><td class='num'>9</td><td>apel identic repetat → doar bucla_detectata (pasul 3), nu limita_pasi</td><td class='pass'>✓ trecut</td></tr><tr><td class='num'>9</td><td>apeluri care diferă (hours = 1…6) → doar limita_pasi, nu bucla_detectata</td><td class='pass'>✓ trecut</td></tr></tbody></table></div>
+</section>
+</main>
+</body>
+</html>
