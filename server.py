@@ -23,6 +23,7 @@ CONFLICTE = {
 # se pierde doar când serverul este oprit.
 PORNITE: set[str] = set()
 TERMOSTAT = {"temp_c": 21.0}
+JALUZELE = {"pozitie": 100}  # 0 = închise complet, 100 = deschise complet
 
 # Adnotări (indicii pentru gazdă, nu garanții): vezi secțiunea 4.2.
 CITIRE = {"readOnlyHint": True}
@@ -66,8 +67,10 @@ def estimate_energy(name: str, hours: float) -> dict:
 
 @mcp.tool(annotations=CITIRE)
 def get_building_state() -> dict:
-    """Returnează starea curentă a clădirii: dispozitivele pornite și temperatura dorită a termostatului."""
-    return {"pornite": sorted(PORNITE), "termostat_c": TERMOSTAT["temp_c"]}
+    """Returnează starea curentă a clădirii: dispozitivele pornite, temperatura dorită a termostatului
+    și poziția jaluzelelor (0 = închise, 100 = deschise)."""
+    return {"pornite": sorted(PORNITE), "termostat_c": TERMOSTAT["temp_c"],
+            "jaluzele_pozitie": JALUZELE["pozitie"]}
 
 
 # ---------- Instrumente noi, cu efecte ----------
@@ -98,11 +101,28 @@ def set_thermostat(
     TERMOSTAT["temp_c"] = temp_c
     return {"ok": True, "temp_c": temp_c}
 
+@mcp.tool(annotations=MODIFICARE)
+def set_blinds(
+    position: Annotated[int, Field(ge=0, le=100, description="Poziția jaluzelelor în procente: 0 = închise complet, 100 = deschise complet.")],
+) -> dict:
+    """Reglează poziția jaluzelelor (0-100%).
+
+    Refuză închiderea completă (position=0) cât timp lampa_led este stinsă: camera ar rămâne
+    în întuneric. Porniți întâi lampa_led sau alegeți o poziție mai mare decât 0.
+    """
+    if position == 0 and "lampa_led" not in PORNITE:
+        return {"ok": False, "motiv": "Jaluzelele nu se închid complet cât timp lampa_led este stinsă "
+                                      "(camera ar rămâne în întuneric). Porniți întâi lampa_led."}
+    JALUZELE["pozitie"] = position
+    return {"ok": True, "jaluzele_pozitie": position}
+
 @mcp.tool(annotations=DISTRUGERE)
 def reset_building() -> dict:
-    """Oprește toate dispozitivele și readuce termostatul la 21 °C. Șterge starea curentă a clădirii."""
+    """Oprește toate dispozitivele, readuce termostatul la 21 °C și deschide complet jaluzelele.
+    Șterge starea curentă a clădirii."""
     PORNITE.clear()
     TERMOSTAT["temp_c"] = 21.0
+    JALUZELE["pozitie"] = 100
     return {"ok": True, "mesaj": "Clădirea a fost resetată."}
 
 # ---------- Resursă și prompt (ca în Laboratorul 1) ----------

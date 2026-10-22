@@ -16,6 +16,8 @@ def main():
 
     tipuri, apeluri, erori, refuzuri = Counter(), Counter(), Counter(), 0
     durate, tokeni, stricate = [], [], 0
+    apeluri_pe_intrebare = []  # NOU: câte apeluri a făcut agentul pentru fiecare întrebare
+    oprite = []                # NOU: întrebările încheiate cu bucla_detectata sau limita_pasi
     with open(path, encoding="utf-8") as f:
         for linie in f:
             try:
@@ -24,8 +26,15 @@ def main():
                 stricate += 1
                 continue
             tipuri[e["tip"]] += 1
+            if e["tip"] == "intrebare":
+                apeluri_pe_intrebare.append(0)
+                intrebare_curenta = e.get("text", "")
+            elif e["tip"] in ("bucla_detectata", "limita_pasi") and apeluri_pe_intrebare:
+                oprite.append((e["tip"], intrebare_curenta))
             if e["tip"] == "apel":
                 apeluri[e["nume"]] += 1
+                if apeluri_pe_intrebare:
+                    apeluri_pe_intrebare[-1] += 1
             elif e["tip"] == "rezultat" and e.get("eroare"):
                 erori[e["nume"]] += 1
             elif e["tip"] == "confirmare" and not e["aprobat"]:
@@ -43,6 +52,15 @@ def main():
         print(f"Cereri către model: {len(durate)} | durata medie: {sum(durate) / len(durate):.0f} ms")
     if tokeni:
         print(f"Tokeni în prompt: primul {tokeni[0]}, ultimul {tokeni[-1]}, maxim {max(tokeni)}")
+    if apeluri_pe_intrebare:
+        print(f"Apeluri pe întrebare: medie {sum(apeluri_pe_intrebare) / len(apeluri_pe_intrebare):.2f}"
+              f" | maxim {max(apeluri_pe_intrebare)} | fără niciun apel: {apeluri_pe_intrebare.count(0)}"
+              f" din {len(apeluri_pe_intrebare)}")
+        print(f"Întrebări oprite de agent: {len(oprite)} din {len(apeluri_pe_intrebare)}"
+              f" (bucla_detectata: {sum(t == 'bucla_detectata' for t, _ in oprite)},"
+              f" limita_pasi: {sum(t == 'limita_pasi' for t, _ in oprite)})")
+        for tip, text in oprite:
+            print(f"  - {tip}: {text[:60]}")
     if stricate:
         print(f"Atenție: {stricate} linii nu au putut fi citite.")
 
